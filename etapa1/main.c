@@ -1,12 +1,15 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include "lex.yy.h"
 #include "tokens.h"
-#include "hash.h"
 
 extern int isRunning();
 extern void initMe();
 extern int getLineNumber();
+
+extern void printHashTable();
+extern char *yytext;
+extern FILE *yyin;
+extern int yylex();
 
 void infoSymbol() {
     if (yytext[0] == '\0') {
