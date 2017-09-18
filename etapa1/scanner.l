@@ -80,6 +80,7 @@ KEYWORD byte|short|long|float|double|if|then|else|while|for|read|return|print
         return TK_IDENTIFIER;
     }
     . {
+        yyless(0);
         BEGIN(INITIAL);
     }
 }

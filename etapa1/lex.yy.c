@@ -976,44 +976,45 @@ case 27:
 YY_RULE_SETUP
 #line 82 "scanner.l"
 {
+        yyless(0);
         BEGIN(INITIAL);
     }
 	YY_BREAK
 
 case 28:
 YY_RULE_SETUP
-#line 87 "scanner.l"
+#line 88 "scanner.l"
 {}
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 88 "scanner.l"
+#line 89 "scanner.l"
 {}
 	YY_BREAK
 case 30:
 /* rule 30 can match eol */
 YY_RULE_SETUP
-#line 89 "scanner.l"
+#line 90 "scanner.l"
 { ++currentLine; }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 91 "scanner.l"
+#line 92 "scanner.l"
 { BEGIN(MULTILINE_COMMENT); }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 93 "scanner.l"
+#line 94 "scanner.l"
 { BEGIN(INITIAL); }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 94 "scanner.l"
+#line 95 "scanner.l"
 ;
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 96 "scanner.l"
+#line 97 "scanner.l"
 {
     // Se chegar aqui, é um caractere não reconhecido.
     return TOKEN_ERROR;
@@ -1021,10 +1022,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 100 "scanner.l"
+#line 101 "scanner.l"
 ECHO;
 	YY_BREAK
-#line 1028 "lex.yy.c"
+#line 1029 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(MULTILINE_COMMENT):
 case YY_STATE_EOF(IDENTIFIER):
@@ -2023,7 +2024,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 100 "scanner.l"
+#line 101 "scanner.l"
 
 
 
