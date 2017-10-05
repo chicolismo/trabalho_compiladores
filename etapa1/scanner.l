@@ -1,6 +1,10 @@
 %{
 #include "tokens.h"
 #include "hash.h"
+#include <string.h>
+#include <stdbool.h>
+
+void removeExtraSpaces(char *inputString);
 
 /*char buffer[256];*/
 /*int idx = 0;*/
@@ -67,23 +71,49 @@ KEYWORD byte|short|long|float|double|if|then|else|while|for|read|return|print
     return { return KW_RETURN; }
     print { return KW_PRINT; }
 
-    [a-zA-Z_]+ {
-        // Coloca a palavra de volta e muda de estado.
-        yyless(0);
-        BEGIN(IDENTIFIER);
-    }
-}
-
-<IDENTIFIER>{
-    [a-zA-Z_]+([a-zA-Z_0-9 \t]*[a-zA-Z0-9])? {
+    [a-zA-Z_]([a-zA-Z_0-9 \t]*[a-zA-Z0-9])? {
+        removeExtraSpaces(yytext);
         setHashNode(yytext, TK_IDENTIFIER);
         return TK_IDENTIFIER;
     }
-    . {
-        yyless(0);
-        BEGIN(INITIAL);
-    }
+
+    /*
+       Originalmente estávamos usando o código que identificava a primeira
+       letra do nome do identificador e mudava o estado para poder ler diversas
+       palavras separadas com espaços.
+
+       Isso era necessário para poder escrever coisas como:
+
+               long var 1;
+
+       Onde o começo da linha seria identificado como palavra-chave, e o resto
+       como identificador.
+
+       Devido ao email enviado esclarecendo que a linha acima deveria ser
+       entendida como um identificador, resolvemos atualizar o código e não
+       usar outro estado para os identificadores.
+
+       As linhas comentadas abaixo eram as responsáveis pelo comportamento
+       original.
+     */
+
+    /*[a-zA-Z_]+ {*/
+        /*// Coloca a palavra de volta e muda de estado.*/
+        /*yyless(0);*/
+        /*BEGIN(IDENTIFIER);*/
+    /*}*/
 }
+
+    /*<IDENTIFIER>{*/
+        /*[a-zA-Z_]+([a-zA-Z_0-9 \t]*[a-zA-Z0-9])? {*/
+            /*setHashNode(yytext, TK_IDENTIFIER);*/
+            /*return TK_IDENTIFIER;*/
+        /*}*/
+        /*. {*/
+            /*yyless(0);*/
+            /*BEGIN(INITIAL);*/
+        /*}*/
+    /*}*/
 
 [ \t]+ {}
 "//".* {}
@@ -120,4 +150,33 @@ int getLineNumber() {
 
 void initMe() {
     initializeHashTable();
+}
+
+void removeExtraSpaces(char *inputString) {
+    size_t len = strlen(inputString);
+    char *string = malloc(sizeof(char) * len);
+
+    int i = 0;
+    bool insertSpace = true;
+    char *c = inputString;
+    while (i < len && *c != '\0') {
+        if (*c == ' ' || *c == '\t') {
+            if (insertSpace) {
+                string[i] = ' ';
+                insertSpace = false;
+            }
+            else {
+                --i;
+            }
+        }
+        else {
+            insertSpace = true;
+            string[i] = *c;
+        }
+        ++c;
+        ++i;
+    }
+    string[i] = '\0';
+    strcpy(inputString, string);
+    free(string);
 }
