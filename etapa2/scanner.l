@@ -1,86 +1,74 @@
 %{
-/*#include "tokens.h"*/
 #include "y.tab.h"
+/*#include "tokens.h"*/
 #include "hash.h"
-#include <string.h>
-#include <stdbool.h>
 
 int currentLine = 1;
 int running = 1;
 %}
 
 %x MULTILINE_COMMENT
-%x IDENTIFIER
-
-/*KEYWORD byte|short|long|float|double|if|then|else|while|for|read|return|print*/
 
 %%
 
-<INITIAL>{
-    [0-9]+ {
-        setHashNode(yytext, LIT_INTEGER);
-        return LIT_INTEGER;
-    }
-
-    [0-9]+"."[0-9]+ {
-        setHashNode(yytext, LIT_REAL);
-        return LIT_REAL;
-    }
-
-    '([^\\]|\\.)' {
-        setHashNode(yytext, LIT_CHAR);
-        return LIT_CHAR;
-    }
-
-    \"(\\.|[^"])*\" {
-        setHashNode(yytext, LIT_STRING);
-        return LIT_STRING;
-    }
-
-    [\,\;\:\(\)\[\]\{\}\+\-\*\/\<\>\=\!\&\$\#] {
-        return yytext[0];
-    }
-
-    "<=" { return OPERATOR_LE; }
-    ">=" { return OPERATOR_GE; }
-    "==" { return OPERATOR_EQ; }
-    "!=" { return OPERATOR_NE; }
-    "&&" { return OPERATOR_AND; }
-    "||" { return OPERATOR_OR; }
-
-    byte { return KW_BYTE; }
-    short { return KW_SHORT; }
-    long { return KW_LONG; }
-    float { return KW_FLOAT; }
-    double { return KW_DOUBLE; }
-    if { return KW_IF; }
-    then { return KW_THEN; }
-    else { return KW_ELSE; }
-    while { return KW_WHILE; }
-    for { return KW_FOR; }
-    read { return KW_READ; }
-    return { return KW_RETURN; }
-    print { return KW_PRINT; }
-
-    [a-zA-Z_]([a-zA-Z_0-9 \t]*[a-zA-Z0-9])? {
-        setHashNode(yytext, TK_IDENTIFIER);
-        return TK_IDENTIFIER;
-    }
+[0-9]+ {
+    setHashNode(yytext, LIT_INTEGER);
+    return LIT_INTEGER;
 }
 
-[ \t]+ {}
-"//".* {}
-"\n" { ++currentLine; }
+[0-9]+"."[0-9]+ {
+    setHashNode(yytext, LIT_REAL);
+    return LIT_REAL;
+}
 
-<INITIAL>"/*" { BEGIN(MULTILINE_COMMENT); }
+'([^\\]|\\.)' {
+    setHashNode(yytext, LIT_CHAR);
+    return LIT_CHAR;
+}
 
-<MULTILINE_COMMENT>"*/" { BEGIN(INITIAL); }
+\"(\\.|[^"])*\" {
+    setHashNode(yytext, LIT_STRING);
+    return LIT_STRING;
+}
+
+[\,\;\:\(\)\[\]\{\}\+\-\*\/\<\>\=\!\&\$\#]  return yytext[0];
+
+"<="   return OPERATOR_LE;
+">="   return OPERATOR_GE;
+"=="   return OPERATOR_EQ;
+"!="   return OPERATOR_NE;
+"&&"   return OPERATOR_AND;
+"||"   return OPERATOR_OR;
+
+byte   return KW_BYTE;
+short  return KW_SHORT;
+long   return KW_LONG;
+float  return KW_FLOAT;
+double return KW_DOUBLE;
+if     return KW_IF;
+then   return KW_THEN;
+else   return KW_ELSE;
+while  return KW_WHILE;
+for    return KW_FOR;
+read   return KW_READ;
+return return KW_RETURN;
+print  return KW_PRINT;
+
+[a-zA-Z_]([a-zA-Z_0-9 \t]*[a-zA-Z0-9])* {
+    setHashNode(yytext, TK_IDENTIFIER);
+    return TK_IDENTIFIER;
+}
+
+[ \t]+ ;
+"//".* ;
+"\n" ++currentLine;
+
+<INITIAL>"/*" BEGIN(MULTILINE_COMMENT);
+
+<MULTILINE_COMMENT>"*/" BEGIN(INITIAL);
 <MULTILINE_COMMENT>. ;
 
-<INITIAL>. {
-    // Se chegar aqui, é um caractere não reconhecido.
-    return TOKEN_ERROR;
-}
+. return TOKEN_ERROR;
 %%
 
 int yywrap();

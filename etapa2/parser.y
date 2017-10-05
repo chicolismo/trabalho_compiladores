@@ -1,23 +1,22 @@
 %{
+
+#include "hash.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include "hash.h"
 
-int yyerror(char *text);
+void yyerror(char *text);
 
-extern int yylex();
 extern int getLineNumber();
+extern int yylex();
 
 %}
 
-
-%token KW_INT
-%token KW_REAL
 %token KW_BYTE
 %token KW_SHORT
 %token KW_LONG
 %token KW_FLOAT
 %token KW_DOUBLE
+
 %token KW_IF
 %token KW_THEN
 %token KW_ELSE
@@ -35,6 +34,7 @@ extern int getLineNumber();
 %token OPERATOR_OR
 
 %token TK_IDENTIFIER
+
 %token LIT_INTEGER
 %token LIT_REAL
 %token LIT_CHAR
@@ -46,22 +46,37 @@ extern int getLineNumber();
 
 %%
 
-program: decl
-       | expr;
+program: declarations
+       | expressions
+       |
+       ;
 
 
-type: KW_INT
-    | KW_BYTE
-    | KW_SHORT
-    | KW_LONG
-    | KW_FLOAT
-    | KW_DOUBLE
-    ;
-
+declarations: decl
+            | declarations decl
+            ;
 
 decl: TK_IDENTIFIER ':' type '=' expr
-    | TK_IDENTIFIER ':' type '[' LIT_INTEGER ']' ';'
     | TK_IDENTIFIER ':' type '[' LIT_INTEGER ']' '=' list
+    | TK_IDENTIFIER ':' type '[' LIT_INTEGER ']' ';'
+    | fn_decl
+    ;
+
+fn_decl: '(' type ')' TK_IDENTIFIER '(' params ')' '{' program '}'
+       ;
+
+params:
+      ;
+
+expressions: expr
+           | expressions expr
+           ;
+
+
+expr: TK_IDENTIFIER
+    | TK_IDENTIFIER '[' expr ']'
+    | '(' expr ')'
+    | literal
     ;
 
 
@@ -71,23 +86,20 @@ literal: LIT_INTEGER
        | LIT_STRING
        ;
 
-list:
+type: KW_BYTE
+    | KW_SHORT
+    | KW_LONG
+    | KW_FLOAT
+    | KW_DOUBLE
     ;
 
-params:
-      ;
-
-expr: TK_IDENTIFIER
-    | TK_IDENTIFIER '[' expr ']'
-    | TK_IDENTIFIER '(' params ')'
-    | '(' expr ')'
-    | literal
+list:
     ;
 
 %%
 
-int yyerror(char *text) {
+void yyerror(char *text) {
     printf("Erro de sintaxe na linha %d\n", getLineNumber());
     exit(3);
-    return 3;
 }
+
