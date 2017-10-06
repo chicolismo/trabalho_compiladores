@@ -34,12 +34,12 @@ extern int getLineNumber();
 %token OPERATOR_AND
 %token OPERATOR_OR
 
-%token TK_IDENTIFIER
+%token<symbol> TK_IDENTIFIER
 
-%token LIT_INTEGER
-%token LIT_REAL
-%token LIT_CHAR
-%token LIT_STRING
+%token<symbol> LIT_INTEGER
+%token<symbol> LIT_REAL
+%token<symbol> LIT_CHAR
+%token<symbol> LIT_STRING
 
 %token TOKEN_ERROR
 
