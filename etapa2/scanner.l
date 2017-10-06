@@ -1,35 +1,28 @@
 %{
-#include "y.tab.h"
-/*#include "tokens.h"*/
 #include "hash.h"
+#include "y.tab.h"
 
 int currentLine = 1;
 int running = 1;
+
+int yywrap();
+int isRunning();
+int getLineNumber();
+void initMe();
 %}
 
 %x MULTILINE_COMMENT
 
+
+
 %%
 
-[0-9]+ {
-    setHashNode(yytext, LIT_INTEGER);
-    return LIT_INTEGER;
-}
 
-[0-9]+"."[0-9]+ {
-    setHashNode(yytext, LIT_REAL);
-    return LIT_REAL;
-}
 
-'([^\\]|\\.)' {
-    setHashNode(yytext, LIT_CHAR);
-    return LIT_CHAR;
-}
-
-\"(\\.|[^"])*\" {
-    setHashNode(yytext, LIT_STRING);
-    return LIT_STRING;
-}
+[0-9]+          { yylval.symbol = setHashNode(yytext, LIT_INTEGER); return LIT_INTEGER; }
+[0-9]+"."[0-9]+ { yylval.symbol = setHashNode(yytext, LIT_REAL);    return LIT_REAL; }
+'([^\\]|\\.)'   { yylval.symbol = setHashNode(yytext, LIT_CHAR);    return LIT_CHAR; }
+\"(\\.|[^"])*\" { yylval.symbol = setHashNode(yytext, LIT_STRING);  return LIT_STRING; }
 
 [\,\;\:\(\)\[\]\{\}\+\-\*\/\<\>\=\!\&\$\#]  return yytext[0];
 
@@ -54,10 +47,7 @@ read   return KW_READ;
 return return KW_RETURN;
 print  return KW_PRINT;
 
-[a-zA-Z_]([a-zA-Z_0-9 \t]*[a-zA-Z0-9])* {
-    setHashNode(yytext, TK_IDENTIFIER);
-    return TK_IDENTIFIER;
-}
+[a-zA-Z_]([a-zA-Z_0-9 ]*[a-zA-Z0-9])*   { yylval.symbol = setHashNode(yytext, TK_IDENTIFIER); return TK_IDENTIFIER; }
 
 [ \t]+ ;
 "//".* ;
@@ -69,12 +59,12 @@ print  return KW_PRINT;
 <MULTILINE_COMMENT>. ;
 
 . return TOKEN_ERROR;
+
+
+
 %%
 
-int yywrap();
-int isRunning();
-int getLineNumber();
-void initMe();
+
 
 int yywrap() {
     running = 0;

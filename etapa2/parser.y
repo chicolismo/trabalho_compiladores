@@ -1,15 +1,16 @@
 %{
 
-#include "hash.h"
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include "hash.h"
 
-void yyerror(char *text);
-
+int yylex();
+int yyerror(char *text);
 extern int getLineNumber();
-extern int yylex();
 
 %}
+
+%union { HashNode *symbol; }
 
 %token KW_BYTE
 %token KW_SHORT
@@ -42,15 +43,21 @@ extern int yylex();
 
 %token TOKEN_ERROR
 
+%left '+'
+%left '*'
+
 %start program
 
+
+
 %%
+
+
 
 program: declarations
        | expressions
        |
        ;
-
 
 declarations: decl
             | declarations decl
@@ -72,13 +79,11 @@ expressions: expr
            | expressions expr
            ;
 
-
 expr: TK_IDENTIFIER
     | TK_IDENTIFIER '[' expr ']'
     | '(' expr ')'
     | literal
     ;
-
 
 literal: LIT_INTEGER
        | LIT_REAL
@@ -96,9 +101,13 @@ type: KW_BYTE
 list:
     ;
 
+
+
 %%
 
-void yyerror(char *text) {
+
+
+int yyerror(char *text) {
     printf("Erro de sintaxe na linha %d\n", getLineNumber());
     exit(3);
 }
