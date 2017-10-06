@@ -102,8 +102,8 @@ cmd: TK_IDENTIFIER '=' expression
     | KW_READ '>' TK_IDENTIFIER
     | KW_PRINT exp_list
     | KW_RETURN expression
-    | KW_IF exp KW_THEN cmd
-    | KW_IF exp KW_THEN cmd KW_ELSE cmd
+    | KW_IF '(' exp ')' KW_THEN cmd
+    | KW_IF '(' exp ')' KW_THEN cmd KW_ELSE cmd
     | KW_WHILE '(' exp ')' cmd
     | block
     |

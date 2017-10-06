@@ -1,34 +1,9 @@
-long main() {
-    short primeira letra;
-    long segunda letra;
-
-    // Vamos testar com vários espaços
-
-    byte var 1;
-    byte var  1;
-    byte var        1  ;
-
-    /*
-    print("Esta mensagem não pode ser lida\n");
-    */
-
-    primeira letra = 13;
-
-    if (primeira letra >= segunda letra || a <= b && a != c) then {
-        if (g == g) {
-            printf("Certo!\n");
-        }
-        printf("A primeira letra eh maior que a segunda letra");
-    } else {
-        printf("Ocorreu um erro");
-    }
-
-    byte b = 'b';
-
-    while (1) {
-        print("Número" + 12);
-    }
-    printf("Esta eh uma \"String\"!!\n");
-
-    return EXIT_SUCCESS;
+(long) main() {
+	x = 5;
+	if (x > 5) then print "oi";
+	;;
+	while (x == 4) {
+		read > y
+	};
+	return 4
 }
