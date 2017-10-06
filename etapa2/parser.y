@@ -65,7 +65,7 @@ dec: var_dec
     | fun_dec
     ;
 
-var_dec: TK_IDENTIFIER ':' type '=' expr ';'
+var_dec: TK_IDENTIFIER ':' type '=' literal ';'
     | TK_IDENTIFIER ':' type '[' LIT_INTEGER ']' literals_list ';'
     ;
 
@@ -97,22 +97,59 @@ cmds: cmd ';' cmds
     | cmd
     ;
 
-/* TODO */
-cmd:
+cmd: TK_IDENTIFIER '=' expression
+    | TK_IDENTIFIER '[' LIT_INTEGER ']' '=' expression
+    | KW_READ '>' TK_IDENTIFIER
+    | KW_PRINT exp_list
+    | KW_RETURN expression
+    | KW_IF exp KW_THEN cmd
+    | KW_IF exp KW_THEN cmd KW_ELSE cmd
+    | KW_WHILE '(' exp ')' cmd
+    | block
+    |
+    ;
+
+exp_list: expression ',' exp_list
+    | expression
+    ;
+
+expression: LIT_STRING
+    | exp
+    ;
+
+exp: LIT_INTEGER
+    | LIT_REAL
+    | LIT_CHAR
+    | TK_IDENTIFIER
+    | TK_IDENTIFIER '[' LIT_INTEGER ']'
+    | '('exp ')'
+    | exp '+' exp
+    | exp '-' exp
+    | exp '*' exp
+    | exp '/' exp
+    | exp '<' exp
+    | exp '>' exp
+    | '!' exp
+    | exp OPERATOR_LE exp
+    | exp OPERATOR_GE exp
+    | exp OPERATOR_EQ exp
+    | exp OPERATOR_NE exp
+    | exp OPERATOR_AND exp
+    | exp OPERATOR_OR exp
     ;
 
 type: KW_BYTE
-    | KW_SHORT
-    | KW_LONG
-    | KW_FLOAT
-    | KW_DOUBLE
-    ;
+| KW_SHORT
+| KW_LONG
+| KW_FLOAT
+| KW_DOUBLE
+;
 
 literal: LIT_INTEGER
-    | LIT_REAL
-    | LIT_CHAR
-    | LIT_STRING
-    ;
+| LIT_REAL
+| LIT_CHAR
+| LIT_STRING
+;
 
 
 
