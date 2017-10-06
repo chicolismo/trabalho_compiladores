@@ -55,41 +55,51 @@ extern int getLineNumber();
 
 
 program: declarations
-       | expressions
-       |
-       ;
-
-declarations: decl
-            | declarations decl
-            ;
-
-decl: TK_IDENTIFIER ':' type '=' expr
-    | TK_IDENTIFIER ':' type '[' LIT_INTEGER ']' '=' list
-    | TK_IDENTIFIER ':' type '[' LIT_INTEGER ']' ';'
-    | fn_decl
     ;
 
-fn_decl: '(' type ')' TK_IDENTIFIER '(' params ')' '{' program '}'
-       ;
-
-params:
-      ;
-
-expressions: expr
-           | expressions expr
-           ;
-
-expr: TK_IDENTIFIER
-    | TK_IDENTIFIER '[' expr ']'
-    | '(' expr ')'
-    | literal
+declarations: dec declarations
+    |
     ;
 
-literal: LIT_INTEGER
-       | LIT_REAL
-       | LIT_CHAR
-       | LIT_STRING
-       ;
+dec: var_dec
+    | fun_dec
+    ;
+
+var_dec: TK_IDENTIFIER ':' type '=' expr ';'
+    | TK_IDENTIFIER ':' type '[' LIT_INTEGER ']' literals_list ';'
+    ;
+
+literals_list: literal literals_list
+    |
+    ;
+
+fun_dec: fun_header block
+    ;
+
+fun_header: '(' type ')' TK_IDENTIFIER '(' params ')'
+    ;
+
+params: params_list
+    |
+    ;
+
+params_list: param ',' params_list
+    | param
+    ;
+
+param: TK_IDENTIFIER ':' type
+    ;
+
+block: '{' cmds '}'
+    ;
+
+cmds: cmd ';' cmds
+    | cmd
+    ;
+
+/* TODO */
+cmd:
+    ;
 
 type: KW_BYTE
     | KW_SHORT
@@ -98,7 +108,10 @@ type: KW_BYTE
     | KW_DOUBLE
     ;
 
-list:
+literal: LIT_INTEGER
+    | LIT_REAL
+    | LIT_CHAR
+    | LIT_STRING
     ;
 
 
