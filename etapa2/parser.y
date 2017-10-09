@@ -98,58 +98,57 @@ cmds: cmd ';' cmds
     ;
 
 cmd: TK_IDENTIFIER '=' expression
-    | TK_IDENTIFIER '[' LIT_INTEGER ']' '=' expression
+    | TK_IDENTIFIER '[' expression ']' '=' expression
     | KW_READ '>' TK_IDENTIFIER
-    | KW_PRINT exp_list
+    | KW_PRINT expressions_list
     | KW_RETURN expression
-    | KW_IF '(' exp ')' KW_THEN cmd
-    | KW_IF '(' exp ')' KW_THEN cmd KW_ELSE cmd
-    | KW_WHILE '(' exp ')' cmd
+    | KW_IF '(' expression ')' KW_THEN cmd
+    | KW_IF '(' expression ')' KW_THEN cmd KW_ELSE cmd
+    | KW_WHILE '(' expression ')' cmd
     | block
     |
     ;
 
-exp_list: expression ',' exp_list
-    | expression
-    ;
-
-expression: LIT_STRING
-    | exp
-    ;
-
-exp: LIT_INTEGER
-    | LIT_REAL
-    | LIT_CHAR
-    | TK_IDENTIFIER
-    | TK_IDENTIFIER '[' LIT_INTEGER ']'
-    | '('exp ')'
-    | exp '+' exp
-    | exp '-' exp
-    | exp '*' exp
-    | exp '/' exp
-    | exp '<' exp
-    | exp '>' exp
-    | '!' exp
-    | exp OPERATOR_LE exp
-    | exp OPERATOR_GE exp
-    | exp OPERATOR_EQ exp
-    | exp OPERATOR_NE exp
-    | exp OPERATOR_AND exp
-    | exp OPERATOR_OR exp
+expressions_list: any_expression ',' expressions_list
+    | any_expression
     ;
 
 type: KW_BYTE
-| KW_SHORT
-| KW_LONG
-| KW_FLOAT
-| KW_DOUBLE
-;
+    | KW_SHORT
+    | KW_LONG
+    | KW_FLOAT
+    | KW_DOUBLE
+    ;
 
 literal: LIT_INTEGER
-| LIT_REAL
-| LIT_CHAR
-| LIT_STRING
-;
+    | LIT_REAL
+    | LIT_CHAR
+    ;
+
+expression: LIT_INTEGER
+    | LIT_REAL
+    | LIT_CHAR
+    | TK_IDENTIFIER
+    | TK_IDENTIFIER '[' expression ']'
+    | '(' expression ')'
+    | expression '+' expression
+    | expression '-' expression
+    | expression '*' expression
+    | expression '/' expression
+    | expression '<' expression
+    | expression '>' expression
+    | '!' expression
+    | expression OPERATOR_LE expression
+    | expression OPERATOR_GE expression
+    | expression OPERATOR_EQ expression
+    | expression OPERATOR_NE expression
+    | expression OPERATOR_AND expression
+    | expression OPERATOR_OR expression
+    ;
+
+any_expression: LIT_STRING
+    | expression
+    ;
 
 
 
