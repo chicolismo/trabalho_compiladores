@@ -19,7 +19,7 @@ d: byte = 65;
     read > i;
     while (i<10)
     {
-        //a = incn(a,1);
+        a = incn(a,1);
         i = i + 1
     };
     print "Incrementado algumas vezes fica ",a,"\n";
@@ -34,9 +34,9 @@ d: byte = 65;
     {};
 
     print "oi", "eu", "sou", "o", "goku";
-    print 5;
-    print 1,2,3,4,5;
-    print 3+1;
+    print (5);
+    print (1),2,3,4,5;
+    print (3+1);
 
     while (x)
     {
