@@ -90,6 +90,14 @@ params_list: param ',' params_list
 param: TK_IDENTIFIER ':' type
     ;
 
+args: args_list
+    |
+    ;
+
+args_list: expression ',' args_list
+    | expression
+    ;
+
 block: '{' cmds '}'
     ;
 
@@ -130,6 +138,7 @@ expression: LIT_INTEGER
     | LIT_CHAR
     | TK_IDENTIFIER
     | TK_IDENTIFIER '[' expression ']'
+    | TK_IDENTIFIER '(' args ')'
     | '(' expression ')'
     | expression '+' expression
     | expression '-' expression
