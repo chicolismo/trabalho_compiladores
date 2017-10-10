@@ -44,15 +44,13 @@ extern int getLineNumber();
 %token TOKEN_ERROR
 
 %left '+'
+%left '-'
 %left '*'
+%left '/'
 
 %start program
 
-
-
 %%
-
-
 
 program: declarations
     ;
