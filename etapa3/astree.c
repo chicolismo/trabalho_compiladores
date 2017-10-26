@@ -15,12 +15,30 @@ AST *createAST(int type, HashNode *symbol, AST *son0, AST *son1, AST *son2, AST 
     return newNode;
 }
 
-void printAST(AST *node) {
+void printAST(AST *node, int level) {
+	int i;
+
     if(node) {
-        printf("%s\n", node->symbol->string);
-        printAST(node->son[0]);
-        printAST(node->son[1]);
-        printAST(node->son[2]);
-        printAST(node->son[3]);
+		// Identacao
+		for(i=0; i<level; i++)
+			fprintf(stderr, "  ");
+
+		// Tipo do nodo
+		switch(node->type) {
+			case AST_SYMBOL: fprintf(stderr, "AST_SYMBOL:"); break;
+			case AST_ADD: fprintf(stderr, "AST_ADD:"); break;
+			case AST_MULT: fprintf(stderr, "AST_MULT:"); break;
+			default: fprintf(stderr, "UNKNOWN\n"); break;
+		}
+
+		// Simbolo do nodo
+		if(node->symbol)
+			fprintf(stderr, "%s\n", node->symbol->string);
+		else
+			fprintf(stderr, "0\n");
+
+		// Aplica recursao para filhos do nodo
+		for(i=0; i<MAX_SONS; i++)
+			printAST(node->son[i], ++level);
     }
 }

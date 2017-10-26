@@ -6,6 +6,10 @@
 
 #define MAX_SONS 4
 
+#define AST_SYMBOL	1
+#define AST_ADD		2
+#define AST_MULT	3
+
 typedef struct ASTreeNode {
     int type;
     HashNode *symbol;
@@ -13,6 +17,6 @@ typedef struct ASTreeNode {
 } AST;
 
 AST *createAST(int type, HashNode *symbol, AST *son0, AST *son1, AST *son2, AST *son3);
-void printAST(AST *node);
+void printAST(AST *node, int level);
 
 #endif // __ASTREE_H__
