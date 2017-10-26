@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "astree.h"
 #include "hash.h"
 
 int yylex();
@@ -10,7 +11,10 @@ extern int getLineNumber();
 
 %}
 
-%union { HashNode *symbol; }
+%union {
+	AST *ast;
+	HashNode *symbol;
+}
 
 %token KW_BYTE
 %token KW_SHORT
@@ -42,6 +46,11 @@ extern int getLineNumber();
 %token<symbol> LIT_STRING
 
 %token TOKEN_ERROR
+
+%type<ast> args
+%type<ast> args_list
+%type<ast> expression
+%type<ast> any_expression
 
 %left '+'
 %left '-'
@@ -88,12 +97,12 @@ params_list: param ',' params_list
 param: TK_IDENTIFIER ':' type
     ;
 
-args: args_list
-    |
+args: args_list                           { $$ = $1; }
+    |                                     { $$ = NULL; }
     ;
 
-args_list: expression ',' args_list
-    | expression
+args_list: expression ',' args_list       { $$ = createAST(AST_LIST,0,$1,$3,0,0); }
+    | expression                          { $$ = $1; }
     ;
 
 block: '{' cmds '}'
@@ -131,30 +140,30 @@ literal: LIT_INTEGER
     | LIT_CHAR
     ;
 
-expression: LIT_INTEGER
-    | LIT_REAL
-    | LIT_CHAR
-    | TK_IDENTIFIER
-    | TK_IDENTIFIER '[' expression ']'
-    | TK_IDENTIFIER '(' args ')'
-    | '(' expression ')'
-    | expression '+' expression
-    | expression '-' expression
-    | expression '*' expression
-    | expression '/' expression
-    | expression '<' expression
-    | expression '>' expression
-    | '!' expression
-    | expression OPERATOR_LE expression
-    | expression OPERATOR_GE expression
-    | expression OPERATOR_EQ expression
-    | expression OPERATOR_NE expression
-    | expression OPERATOR_AND expression
-    | expression OPERATOR_OR expression
+expression: LIT_INTEGER                   { $$ = createAST(AST_SYMBOL,$1,0,0,0,0); }
+    | LIT_REAL                            { $$ = createAST(AST_SYMBOL,$1,0,0,0,0); }
+    | LIT_CHAR                            { $$ = createAST(AST_SYMBOL,$1,0,0,0,0); }
+    | TK_IDENTIFIER                       { $$ = createAST(AST_SYMBOL,$1,0,0,0,0); }
+    | TK_IDENTIFIER '[' expression ']'    { $$ = createAST(AST_SYMBOL,$1,$3,0,0,0); }
+    | TK_IDENTIFIER '(' args ')'          { $$ = createAST(AST_SYMBOL,$1,$3,0,0,0); }
+    | '(' expression ')'                  { $$ = $2; }
+    | expression '+' expression           { $$ = createAST(AST_ADD,0,$1,$3,0,0); }
+    | expression '-' expression           { $$ = createAST(AST_SUB,0,$1,$3,0,0); }
+    | expression '*' expression           { $$ = createAST(AST_MUL,0,$1,$3,0,0); }
+    | expression '/' expression           { $$ = createAST(AST_DIV,0,$1,$3,0,0); }
+    | expression '<' expression           { $$ = createAST(AST_LESS,0,$1,$3,0,0); }
+    | expression '>' expression           { $$ = createAST(AST_GREATER,0,$1,$3,0,0); }
+    | '!' expression                      { $$ = createAST(AST_NOT,0,$2,0,0,0); }
+    | expression OPERATOR_LE expression   { $$ = createAST(AST_LE,0,$1,$3,0,0); }
+    | expression OPERATOR_GE expression   { $$ = createAST(AST_GE,0,$1,$3,0,0); }	
+    | expression OPERATOR_EQ expression   { $$ = createAST(AST_EQ,0,$1,$3,0,0); }
+    | expression OPERATOR_NE expression   { $$ = createAST(AST_NE,0,$1,$3,0,0); }
+    | expression OPERATOR_AND expression  { $$ = createAST(AST_AND,0,$1,$3,0,0); }
+    | expression OPERATOR_OR expression   { $$ = createAST(AST_OR,0,$1,$3,0,0); }
     ;
 
-any_expression: LIT_STRING
-    | expression
+any_expression: LIT_STRING                { $$ = createAST(AST_SYMBOL,$1,0,0,0,0); }
+    | expression                          { $$ = $1; }
     ;
 
 %%

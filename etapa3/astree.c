@@ -25,9 +25,21 @@ void printAST(AST *node, int level) {
 
 		// Tipo do nodo
 		switch(node->type) {
-			case AST_SYMBOL: fprintf(stderr, "AST_SYMBOL:"); break;
-			case AST_ADD: fprintf(stderr, "AST_ADD:"); break;
-			case AST_MULT: fprintf(stderr, "AST_MULT:"); break;
+			case AST_SYMBOL: fprintf(stderr, "AST_SYMBOL: "); break;
+			case AST_ADD: fprintf(stderr, "AST_ADD: "); break;
+			case AST_SUB: fprintf(stderr, "AST_SUB: "); break;
+			case AST_MUL: fprintf(stderr, "AST_MUL: "); break;
+			case AST_DIV: fprintf(stderr, "AST_DIV: "); break;
+			case AST_LESS: fprintf(stderr, "AST_LESS: "); break;
+			case AST_GREATER: fprintf(stderr, "AST_GREATER: "); break;
+			case AST_NOT: fprintf(stderr, "AST_NOT: "); break;
+			case AST_LE: fprintf(stderr, "AST_LE: "); break;
+			case AST_GE: fprintf(stderr, "AST_GE: "); break;
+			case AST_EQ: fprintf(stderr, "AST_EQ: "); break;
+			case AST_NE: fprintf(stderr, "AST_NE: "); break;
+			case AST_AND: fprintf(stderr, "AST_AND: "); break;
+			case AST_OR: fprintf(stderr, "AST_OR: "); break;
+			case AST_LIST: fprintf(stderr, "AST_LIST: "); break;
 			default: fprintf(stderr, "UNKNOWN\n"); break;
 		}
 
