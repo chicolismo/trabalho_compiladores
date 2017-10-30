@@ -14,8 +14,8 @@ FILE *output_file = NULL;
 %}
 
 %union {
-	AST *ast;
 	HashNode *symbol;
+	AST *ast;
 }
 
 %token KW_BYTE
@@ -40,16 +40,22 @@ FILE *output_file = NULL;
 %token OPERATOR_AND
 %token OPERATOR_OR
 
-%token<symbol> TK_IDENTIFIER
+%token TK_IDENTIFIER
 
-%token<symbol> LIT_INTEGER
-%token<symbol> LIT_REAL
-%token<symbol> LIT_CHAR
-%token<symbol> LIT_STRING
+%token LIT_INTEGER
+%token LIT_REAL
+%token LIT_CHAR
+%token LIT_STRING
 
 %token TOKEN_ERROR
 
 %type<ast> program
+%type<ast> identifier
+
+%type<ast> literal_integer
+%type<ast> literal_real
+%type<ast> literal_char
+
 %type<ast> declarations
 %type<ast> dec
 %type<ast> var_dec
@@ -77,6 +83,14 @@ FILE *output_file = NULL;
 %type<ast> KW_DOUBLE
 
 
+%type<symbol> TK_IDENTIFIER
+%type<symbol> LIT_INTEGER
+%type<symbol> LIT_REAL
+%type<symbol> LIT_CHAR
+%type<symbol> LIT_STRING
+
+
+
 %left '+'
 %left '-'
 %left '*'
@@ -101,9 +115,18 @@ dec: var_dec { $$ = $1; }
    | fun_dec { $$ = $1; }
    ;
 
-var_dec: TK_IDENTIFIER ':' type '=' literal ';'                       { $$ = createAST(AST_VAR_DECL, 0, $1, $3, $5, 0); }
-       | TK_IDENTIFIER ':' type '[' LIT_INTEGER ']' literals_list ';' { $$ = createAST(AST_ARY_DECL, 0, $1, $3, $5, $7); }
+
+var_dec: identifier ':' type '=' literal ';'                       { $$ = createAST(AST_VAR_DECL, 0, $1, $3, $5, 0); }
+       | identifier ':' type '[' literal_integer ']' literals_list ';' { $$ = createAST(AST_ARY_DECL, 0, $1, $3, $5, $7); }
        ;
+
+identifier: TK_IDENTIFIER { $$ = createAST(AST_SYMBOL, $1, 0, 0, 0, 0); }
+
+literal_integer: LIT_INTEGER { $$ = createAST(AST_SYMBOL, $1, 0, 0, 0, 0); }
+
+literal_real: LIT_REAL { $$ = createAST(AST_SYMBOL, $1, 0, 0, 0, 0); }
+
+literal_char: LIT_CHAR { $$ = createAST(AST_SYMBOL, $1, 0, 0, 0, 0); }
 
 literals_list: literal literals_list
              |                       { $$ = NULL; }
@@ -112,7 +135,7 @@ literals_list: literal literals_list
 fun_dec: fun_header block { $$ = createAST(AST_FUNC_DECL, 0, $1, $2, 0, 0); }
        ;
 
-fun_header: '(' type ')' TK_IDENTIFIER '(' params ')' { $$ = createAST(AST_FUNC_HEADER, 0, $2, $4, $6, 0); }
+fun_header: '(' type ')' identifier '(' params ')' { $$ = createAST(AST_FUNC_HEADER, 0, $2, $4, $6, 0); }
           ;
 
 params: params_list { $$ = $1; }
@@ -123,7 +146,7 @@ params_list: param ',' params_list { $$ = createAST(AST_PARAM_LIST, 0, $1, $3, 0
            | param                 { $$ = $1; }
            ;
 
-param: TK_IDENTIFIER ':' type { $$ = createAST(AST_PARAM, 0, $1, $3, 0, 0); }
+param: identifier ':' type { $$ = createAST(AST_PARAM, 0, $1, $3, 0, 0); }
      ;
 
 args: args_list { $$ = $1; }
@@ -141,9 +164,9 @@ cmds: cmd ';' cmds { $$ = createAST(AST_CMD_LIST, 0, $1, $3, 0, 0);}
     | cmd { $$ = $1; }
     ;
 
-cmd: TK_IDENTIFIER '=' expression                     { $$ = createAST(AST_VAR_ASSIGN, 0, $1, $3, 0, 0); printAST($$, 0); }
-   | TK_IDENTIFIER '[' expression ']' '=' expression  { $$ = createAST(AST_ARY_ASSIGN, 0, $1, $3, $6, 0); printAST($$, 0); }
-   | KW_READ '>' TK_IDENTIFIER                        { $$ = createAST(AST_READ, 0, $3, 0, 0, 0); }
+cmd: identifier '=' expression                     { $$ = createAST(AST_VAR_ASSIGN, 0, $1, $3, 0, 0); }
+   | identifier '[' expression ']' '=' expression  { $$ = createAST(AST_ARY_ASSIGN, 0, $1, $3, $6, 0); }
+   | KW_READ '>' identifier                           { $$ = createAST(AST_READ, 0, $3, 0, 0, 0); }
    | KW_PRINT expressions_list                        { $$ = createAST(AST_PRINT, 0, $2, 0, 0, 0); }
    | KW_RETURN expression                             { $$ = createAST(AST_RETURN, 0, $2, 0, 0, 0); }
    | KW_IF '(' expression ')' KW_THEN cmd             { $$ = createAST(AST_IF, 0, $3, $6, 0, 0); }
@@ -165,17 +188,15 @@ type: KW_BYTE   { $$ = createAST(AST_TYPE_BYTE, 0, 0, 0, 0, 0); }
     ;
 
 
-literal: LIT_INTEGER { $$ = createAST(AST_SYMBOL, $1, 0, 0, 0, 0); }
-       | LIT_REAL    { $$ = createAST(AST_SYMBOL, $1, 0, 0, 0, 0); }
-       | LIT_CHAR    { $$ = createAST(AST_SYMBOL, $1, 0, 0, 0, 0); }
+literal: literal_integer { $$ = $1; }
+       | literal_real    { $$ = $1; }
+       | literal_char    { $$ = $1; }
        ;
 
-expression: LIT_INTEGER                        { $$ = createAST(AST_SYMBOL, $1, 0, 0, 0, 0); }
-          | LIT_REAL                           { $$ = createAST(AST_SYMBOL, $1, 0, 0, 0, 0); }
-          | LIT_CHAR                           { $$ = createAST(AST_SYMBOL, $1, 0, 0, 0, 0); }
-          | TK_IDENTIFIER                      { $$ = createAST(AST_SYMBOL, $1, 0, 0, 0, 0); }
-          | TK_IDENTIFIER '[' expression ']'   { $$ = createAST(AST_SYMBOL, $1, $3, 0, 0, 0); printAST($$, 0); }
-          | TK_IDENTIFIER '(' args ')'         { $$ = createAST(AST_SYMBOL, $1, $3, 0, 0, 0); printAST($$, 0); }
+expression: literal                            { $$ = $1; }
+          | identifier                         { $$ = $1; }
+          | identifier '[' expression ']'      { $$ = createAST(AST_ARY_INDEX, 0, $1, $3, 0, 0); }
+          | identifier '(' args ')'            { $$ = createAST(AST_FUNC_CALL, 0, $1, $3, 0, 0); }
           | '(' expression ')'                 { $$ = $2; }
           | expression '+' expression          { $$ = createAST(AST_ADD, 0, $1, $3, 0, 0); }
           | expression '-' expression          { $$ = createAST(AST_SUB, 0, $1, $3, 0, 0); }

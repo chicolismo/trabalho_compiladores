@@ -48,6 +48,8 @@
 #define AST_FUNC_DECL 36
 #define AST_CMD_LIST 37
 #define AST_PARAM_LIST 38
+#define AST_ARY_INDEX 40
+#define AST_FUNC_CALL 41
 
 typedef struct ASTreeNode {
     int type;
