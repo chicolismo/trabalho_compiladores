@@ -23,4 +23,5 @@ main.o: main.c
 	gcc -c main.c
 
 clean:
-	rm etapa3 lex.yy.c lex.yy.h y.tab.c y.tab.h *.o *~
+	#rm etapa3 lex.yy.c lex.yy.h y.tab.c y.tab.h *.o *~
+	rm etapa3 lex.yy.c lex.yy.h y.tab.c y.tab.h *.o
