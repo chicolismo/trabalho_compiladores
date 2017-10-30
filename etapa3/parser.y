@@ -76,11 +76,11 @@ FILE *output_file = NULL;
 %type<ast> expression
 %type<ast> any_expression
 
-%type<ast> KW_BYTE
-%type<ast> KW_SHORT
-%type<ast> KW_LONG
-%type<ast> KW_FLOAT
-%type<ast> KW_DOUBLE
+%type<symbol> KW_BYTE
+%type<symbol> KW_SHORT
+%type<symbol> KW_LONG
+%type<symbol> KW_FLOAT
+%type<symbol> KW_DOUBLE
 
 
 %type<symbol> TK_IDENTIFIER
@@ -180,11 +180,11 @@ expressions_list: any_expression ',' expressions_list { $$ = createAST(AST_EXPR_
                 | any_expression                      { $$ = $1; }
                 ;
 
-type: KW_BYTE   { $$ = createAST(AST_TYPE_BYTE, 0, 0, 0, 0, 0); }
-    | KW_SHORT  { $$ = createAST(AST_TYPE_SHORT, 0, 0, 0, 0, 0); }
-    | KW_LONG   { $$ = createAST(AST_TYPE_LONG, 0, 0, 0, 0, 0); }
-    | KW_FLOAT  { $$ = createAST(AST_TYPE_FLOAT, 0, 0, 0, 0, 0); }
-    | KW_DOUBLE { $$ = createAST(AST_TYPE_DOUBLE, 0, 0, 0, 0, 0); }
+type: KW_BYTE   { $$ = createAST(AST_TYPE_BYTE, $1, 0, 0, 0, 0); }
+    | KW_SHORT  { $$ = createAST(AST_TYPE_SHORT, $1, 0, 0, 0, 0); }
+    | KW_LONG   { $$ = createAST(AST_TYPE_LONG, $1, 0, 0, 0, 0); }
+    | KW_FLOAT  { $$ = createAST(AST_TYPE_FLOAT, $1, 0, 0, 0, 0); }
+    | KW_DOUBLE { $$ = createAST(AST_TYPE_DOUBLE, $1, 0, 0, 0, 0); }
     ;
 
 
