@@ -22,25 +22,27 @@ int main(int argc, char **argv) {
 	}
 
     FILE *input_file = fopen(argv[1], "r");
-
     if (input_file == NULL) {
         fprintf(stderr, "Erro ao abrir o arquivo de teste\n");
         exit(1);
     }
 
-    yyin = input_file;
-    initMe();
-    yyparse();
-
     FILE *output_file = fopen(argv[2], "w");
     if (output_file == NULL) {
         fprintf(stderr, "Erro ao abrir o arquivo de saída\n");
+        fclose(input_file);
         exit(1);
     }
     set_output_file(output_file);
 
+    yyin = input_file;
+    initMe();
+    yyparse();
+
     fprintf(stdout, "Operação realizada com sucesso!\nImprimindo a tabela hash.\n");
     printHashTable();
     fprintf(stdout, "Terminado.\n\n");
+
+    fclose(output_file);
     return 0;
 }

@@ -9,8 +9,7 @@ c: byte = 'x';
 d: byte = 65;
 
 
-(long) main()
-{
+(long) main(fuck : long, shite: byte) {
     a = 10;
     c = !a;
     v[2] = v[10-1];

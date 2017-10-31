@@ -5,7 +5,8 @@
 
 AST *createAST(int type, HashNode *symbol, AST *son0, AST *son1, AST *son2, AST *son3) {
     AST *newNode;
-    newNode = (AST *) calloc(1, sizeof(AST));
+    //newNode = (AST *) calloc(1, sizeof(AST));
+    newNode = malloc(sizeof(AST));
     newNode->type = type;
     newNode->symbol = symbol;
     newNode->son[0] = son0;
@@ -15,11 +16,12 @@ AST *createAST(int type, HashNode *symbol, AST *son0, AST *son1, AST *son2, AST 
     return newNode;
 }
 
+// printAST {{{
 void printAST(AST *node, int level) {
     int i;
 
     if (node) {
-        // Identacao
+        // Indentação
         for (i = 0; i < level; i++) {
             fprintf(stdout, "  ");
         }
@@ -106,6 +108,10 @@ void printAST(AST *node, int level) {
 
         case AST_TYPE_DOUBLE: fprintf(stdout, "AST_TYPE_DOUBLE: "); break;
 
+        case AST_LIT_LIST: fprintf(stdout, "AST_LIT_LIST: "); break;
+
+        case AST_EMPTY_LIT_LIST: fprintf(stdout, "AST_EMPTY_LIT_LIST: "); break;
+
         default:
             fprintf(stdout, "UNKNOWN\n");
             break;
@@ -124,11 +130,376 @@ void printAST(AST *node, int level) {
         for (i = 0; i < MAX_SONS; i++) {
             printAST(node->son[i], level + 1);
         }
-        //++level;
     }
 }
+// }}}
 
-void generateCode(FILE *output_file, AST *node) {
+void d(const char *text) {
+    printf("%s\n", text);
+}
+
+
+void generateCode(FILE *out, AST *node) {
     // TODO: Implementar a geração de código.
+    
+    if (out == NULL) {
+        fprintf(stderr, "Arquivo de saída é inválido\n");
+        return;
+    }
 
+    if (node == NULL) {
+        return;
+    }
+
+    switch (node->type) {
+    case AST_SYMBOL:
+        d("symbol");
+
+        if (node->symbol) {
+            fprintf(out, "%s", node->symbol->string);
+        }
+        else {
+            fprintf(out, "<<Erro ao ler o símbolo no nodo>>");
+        }
+        break;
+
+    case AST_ADD:
+        d("add");
+
+        generateCode(out, node->son[0]);
+        fprintf(out, " + ");
+        generateCode(out, node->son[1]);
+        break;
+
+    case AST_SUB:
+        d("sub");
+
+        generateCode(out, node->son[0]);
+        fprintf(out, " - ");
+        generateCode(out, node->son[1]);
+        break;
+
+    case AST_MUL:
+        d("mul");
+
+        generateCode(out, node->son[0]);
+        fprintf(out, " * ");
+        generateCode(out, node->son[1]);
+        break;
+
+    case AST_DIV:
+        d("div");
+
+        generateCode(out, node->son[0]);
+        fprintf(out, " / ");
+        generateCode(out, node->son[1]);
+        break;
+
+    case AST_LT:
+        d("less than");
+
+        generateCode(out, node->son[0]);
+        fprintf(out, " < ");
+        generateCode(out, node->son[1]);
+        break;
+
+    case AST_GT:
+        d("greater than");
+
+        generateCode(out, node->son[0]);
+        fprintf(out, " > ");
+        generateCode(out, node->son[1]);
+        break;
+
+    case AST_NOT:
+        d("not");
+
+        fprintf(out, "!");
+        generateCode(out, node->son[0]);
+        break;
+
+    case AST_LE:
+        d("less than or equal to");
+
+        generateCode(out, node->son[0]);
+        fprintf(out, " <= ");
+        generateCode(out, node->son[1]);
+        break;
+
+    case AST_GE:
+        d("greater than or equal to");
+
+        generateCode(out, node->son[0]);
+        fprintf(out, " >= ");
+        generateCode(out, node->son[1]);
+        break;
+
+    case AST_EQ:
+        d("equal");
+
+        generateCode(out, node->son[0]);
+        fprintf(out, " == ");
+        generateCode(out, node->son[1]);
+        break;
+
+    case AST_NE:
+        d("not equal");
+
+        generateCode(out, node->son[0]);
+        fprintf(out, " != ");
+        generateCode(out, node->son[1]);
+        break;
+
+    case AST_AND:
+        d("and");
+
+        generateCode(out, node->son[0]);
+        fprintf(out, " && ");
+        generateCode(out, node->son[1]);
+        break;
+
+    case AST_OR:
+        d("or");
+
+        generateCode(out, node->son[0]);
+        fprintf(out, " || ");
+        generateCode(out, node->son[1]);
+        break;
+
+    case AST_LIST:
+        d("ast_list");
+
+        generateCode(out, node->son[0]);
+        fprintf(out, ", ");
+        generateCode(out, node->son[1]);
+        break;
+
+    case AST_VAR_DECL:
+        d("ast_var_decl");
+
+        generateCode(out, node->son[0]);
+        fprintf(out, " : ");
+        generateCode(out, node->son[1]);
+        fprintf(out, " = ");
+        generateCode(out, node->son[2]);
+        fprintf(out, ";\n");
+        break;
+
+    case AST_ARY_DECL:
+        d("ast_ary_decl");
+
+        generateCode(out, node->son[0]);
+        fprintf(out, " : ");
+        generateCode(out, node->son[1]);
+        fprintf(out, " = ");
+        fprintf(out, "[");
+        generateCode(out, node->son[2]);
+        if (node->son[3]->type == AST_EMPTY_LIT_LIST) {
+            fprintf(out, "]");
+        }
+        else {
+            fprintf(out, "] ");
+        }
+        generateCode(out, node->son[3]);
+        fprintf(out, ";\n");
+        break;
+
+    case AST_DECL_LIST:
+        d("ast_decl_list");
+
+        generateCode(out, node->son[0]);
+        generateCode(out, node->son[1]);
+        break;
+
+    case AST_EXPR_LIST:
+        d("ast_expr_list");
+
+        generateCode(out, node->son[0]);
+        fprintf(out, ", ");
+        generateCode(out, node->son[1]);
+        break;
+
+    case AST_VAR_ASSIGN:
+        d("ast_var_assign");
+
+        generateCode(out, node->son[0]);
+        fprintf(out, " = ");
+        generateCode(out, node->son[1]);
+        break;
+
+    case AST_ARY_ASSIGN:
+        d("ast_ary_assign");
+
+        generateCode(out, node->son[0]);
+        fprintf(out, "[");
+        generateCode(out, node->son[1]);
+        fprintf(out, "] = ");
+        generateCode(out, node->son[2]);
+        break;
+
+    case AST_WHILE:
+        d("ast_while");
+
+        fprintf(out, "while (");
+        generateCode(out, node->son[0]);
+        fprintf(out, ")");
+        generateCode(out, node->son[1]);
+        break;
+
+    case AST_IF_ELSE:
+        d("ast_if_else");
+
+        fprintf(out, "if (");
+        generateCode(out, node->son[0]);
+        fprintf(out, ") then ");
+        generateCode(out, node->son[1]);
+        fprintf(out, " else ");
+        generateCode(out, node->son[2]);
+        break;
+
+    case AST_IF:
+        d("ast_if");
+
+        fprintf(out, "if (");
+        generateCode(out, node->son[0]);
+        fprintf(out, ") then ");
+        generateCode(out, node->son[1]);
+        break;
+
+    case AST_RETURN:
+        d("ast_return");
+
+        fprintf(out, "return ");
+        generateCode(out, node->son[0]);
+        break;
+
+    case AST_PRINT:
+        d("ast_print");
+
+        fprintf(out, "print ");
+        generateCode(out, node->son[0]);
+        break;
+
+    case AST_READ:
+        d("ast_read");
+
+        fprintf(out, "read > ");
+        generateCode(out, node->son[0]);
+        break;
+
+    case AST_BLOCK:
+        d("ast_block");
+
+        fprintf(out, "{");
+        generateCode(out, node->son[0]);
+        fprintf(out, "}");
+        break;
+
+    case AST_PARAM:
+        d("ast_param");
+
+        generateCode(out, node->son[0]);
+        fprintf(out, " : ");
+        generateCode(out, node->son[1]);
+        break;
+
+    case AST_FUNC_HEADER:
+        d("ast_func_header");
+
+        fprintf(out, "(");
+        generateCode(out, node->son[0]);
+        fprintf(out, ") ");
+        generateCode(out, node->son[1]);
+        fprintf(out, "(");
+        generateCode(out, node->son[2]);
+        fprintf(out, ")");
+        break;
+
+    case AST_FUNC_DECL:
+        d("ast_func_decl");
+
+        generateCode(out, node->son[0]);
+        fprintf(out, "\n");
+        generateCode(out, node->son[1]);
+        break;
+
+    case AST_LIT_LIST:
+        generateCode(out, node->son[0]);
+        if (node->son[1]->type != AST_EMPTY_LIT_LIST) {
+            fprintf(out, " ");
+        }
+        generateCode(out, node->son[1]);
+        break;
+
+    case AST_CMD_LIST:
+        d("ast_cmd_decl");
+        generateCode(out, node->son[0]);
+        fprintf(out, ";\n");
+        generateCode(out, node->son[1]);
+        break;
+
+    case AST_PARAM_LIST:
+        d("ast_param_decl");
+
+        generateCode(out, node->son[0]);
+        fprintf(out, ", ");
+        generateCode(out, node->son[1]);
+        break;
+
+    case AST_ARY_INDEX:
+        d("ast_ary_index");
+
+        generateCode(out, node->son[0]);
+        fprintf(out, "[");
+        generateCode(out, node->son[1]);
+        fprintf(out, "]");
+        break;
+
+    case AST_FUNC_CALL:
+        d("ast_func_call");
+
+        generateCode(out, node->son[0]);
+        fprintf(out, "(");
+        generateCode(out, node->son[1]);
+        fprintf(out, ")");
+        break;
+
+    case AST_PARENS_EXPR:
+        d("ast_parens_expr");
+
+        fprintf(out, "(");
+        generateCode(out, node->son[0]);
+        fprintf(out, ")");
+        break;
+
+    case AST_TYPE_BYTE:
+        d("ast_type_byte");
+
+        fprintf(out, "byte");
+        break;
+
+    case AST_TYPE_SHORT:
+        d("ast_type_short");
+
+        fprintf(out, "short");
+        break;
+
+    case AST_TYPE_LONG:
+        d("ast_type_long");
+
+        fprintf(out, "long");
+        break;
+
+    case AST_TYPE_FLOAT:
+        d("ast_type_float");
+
+        fprintf(out, "float");
+        break;
+
+    case AST_TYPE_DOUBLE:
+        d("ast_type_double");
+
+        fprintf(out, "double");
+        break;
+    }
 }

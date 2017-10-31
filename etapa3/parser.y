@@ -14,8 +14,8 @@ FILE *output_file = NULL;
 %}
 
 %union {
-	HashNode *symbol;
 	AST *ast;
+	HashNode *symbol;
 }
 
 %token KW_BYTE
@@ -50,11 +50,12 @@ FILE *output_file = NULL;
 %token TOKEN_ERROR
 
 %type<ast> program
-%type<ast> identifier
 
+%type<ast> identifier
 %type<ast> literal_integer
 %type<ast> literal_real
 %type<ast> literal_char
+%type<ast> literal_string
 
 %type<ast> declarations
 %type<ast> dec
@@ -76,19 +77,11 @@ FILE *output_file = NULL;
 %type<ast> expression
 %type<ast> any_expression
 
-%type<symbol> KW_BYTE
-%type<symbol> KW_SHORT
-%type<symbol> KW_LONG
-%type<symbol> KW_FLOAT
-%type<symbol> KW_DOUBLE
-
-
 %type<symbol> TK_IDENTIFIER
 %type<symbol> LIT_INTEGER
 %type<symbol> LIT_REAL
 %type<symbol> LIT_CHAR
 %type<symbol> LIT_STRING
-
 
 
 %left '+'
@@ -100,11 +93,7 @@ FILE *output_file = NULL;
 
 %%
 
-program: declarations {
-                          $$ = $1;
-                          printAST($$, 0);
-                          //generateCode(output_file, $$);
-                      }
+program: declarations { $$ = $1; printAST($$, 0); printHashTable(); generateCode(output_file, $$); }
        ;
 
 declarations: dec declarations { $$ = createAST(AST_DECL_LIST, 0, $1, $2, 0, 0); }
@@ -116,7 +105,7 @@ dec: var_dec { $$ = $1; }
    ;
 
 
-var_dec: identifier ':' type '=' literal ';'                       { $$ = createAST(AST_VAR_DECL, 0, $1, $3, $5, 0); }
+var_dec: identifier ':' type '=' literal ';'                           { $$ = createAST(AST_VAR_DECL, 0, $1, $3, $5, 0); }
        | identifier ':' type '[' literal_integer ']' literals_list ';' { $$ = createAST(AST_ARY_DECL, 0, $1, $3, $5, $7); }
        ;
 
@@ -128,8 +117,8 @@ literal_real: LIT_REAL { $$ = createAST(AST_SYMBOL, $1, 0, 0, 0, 0); }
 
 literal_char: LIT_CHAR { $$ = createAST(AST_SYMBOL, $1, 0, 0, 0, 0); }
 
-literals_list: literal literals_list
-             |                       { $$ = NULL; }
+literals_list: literal literals_list { $$ = createAST(AST_LIT_LIST, 0, $1, $2, 0, 0); }
+             |                       { $$ = createAST(AST_EMPTY_LIT_LIST, 0, 0, 0, 0, 0); }
              ;
 
 fun_dec: fun_header block { $$ = createAST(AST_FUNC_DECL, 0, $1, $2, 0, 0); }
@@ -180,12 +169,15 @@ expressions_list: any_expression ',' expressions_list { $$ = createAST(AST_EXPR_
                 | any_expression                      { $$ = $1; }
                 ;
 
-type: KW_BYTE   { $$ = createAST(AST_TYPE_BYTE, $1, 0, 0, 0, 0); }
-    | KW_SHORT  { $$ = createAST(AST_TYPE_SHORT, $1, 0, 0, 0, 0); }
-    | KW_LONG   { $$ = createAST(AST_TYPE_LONG, $1, 0, 0, 0, 0); }
-    | KW_FLOAT  { $$ = createAST(AST_TYPE_FLOAT, $1, 0, 0, 0, 0); }
-    | KW_DOUBLE { $$ = createAST(AST_TYPE_DOUBLE, $1, 0, 0, 0, 0); }
+type: KW_BYTE   { $$ = createAST(AST_TYPE_BYTE, 0, 0, 0, 0, 0); }
+    | KW_SHORT  { $$ = createAST(AST_TYPE_SHORT, 0, 0, 0, 0, 0); }
+    | KW_LONG   { $$ = createAST(AST_TYPE_LONG, 0, 0, 0, 0, 0); }
+    | KW_FLOAT  { $$ = createAST(AST_TYPE_FLOAT, 0, 0, 0, 0, 0); }
+    | KW_DOUBLE { $$ = createAST(AST_TYPE_DOUBLE, 0, 0, 0, 0, 0); }
     ;
+
+
+literal_string: LIT_STRING { $$ = createAST(AST_SYMBOL, $1, 0, 0, 0, 0); }
 
 
 literal: literal_integer { $$ = $1; }
@@ -193,11 +185,12 @@ literal: literal_integer { $$ = $1; }
        | literal_char    { $$ = $1; }
        ;
 
+
 expression: literal                            { $$ = $1; }
           | identifier                         { $$ = $1; }
           | identifier '[' expression ']'      { $$ = createAST(AST_ARY_INDEX, 0, $1, $3, 0, 0); }
           | identifier '(' args ')'            { $$ = createAST(AST_FUNC_CALL, 0, $1, $3, 0, 0); }
-          | '(' expression ')'                 { $$ = $2; }
+          | '(' expression ')'                 { $$ = createAST(AST_PARENS_EXPR, 0, $2, 0, 0, 0); }
           | expression '+' expression          { $$ = createAST(AST_ADD, 0, $1, $3, 0, 0); }
           | expression '-' expression          { $$ = createAST(AST_SUB, 0, $1, $3, 0, 0); }
           | expression '*' expression          { $$ = createAST(AST_MUL, 0, $1, $3, 0, 0); }
@@ -213,7 +206,7 @@ expression: literal                            { $$ = $1; }
           | expression OPERATOR_OR expression  { $$ = createAST(AST_OR, 0, $1, $3, 0, 0); }
           ;
 
-any_expression: LIT_STRING { $$ = createAST(AST_SYMBOL, $1, 0, 0, 0, 0); }
+any_expression: literal_string { $$ = $1; }
               | expression { $$ = $1; }
               ;
 
@@ -221,6 +214,7 @@ any_expression: LIT_STRING { $$ = createAST(AST_SYMBOL, $1, 0, 0, 0, 0); }
 
 void set_output_file(FILE *fh) {
     output_file = fh;
+    fprintf(stdout, "Setting output file: %p\n", output_file);
 }
 
 int yyerror(char *text) {

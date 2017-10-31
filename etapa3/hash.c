@@ -35,6 +35,7 @@ HashNode *createHashNode(const char *string, int type) {
     size_t size = strlen(string) + 1;
     node->string = malloc(sizeof(char) * size);
     strcpy(node->string, string);
+    node->string[size - 1] = '\0';
     node->type = type;
     node->next = NULL;
     return node;
