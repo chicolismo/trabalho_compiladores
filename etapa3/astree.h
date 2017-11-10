@@ -69,6 +69,8 @@ AST *createAST(
     AST *son3
 );
 
+void printNode(AST *node);
+
 void printAST(AST *node, int level);
 
 void generateCode(FILE *output_file, AST *node);

@@ -93,7 +93,7 @@ FILE *output_file = NULL;
 
 %%
 
-program: declarations { $$ = $1; printAST($$, 0); printHashTable(); generateCode(output_file, $$); }
+program: declarations { $$ = $1; fprintf(stdout, "Imprimindo a árvore\n"); printAST($$, 0); generateCode(output_file, $$); }
        ;
 
 declarations: dec declarations { $$ = createAST(AST_DECL_LIST, 0, $1, $2, 0, 0); }
@@ -214,7 +214,6 @@ any_expression: literal_string { $$ = $1; }
 
 void set_output_file(FILE *fh) {
     output_file = fh;
-    fprintf(stdout, "Setting output file: %p\n", output_file);
 }
 
 int yyerror(char *text) {

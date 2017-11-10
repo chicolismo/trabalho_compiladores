@@ -26,6 +26,7 @@ int main(int argc, char **argv) {
         fprintf(stderr, "Erro ao abrir o arquivo de teste\n");
         exit(1);
     }
+    yyin = input_file;
 
     FILE *output_file = fopen(argv[2], "w");
     if (output_file == NULL) {
@@ -35,7 +36,6 @@ int main(int argc, char **argv) {
     }
     set_output_file(output_file);
 
-    yyin = input_file;
     initMe();
     yyparse();
 
@@ -43,6 +43,7 @@ int main(int argc, char **argv) {
     printHashTable();
     fprintf(stdout, "Terminado.\n\n");
 
+    fclose(input_file);
     fclose(output_file);
     return 0;
 }
