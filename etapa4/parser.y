@@ -93,8 +93,15 @@ FILE *output_file = NULL;
 
 %%
 
-program: declarations { $$ = $1; fprintf(stdout, "Imprimindo a árvore\n"); printAST($$, 0); generateCode(output_file, $$); }
-       ;
+program: declarations {
+    $$ = $1;
+    fprintf(stdout, "Imprimindo a árvore\n");
+    printAST($$, 0);
+    generateCode(output_file, $$);
+    semanticSetTypes($$);
+    semanticCheckUndeclared();
+    semanticCheckUsage($$);
+};
 
 declarations: dec declarations { $$ = createAST(AST_DECL_LIST, 0, $1, $2, 0, 0); }
             |                  { $$ = 0; }
