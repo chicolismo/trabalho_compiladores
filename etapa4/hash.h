@@ -4,9 +4,16 @@
 
 #define HASH_SIZE 1000
 
+#define SYMBOL_LIT_INTEGER 1
+#define SYMBOL_LIT_REAL 2
+#define SYMBOL_LIT_CHAR 3
+#define SYMBOL_IDENTIFIER 4
+
 struct HashNode {
     char *string;
     int type;
+    int datatype;
+    int lineNumber;
     struct HashNode *next;
 };
 
