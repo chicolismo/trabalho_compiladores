@@ -16,9 +16,9 @@ void initMe();
 
 %%
 
-[0-9]+          { yylval.symbol = setHashNode(yytext, LIT_INTEGER); return LIT_INTEGER; }
-[0-9]+"."[0-9]+ { yylval.symbol = setHashNode(yytext, LIT_REAL);    return LIT_REAL; }
-'([^\\]|\\.)'   { yylval.symbol = setHashNode(yytext, LIT_CHAR);    return LIT_CHAR; }
+[0-9]+          { yylval.symbol = setHashNode(yytext, SYMBOL_LIT_INTEGER); return LIT_INTEGER; }
+[0-9]+"."[0-9]+ { yylval.symbol = setHashNode(yytext, SYMBOL_LIT_REAL);    return LIT_REAL; }
+'([^\\]|\\.)'   { yylval.symbol = setHashNode(yytext, SYMBOL_LIT_CHAR);    return LIT_CHAR; }
 \"(\\.|[^"])*\" { yylval.symbol = setHashNode(yytext, LIT_STRING);  return LIT_STRING; }
 
 [\,\;\:\(\)\[\]\{\}\+\-\*\/\<\>\=\!\&\$\#]  return yytext[0];
@@ -44,7 +44,7 @@ read   return KW_READ;
 return return KW_RETURN;
 print  return KW_PRINT;
 
-[a-zA-Z_]([a-zA-Z_0-9 ]*[a-zA-Z_0-9])* { yylval.symbol = setHashNode(yytext, TK_IDENTIFIER); return TK_IDENTIFIER; }
+[a-zA-Z_]([a-zA-Z_0-9 ]*[a-zA-Z_0-9])* { yylval.symbol = setHashNode(yytext, SYMBOL_IDENTIFIER); return TK_IDENTIFIER; }
 
 [ \t]+ ;
 "//".* ;
