@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include "astree.h"
 #include "hash.h"
+#include "semantic.h"
 
 int yylex();
 int yyerror(char *text);
