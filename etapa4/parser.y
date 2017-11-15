@@ -116,13 +116,13 @@ var_dec: identifier ':' type '=' literal ';'                           { $$ = cr
        | identifier ':' type '[' literal_integer ']' literals_list ';' { $$ = createAST(AST_ARY_DECL, 0, $1, $3, $5, $7); }
        ;
 
-identifier: TK_IDENTIFIER { $$ = createAST(AST_SYMBOL, $1, 0, 0, 0, 0); }
+identifier: TK_IDENTIFIER { $$ = createAST(AST_IDENTIFIER, $1, 0, 0, 0, 0); }
 
-literal_integer: LIT_INTEGER { $$ = createAST(AST_SYMBOL, $1, 0, 0, 0, 0); }
+literal_integer: LIT_INTEGER { $$ = createAST(AST_INTEGER, $1, 0, 0, 0, 0); }
 
-literal_real: LIT_REAL { $$ = createAST(AST_SYMBOL, $1, 0, 0, 0, 0); }
+literal_real: LIT_REAL { $$ = createAST(AST_REAL, $1, 0, 0, 0, 0); }
 
-literal_char: LIT_CHAR { $$ = createAST(AST_SYMBOL, $1, 0, 0, 0, 0); }
+literal_char: LIT_CHAR { $$ = createAST(AST_CHAR, $1, 0, 0, 0, 0); }
 
 literals_list: literal literals_list { $$ = createAST(AST_LIT_LIST, 0, $1, $2, 0, 0); }
              |                       { $$ = createAST(AST_EMPTY_LIT_LIST, 0, 0, 0, 0, 0); }
@@ -184,7 +184,7 @@ type: KW_BYTE   { $$ = createAST(AST_TYPE_BYTE, 0, 0, 0, 0, 0); }
     ;
 
 
-literal_string: LIT_STRING { $$ = createAST(AST_SYMBOL, $1, 0, 0, 0, 0); }
+literal_string: LIT_STRING { $$ = createAST(AST_STRING, $1, 0, 0, 0, 0); }
 
 
 literal: literal_integer { $$ = $1; }
