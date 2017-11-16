@@ -12,7 +12,6 @@ void semanticVerification(AST *node) {
     semanticSetTypes(node);
     semanticCheckUndeclared(node);
     semanticCheckUsage(node);
-    semanticCheckOperands(node);
 }
 
 void semanticSetTypes(AST *node) {
@@ -149,25 +148,25 @@ void semanticCheckUsage(AST *node) {
     
     else if(node->type == AST_VAR_ASSIGN) {
         if(node->son[0]->symbol->type != SYMBOL_IDENTIFIER_SCALAR) {
-            fprintf(stderr, "ERRO SEMANTICO: Identificador \"%s\" na linha %d deveria ser um escalar.\n", node->symbol->text, node->lineNumber);
+            fprintf(stderr, "ERRO SEMANTICO: Identificador \"%s\" na linha %d deveria ser um escalar.\n", node->son[0]->symbol->string, node->lineNumber);
             exit(4);
         }
     }
 
     else if(node->type == AST_ARY_ASSIGN) {
         if(node->son[0]->symbol->type != SYMBOL_IDENTIFIER_VECTOR) {
-            fprintf(stderr, "ERRO SEMANTICO: Identificador \"%s\" na linha %d deveria ser um vetor.\n", node->symbol->text, node->lineNumber);
+            fprintf(stderr, "ERRO SEMANTICO: Identificador \"%s\" na linha %d deveria ser um vetor.\n", node->son[0]->symbol->string, node->lineNumber);
             exit(4);
         }
     }
 
     else if(node->type == AST_FUNC_CALL) {
         if(node->symbol->type != SYMBOL_IDENTIFIER_FUNCTION) {
-            fprintf(stderr, "ERRO SEMANTICO: Identificador \"%s\" na linha %d deveria ser uma chamada de funcao.\n", node->symbol->text, node->lineNumber);
+            fprintf(stderr, "ERRO SEMANTICO: Identificador \"%s\" na linha %d deveria ser uma chamada de funcao.\n", node->son[0]->symbol->string, node->lineNumber);
             exit(4);
         }
         
-        checkFunctionCall(node, program));
+        checkFunctionCall(node, program);
     }
     
     int i;
@@ -207,17 +206,26 @@ void compareArgsAndParams(AST *functionCall, AST *args, AST *params) {
         exit(4);
     }
     
+//    int argDataType = args->son[0]->datatype;
+//    int paramDataType = params->son[0]->type;
+//    int type = convertDataTypes(argDataType, paramDataType);
+//
+//    if(type < 0 || type > paramDataType) {
+//        fprintf(stderr, "ERRO SEMANTICO: Chamada da funcao \"%s\" na linha %d possui argumentos com tipos incompativeis com a sua declaracao.\n", functionCall->son[0]->symbol->string, functionCall->lineNumber);
+//        exit(4);
+//    }
+    
     compareArgsAndParams(functionCall, args->son[1], params->son[1]);
 }
 
 int convertDataTypes(int type1, int type2) {
     // Se os tipos forem equivalentes
-    if type1 == type2
+    if(type1 == type2)
         return 0;
     
     // Se os tipos forem compativeis, retorna o maior deles
     if(type1 >= DATATYPE_BYTE && type1 <= DATATYPE_DOUBLE && type2 >= DATATYPE_BYTE && type2 <= DATATYPE_DOUBLE) {
-        if type1 > type2
+        if(type1 > type2)
             return type1;
         else
             return type2;
