@@ -99,9 +99,7 @@ program: declarations {
     fprintf(stdout, "Imprimindo a árvore\n");
     printAST($$, 0);
     generateCode(output_file, $$);
-    semanticSetTypes($$);
-    semanticCheckUndeclared();
-    semanticCheckUsage($$);
+    semanticVerification($$);
 };
 
 declarations: dec declarations { $$ = createAST(AST_DECL_LIST, 0, $1, $2, 0, 0); }
