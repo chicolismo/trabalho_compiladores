@@ -149,21 +149,21 @@ void semanticCheckUsage(AST *node) {
 //            exit(4);
 //        }
 //    }
-//    
+//
 //    else if(node->type == AST_ARY_ASSIGN) {
 //        if(node->symbol->type != SYMBOL_VAR) {
 //            fprintf(stderr, "ERRO SEMANTICO: Identificador \"%s\" na linha %d deveria ser um vetor.\n", node->symbol->text, node->symbol->lineNumber);
 //            exit(4);
 //        }
 //    }
-//    
+//
 //    else if(node->type == AST_ARY_INDEX) {
 //        if(node->symbol->type != SYMBOL_VAR) {
 //            fprintf(stderr, "ERRO SEMANTICO: Identificador \"%s\" na linha %d deveria ser uma chamada de funcao.\n", node->symbol->text, node->symbol->lineNumber);
 //            exit(4);
 //        }
 //    }
-//    
+//
 //    else if(node->type == AST_FUNC_CALL) {
 //        if(node->symbol->type != SYMBOL_VAR) {
 //            fprintf(stderr, "ERRO SEMANTICO: Identificador \"%s\" na linha %d deveria ser uma chamada de funcao.\n", node->symbol->text, node->symbol->lineNumber);

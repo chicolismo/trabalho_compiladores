@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include "astree.h"
+#include "y.tab.h"
+
+extern int getLineNumber();
 
 AST *createAST(int type, HashNode *symbol, AST *son0, AST *son1, AST *son2, AST *son3) {
     AST *newNode;
@@ -9,6 +12,7 @@ AST *createAST(int type, HashNode *symbol, AST *son0, AST *son1, AST *son2, AST 
     newNode = malloc(sizeof(AST));
     newNode->type = type;
     newNode->symbol = symbol;
+    newNode->lineNumber = getLineNumber();
     newNode->son[0] = son0;
     newNode->son[1] = son1;
     newNode->son[2] = son2;

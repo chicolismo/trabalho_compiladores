@@ -57,6 +57,7 @@
 typedef struct ASTreeNode {
     int type;
     HashNode *symbol;
+    int lineNumber;
     struct ASTreeNode *son[MAX_SONS];
 } AST;
 
