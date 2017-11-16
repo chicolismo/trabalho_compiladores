@@ -130,7 +130,7 @@ void semanticCheckUndeclared(AST *node) {
     
     // Se tipo do identificador nao foi redefinido ainda, ele nao foi declarado
     if(node->symbol && node->symbol->type == SYMBOL_IDENTIFIER) {
-        fprintf(stderr, "ERRO SEMANTICO: Identificador \"%s\" na linha %d nao declarado.\n", node->symbol->string, node->symbol->lineNumber);
+        fprintf(stderr, "ERRO SEMANTICO: Identificador \"%s\" na linha %d nao declarado.\n", node->symbol->string, node->lineNumber);
         exit(4);
     }
     
