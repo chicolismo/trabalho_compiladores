@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "astree.h"
 #include "hash.h"
 #include "semantic.h"
@@ -172,13 +173,6 @@ void semanticCheckUsage(AST *node) {
     int i;
     for(i=0; i<MAX_SONS; i++)
         semanticCheckUsage(node->son[i]);
-}
-
-void semanticCheckOperands(AST *node) {
-//    int i;
-//
-//    if(!node)
-//        return;
 }
 
 void checkFunctionCall(AST *functionCall, AST *node) {
