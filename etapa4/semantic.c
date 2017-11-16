@@ -18,113 +18,47 @@ void semanticSetTypes(AST *node) {
     if(!node)
         return;
     
-    else if(node->type == AST_VAR_DECL) {
-        // Nodo ja teve seu tipo redefinido antes, entao ja foi declarado anteriormente
-        if(node->son[0]->symbol->type != SYMBOL_IDENTIFIER) {
-            fprintf(stderr, "ERRO SEMANTICO: Redeclaracao de \"%s\" na linha %d, previamente declarado na linha %d.\n", node->son[0]->symbol->string, node->lineNumber, node->son[0]->symbol->lineNumber);
-            exit(4);
-        } else {
-            node->son[0]->symbol->type = SYMBOL_IDENTIFIER_SCALAR;
-            node->son[0]->symbol->lineNumber = node->lineNumber;
-            
-            if(node->son[1]->type == AST_TYPE_BYTE)
-                node->son[0]->symbol->datatype = DATATYPE_BYTE;
-            
-            else if(node->son[1]->type == AST_TYPE_SHORT)
-                node->son[0]->symbol->datatype = DATATYPE_SHORT;
-            
-            else if(node->son[1]->type == AST_TYPE_LONG)
-                node->son[0]->symbol->datatype = DATATYPE_LONG;
-            
-            else if(node->son[1]->type == AST_TYPE_FLOAT)
-                node->son[0]->symbol->datatype = DATATYPE_FLOAT;
-            
-            else if(node->son[1]->type == AST_TYPE_DOUBLE)
-                node->son[0]->symbol->datatype = DATATYPE_DOUBLE;
-        }
-    }
-    
-    else if(node->type == AST_ARY_DECL) {
-        // Nodo ja teve seu tipo redefinido antes, entao ja foi declarado anteriormente
-        if(node->son[0]->symbol->type != SYMBOL_IDENTIFIER) {
-            fprintf(stderr, "ERRO SEMANTICO: Redeclaracao de \"%s\" na linha %d, previamente declarado na linha %d.\n", node->son[0]->symbol->string, node->lineNumber, node->son[0]->symbol->lineNumber);
-            exit(4);
-        } else {
-            node->son[0]->symbol->type = SYMBOL_IDENTIFIER_VECTOR;
-            node->son[0]->symbol->lineNumber = node->lineNumber;
-            
-            if(node->son[1]->type == AST_TYPE_BYTE)
-                node->son[0]->symbol->datatype = DATATYPE_BYTE;
-            
-            else if(node->son[1]->type == AST_TYPE_SHORT)
-                node->son[0]->symbol->datatype = DATATYPE_SHORT;
-            
-            else if(node->son[1]->type == AST_TYPE_LONG)
-                node->son[0]->symbol->datatype = DATATYPE_LONG;
-            
-            else if(node->son[1]->type == AST_TYPE_FLOAT)
-                node->son[0]->symbol->datatype = DATATYPE_FLOAT;
-            
-            else if(node->son[1]->type == AST_TYPE_DOUBLE)
-                node->son[0]->symbol->datatype = DATATYPE_DOUBLE;
-        }
-    }
-    
-    else if(node->type == AST_FUNC_HEADER) {
-        // Nodo ja teve seu tipo redefinido antes, entao ja foi declarado anteriormente
-        if(node->son[1]->symbol->type != SYMBOL_IDENTIFIER) {
-            fprintf(stderr, "ERRO SEMANTICO: Redeclaracao de \"%s\" na linha %d, previamente declarado na linha %d.\n", node->son[1]->symbol->string, node->lineNumber, node->son[1]->symbol->lineNumber);
-            exit(4);
-        } else {
-            node->son[1]->symbol->type = SYMBOL_IDENTIFIER_FUNCTION;
-            node->son[1]->symbol->lineNumber = node->lineNumber;
-            
-            if(node->son[0]->type == AST_TYPE_BYTE)
-                node->son[1]->symbol->datatype = DATATYPE_BYTE;
-            
-            else if(node->son[0]->type == AST_TYPE_SHORT)
-                node->son[1]->symbol->datatype = DATATYPE_SHORT;
-            
-            else if(node->son[0]->type == AST_TYPE_LONG)
-                node->son[1]->symbol->datatype = DATATYPE_LONG;
-            
-            else if(node->son[0]->type == AST_TYPE_FLOAT)
-                node->son[1]->symbol->datatype = DATATYPE_FLOAT;
-            
-            else if(node->son[0]->type == AST_TYPE_DOUBLE)
-                node->son[1]->symbol->datatype = DATATYPE_DOUBLE;
-        }
-    }
-    
-    else if(node->type == AST_PARAM) {
-        // Nodo ja teve seu tipo redefinido antes, entao ja foi declarado anteriormente
-        if(node->son[0]->symbol->type != SYMBOL_IDENTIFIER) {
-            fprintf(stderr, "ERRO SEMANTICO: Redeclaracao de \"%s\" na linha %d, previamente declarado na linha %d.\n", node->son[0]->symbol->string, node->lineNumber, node->son[0]->symbol->lineNumber);
-            exit(4);
-        } else {
-            node->son[0]->symbol->type = SYMBOL_IDENTIFIER_SCALAR;
-            node->son[0]->symbol->lineNumber = node->lineNumber;
-            
-            if(node->son[1]->type == AST_TYPE_BYTE)
-                node->son[0]->symbol->datatype = DATATYPE_BYTE;
-            
-            else if(node->son[1]->type == AST_TYPE_SHORT)
-                node->son[0]->symbol->datatype = DATATYPE_SHORT;
-            
-            else if(node->son[1]->type == AST_TYPE_LONG)
-                node->son[0]->symbol->datatype = DATATYPE_LONG;
-            
-            else if(node->son[1]->type == AST_TYPE_FLOAT)
-                node->son[0]->symbol->datatype = DATATYPE_FLOAT;
-            
-            else if(node->son[1]->type == AST_TYPE_DOUBLE)
-                node->son[0]->symbol->datatype = DATATYPE_DOUBLE;
-        }
-    }
+    else if(node->type == AST_VAR_DECL)
+        setTypesOfNode(node, SYMBOL_IDENTIFIER_SCALAR, 0, 1);
+        
+    else if(node->type == AST_ARY_DECL)
+        setTypesOfNode(node, SYMBOL_IDENTIFIER_VECTOR, 0, 1);
+        
+    else if(node->type == AST_FUNC_HEADER)
+        setTypesOfNode(node, SYMBOL_IDENTIFIER_FUNCTION, 1, 0);
+        
+    else if(node->type == AST_PARAM)
+        setTypesOfNode(node, SYMBOL_IDENTIFIER_SCALAR, 0, 1);
     
     int i;
     for(i=0; i<MAX_SONS; i++)
         semanticSetTypes(node->son[i]);
+}
+
+void setTypesOfNode(AST *node, int type, int identifierIndex, int datatypeIndex) {
+    // Nodo ja teve seu tipo redefinido antes, entao ja foi declarado anteriormente
+    if(node->son[identifierIndex]->symbol->type != SYMBOL_IDENTIFIER) {
+        fprintf(stderr, "ERRO SEMANTICO: Redeclaracao de \"%s\" na linha %d, previamente declarado na linha %d.\n", node->son[identifierIndex]->symbol->string, node->lineNumber, node->son[identifierIndex]->symbol->lineNumber);
+        exit(4);
+    } else {
+        node->son[identifierIndex]->symbol->type = SYMBOL_IDENTIFIER_SCALAR;
+        node->son[identifierIndex]->symbol->lineNumber = node->lineNumber;
+        
+        if(node->son[datatypeIndex]->type == AST_TYPE_BYTE)
+            node->son[identifierIndex]->symbol->datatype = DATATYPE_BYTE;
+        
+        else if(node->son[datatypeIndex]->type == AST_TYPE_SHORT)
+            node->son[identifierIndex]->symbol->datatype = DATATYPE_SHORT;
+        
+        else if(node->son[datatypeIndex]->type == AST_TYPE_LONG)
+            node->son[identifierIndex]->symbol->datatype = DATATYPE_LONG;
+        
+        else if(node->son[datatypeIndex]->type == AST_TYPE_FLOAT)
+            node->son[identifierIndex]->symbol->datatype = DATATYPE_FLOAT;
+        
+        else if(node->son[datatypeIndex]->type == AST_TYPE_DOUBLE)
+            node->son[identifierIndex]->symbol->datatype = DATATYPE_DOUBLE;
+    }
 }
 
 void semanticCheckUndeclared(AST *node) {
