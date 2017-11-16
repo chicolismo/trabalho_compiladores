@@ -32,8 +32,8 @@ d : byte = 65;
     print (1), 2, 3, 4, 5;
     print (3 + 1);
     while (x) {
-        while (y) {
-            z = 10
+        while (a) {
+            a = 10
         }
     }
 }

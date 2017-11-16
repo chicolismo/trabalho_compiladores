@@ -161,7 +161,7 @@ void semanticCheckUsage(AST *node) {
     }
 
     else if(node->type == AST_FUNC_CALL) {
-        if(node->symbol->type != SYMBOL_IDENTIFIER_FUNCTION) {
+        if(node->son[0]->symbol->type != SYMBOL_IDENTIFIER_FUNCTION) {
             fprintf(stderr, "ERRO SEMANTICO: Identificador \"%s\" na linha %d deveria ser uma chamada de funcao.\n", node->son[0]->symbol->string, node->lineNumber);
             exit(4);
         }
