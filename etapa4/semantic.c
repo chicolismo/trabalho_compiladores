@@ -206,14 +206,14 @@ void compareArgsAndParams(AST *functionCall, AST *args, AST *params) {
         exit(4);
     }
     
-//    int argDataType = args->son[0]->datatype;
-//    int paramDataType = params->son[0]->type;
-//    int type = convertDataTypes(argDataType, paramDataType);
-//
-//    if(type < 0 || type > paramDataType) {
-//        fprintf(stderr, "ERRO SEMANTICO: Chamada da funcao \"%s\" na linha %d possui argumentos com tipos incompativeis com a sua declaracao.\n", functionCall->son[0]->symbol->string, functionCall->lineNumber);
-//        exit(4);
-//    }
+    int argDataType = getExpressionDataType(args->son[0]);
+    int paramDataType = getExpressionDataType(params->son[0]->son[0]);
+    int dataType = convertDataTypes(argDataType, paramDataType);
+
+    if(dataType == DATATYPE_ERROR) {
+        fprintf(stderr, "ERRO SEMANTICO: Chamada da funcao \"%s\" na linha %d possui argumentos com tipos incompativeis com a sua declaracao.\n", functionCall->son[0]->symbol->string, functionCall->lineNumber);
+        exit(4);
+    }
     
     compareArgsAndParams(functionCall, args->son[1], params->son[1]);
 }

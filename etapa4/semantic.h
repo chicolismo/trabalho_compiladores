@@ -10,6 +10,7 @@ void semanticCheckUndeclared(AST *node);
 void semanticCheckUsage(AST *node);
 void checkFunctionCall(AST *functionCall, AST *node);
 void compareArgsAndParams(AST *functionCall, AST *args, AST *params);
+int getExpressionDataType(AST *node);
 int convertDataTypes(int type1, int type2);
 
 #endif // __SEMANTIC_H__
