@@ -19,6 +19,8 @@
 #define DATATYPE_LONG              11
 #define DATATYPE_FLOAT             12
 #define DATATYPE_DOUBLE            13
+#define DATATYPE_BOOL              14
+#define DATATYPE_ERROR             -1
 
 struct HashNode {
     char *string;

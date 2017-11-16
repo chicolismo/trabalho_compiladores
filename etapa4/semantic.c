@@ -218,10 +218,69 @@ void compareArgsAndParams(AST *functionCall, AST *args, AST *params) {
     compareArgsAndParams(functionCall, args->son[1], params->son[1]);
 }
 
+int getExpressionDataType(AST *node) {
+    int dataType;
+    
+    if(!node)
+        return DATATYPE_ERROR;
+    
+    switch(node->type) {
+        case AST_SYMBOL:
+            // TODO expression and literal
+            
+        case AST_ARY_INDEX:
+            // TODO
+            
+        case AST_FUNC_CALL:
+            // TODO
+            return DATATYPE_ERROR;
+            
+        case AST_PARENS_EXPR:
+            return getExpressionDataType(node->son[0]);
+            
+        case AST_ADD:
+        case AST_SUB:
+        case AST_MUL:
+        case AST_DIV:
+            return convertDataTypes(getExpressionDataType(node->son[0]),
+                                    getExpressionDataType(node->son[1]));
+            
+        case AST_LT:
+        case AST_GT:
+        case AST_LE:
+        case AST_GE:
+        case AST_EQ:
+        case AST_NE:
+            dataType = convertDataTypes(getExpressionDataType(node->son[0]),
+                                        getExpressionDataType(node->son[1]));
+            if(dataType != DATATYPE_ERROR && dataType != DATATYPE_BOOL)
+                return DATATYPE_BOOL;
+            else
+                return DATATYPE_ERROR;
+            
+        case AST_NOT:
+            if(getExpressionDataType(node->son[0]) == DATATYPE_BOOL)
+                return DATATYPE_BOOL;
+            else
+                return DATATYPE_ERROR;
+            
+        case AST_AND:
+        case AST_OR:
+            if(getExpressionDataType(node->son[0]) == DATATYPE_BOOL &&
+               getExpressionDataType(node->son[1]) == DATATYPE_BOOL)
+                return DATATYPE_BOOL;
+            else
+                return DATATYPE_ERROR;
+            
+        default:
+            return DATATYPE_ERROR;
+    }
+}
+
 int convertDataTypes(int type1, int type2) {
     // Se os tipos forem equivalentes
     if(type1 == type2)
-        return 0;
+        return type1;
     
     // Se os tipos forem compativeis, retorna o maior deles
     if(type1 >= DATATYPE_BYTE && type1 <= DATATYPE_DOUBLE && type2 >= DATATYPE_BYTE && type2 <= DATATYPE_DOUBLE) {
@@ -231,6 +290,10 @@ int convertDataTypes(int type1, int type2) {
             return type2;
     }
     
+    // Se os dois tipos forem booleanos
+    if(type1 == DATATYPE_BOOL && type2 == DATATYPE_BOOL)
+        return DATATYPE_BOOL;
+    
     // Tipos nao compativeis
-    return -1;
+    return DATATYPE_ERROR;
 }
