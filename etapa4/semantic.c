@@ -85,11 +85,23 @@ void semanticCheckUsage(AST *node) {
             fprintf(stderr, "ERRO SEMANTICO: Identificador \"%s\" na linha %d deveria ser um escalar.\n", node->son[0]->symbol->string, node->lineNumber);
             exit(4);
         }
+        
+        if(convertDataTypes(node->son[0]->symbol->datatype,
+                            getExpressionDataType(node->son[1])) == DATATYPE_ERROR) {
+            fprintf(stderr, "ERRO SEMANTICO: Incompatibilidade de tipos na atribuicao a variavel \"%s\" na linha %d.\n", node->son[0]->symbol->string, node->lineNumber);
+            exit(4);
+        }
     }
 
     else if(node->type == AST_ARY_ASSIGN) {
         if(node->son[0]->symbol->type != SYMBOL_IDENTIFIER_VECTOR) {
             fprintf(stderr, "ERRO SEMANTICO: Identificador \"%s\" na linha %d deveria ser um vetor.\n", node->son[0]->symbol->string, node->lineNumber);
+            exit(4);
+        }
+        
+        if(convertDataTypes(node->son[0]->symbol->datatype,
+                            getExpressionDataType(node->son[2])) == DATATYPE_ERROR) {
+            fprintf(stderr, "ERRO SEMANTICO: Incompatibilidade de tipos na atribuicao a variavel \"%s\" na linha %d.\n", node->son[0]->symbol->string, node->lineNumber);
             exit(4);
         }
     }
