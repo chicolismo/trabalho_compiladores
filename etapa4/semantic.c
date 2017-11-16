@@ -226,14 +226,11 @@ int getExpressionDataType(AST *node) {
     
     switch(node->type) {
         case AST_SYMBOL:
-            // TODO expression and literal
+            return node->symbol->dataType;
             
         case AST_ARY_INDEX:
-            // TODO
-            
         case AST_FUNC_CALL:
-            // TODO
-            return DATATYPE_ERROR;
+            return node->son[0]->symbol->dataType;
             
         case AST_PARENS_EXPR:
             return getExpressionDataType(node->son[0]);
