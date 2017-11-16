@@ -41,7 +41,7 @@ void setTypesOfNode(AST *node, int type, int identifierIndex, int datatypeIndex)
         fprintf(stderr, "ERRO SEMANTICO: Redeclaracao de \"%s\" na linha %d, previamente declarado na linha %d.\n", node->son[identifierIndex]->symbol->string, node->lineNumber, node->son[identifierIndex]->symbol->lineNumber);
         exit(4);
     } else {
-        node->son[identifierIndex]->symbol->type = SYMBOL_IDENTIFIER_SCALAR;
+        node->son[identifierIndex]->symbol->type = type;
         node->son[identifierIndex]->symbol->lineNumber = node->lineNumber;
         
         if(node->son[datatypeIndex]->type == AST_TYPE_BYTE)
