@@ -11,7 +11,7 @@ void semanticVerification(AST *node) {
     program = node;
     setTypes(node);
     checkUndeclaredIdentifiers(node);
-    checkIdentifiersUsage(node);
+    //checkIdentifiersUsage(node);
 }
 
 void setTypes(AST *node) {
@@ -27,8 +27,13 @@ void setTypes(AST *node) {
     else if(node->type == AST_FUNC_DECL) {
         setTypesOfNode(node, SYMBOL_IDENTIFIER_FUNCTION, 1, 0);
         setTypes(node->son[2]); // Set types for function params
-        if(checkFunctionReturnType(node->son[3], node->son[1]->symbol->dataType)) {
-            fprintf(stderr, "ERRO SEMANTICO: Funcao \"%s\" declarada na linha %d nao possui um retorno com tipo compativel.\n", node->son[1]->symbol->string, node->lineNumber);
+        
+        int returnCheck = checkFunctionReturnType(node->son[3], node->son[1]->symbol->dataType);
+        if(returnCheck == 0) {
+            fprintf(stderr, "ERRO SEMANTICO: Funcao \"%s\" declarada na linha %d nao possui retorno.\n", node->son[1]->symbol->string, node->lineNumber);
+            exit(4);
+        } else if(returnCheck < 0) {
+            fprintf(stderr, "ERRO SEMANTICO: Funcao \"%s\" declarada na linha %d possui retorno com tipo incompativel.\n", node->son[1]->symbol->string, node->lineNumber);
             exit(4);
         }
     }
@@ -69,8 +74,21 @@ void setTypesOfNode(AST *node, int type, int identifierIndex, int dataTypeIndex)
     }
 }
 
+// Retorna um valor positivo se encontrar apenas retornos com tipo compativel
+// Retorna 0 se nao houver nenhum retorno na funcao
+// Retorna um valor negativo se encontrar retornos com tipo incompativel
 int checkFunctionReturnType(AST *node, int dataType) {
-    // TODO
+    if(!node)
+        return 0;
+    
+    if(node->type == AST_RETURN) {
+        return 1;
+    }
+    
+    int i, returnsSum = 0;
+    for(i=0; i<MAX_SONS; i++)
+        returnsSum += checkFunctionReturnType(node->son[i], dataType);
+    return returnsSum;
 }
 
 void checkUndeclaredIdentifiers(AST *node) {
