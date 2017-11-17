@@ -9,12 +9,12 @@ AST* program;
 
 void semanticVerification(AST *node) {
     program = node;
-    semanticSetTypes(node);
-    semanticCheckUndeclared(node);
-    semanticCheckUsage(node);
+    setTypes(node);
+    checkUndeclaredIdentifiers(node);
+    checkIdentifiersUsage(node);
 }
 
-void semanticSetTypes(AST *node) {
+void setTypes(AST *node) {
     if(!node)
         return;
     
@@ -26,7 +26,7 @@ void semanticSetTypes(AST *node) {
         
     else if(node->type == AST_FUNC_DECL) {
         setTypesOfNode(node, SYMBOL_IDENTIFIER_FUNCTION, 1, 0);
-        semanticSetTypes(node->son[2]); // Set types for function params
+        setTypes(node->son[2]); // Set types for function params
     }
         
     else if(node->type == AST_PARAM)
@@ -36,7 +36,7 @@ void semanticSetTypes(AST *node) {
     // Apply recursion only for declarations
     if(node->type == AST_DECL_LIST || node->type == AST_PARAM_LIST)
         for(i=0; i<MAX_SONS; i++)
-            semanticSetTypes(node->son[i]);
+            setTypes(node->son[i]);
 }
 
 void setTypesOfNode(AST *node, int type, int identifierIndex, int datatypeIndex) {
@@ -65,7 +65,7 @@ void setTypesOfNode(AST *node, int type, int identifierIndex, int datatypeIndex)
     }
 }
 
-void semanticCheckUndeclared(AST *node) {
+void checkUndeclaredIdentifiers(AST *node) {
     if(!node)
         return;
     
@@ -77,10 +77,10 @@ void semanticCheckUndeclared(AST *node) {
     
     int i;
     for(i=0; i<MAX_SONS; i++)
-        semanticCheckUndeclared(node->son[i]);
+        checkUndeclaredIdentifiers(node->son[i]);
 }
 
-void semanticCheckUsage(AST *node) {
+void checkIdentifiersUsage(AST *node) {
     if(!node)
         return;
     
@@ -121,7 +121,7 @@ void semanticCheckUsage(AST *node) {
     
     int i;
     for(i=0; i<MAX_SONS; i++)
-        semanticCheckUsage(node->son[i]);
+        checkIdentifiersUsage(node->son[i]);
 }
 
 void checkFunctionCall(AST *functionCall, AST *node) {

@@ -5,10 +5,10 @@
 #include "astree.h"
 
 void semanticVerification(AST *node);
-void semanticSetTypes(AST *node);
+void setTypes(AST *node);
 void setTypesOfNode(AST *node, int type, int identifierIndex, int datatypeIndex);
-void semanticCheckUndeclared(AST *node);
-void semanticCheckUsage(AST *node);
+void checkUndeclaredIdentifiers(AST *node);
+void checkIdentifiersUsage(AST *node);
 void checkFunctionCall(AST *functionCall, AST *node);
 void compareArgsAndParams(AST *functionCall, AST *args, AST *params);
 int getExpressionDataType(AST *node);
