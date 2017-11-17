@@ -12,6 +12,7 @@ void checkIdentifiersUsage(AST *node);
 int checkFunctionReturnType(AST *node, int dataType);
 void checkFunctionCall(AST *functionCall, AST *node);
 void compareArgsAndParams(AST *functionCall, AST *args, AST *params);
+void compareArgAndParam(AST *functionCall, AST *arg, AST *param);
 int getExpressionDataType(AST *node);
 int convertDataTypes(int type1, int type2);
 

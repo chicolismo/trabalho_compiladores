@@ -183,24 +183,33 @@ void compareArgsAndParams(AST *functionCall, AST *args, AST *params) {
         exit(4);
     }
     
-    if(args->type != AST_LIST && params->type != AST_PARAM_LIST)
+    if(args->type != AST_LIST && params->type != AST_PARAM_LIST) {
+        // Compara ultimos elementos das listas
+        compareArgAndParam(functionCall, args, params);
         return;
+    }
     
     if(args->type != AST_LIST || params->type != AST_PARAM_LIST) {
         fprintf(stderr, "ERRO SEMANTICO: Chamada da funcao \"%s\" na linha %d com um numero incompativel de argumentos.\n", functionCall->son[0]->symbol->string, functionCall->lineNumber);
         exit(4);
     }
     
-    int argDataType = getExpressionDataType(args->son[0]);
-    int paramDataType = getExpressionDataType(params->son[0]->son[0]);
-    int dataType = convertDataTypes(argDataType, paramDataType);
+    // Compara argumento com parametro atuais
+    compareArgAndParam(functionCall, args->son[0], params->son[0]);
+    
+    // Aplica recursao para demais argumentos e parametros
+    compareArgsAndParams(functionCall, args->son[1], params->son[1]);
+}
 
+void compareArgAndParam(AST *functionCall, AST *arg, AST *param) {
+    int argDataType = getExpressionDataType(arg);
+    int paramDataType = getExpressionDataType(param->son[0]);
+    int dataType = convertDataTypes(argDataType, paramDataType);
+    
     if(dataType == DATATYPE_ERROR) {
         fprintf(stderr, "ERRO SEMANTICO: Chamada da funcao \"%s\" na linha %d possui argumentos com tipos incompativeis com a sua declaracao.\n", functionCall->son[0]->symbol->string, functionCall->lineNumber);
         exit(4);
     }
-    
-    compareArgsAndParams(functionCall, args->son[1], params->son[1]);
 }
 
 int getExpressionDataType(AST *node) {
