@@ -138,10 +138,6 @@ void printNode(AST *node) {
         fprintf(stdout, "AST_PARAM: ");
         break;
 
-    case AST_FUNC_HEADER:
-        fprintf(stdout, "AST_FUNC_HEADER: ");
-        break;
-
     case AST_FUNC_DECL:
         fprintf(stdout, "AST_FUNC_DECL: ");
         break;
@@ -491,8 +487,8 @@ void generateCode(FILE *out, AST *node) {
         generateCode(out, node->son[1]);
         break;
 
-    case AST_FUNC_HEADER:
-        d("ast_func_header");
+    case AST_FUNC_DECL:
+        d("ast_func_decl");
 
         fprintf(out, "(");
         generateCode(out, node->son[0]);
@@ -501,13 +497,6 @@ void generateCode(FILE *out, AST *node) {
         fprintf(out, "(");
         generateCode(out, node->son[2]);
         fprintf(out, ")");
-        break;
-
-    case AST_FUNC_DECL:
-        d("ast_func_decl");
-
-        generateCode(out, node->son[0]);
-        fprintf(out, "\n");
         generateCode(out, node->son[1]);
         break;
 

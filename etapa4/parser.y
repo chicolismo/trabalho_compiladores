@@ -63,7 +63,6 @@ FILE *output_file = NULL;
 %type<ast> var_dec
 %type<ast> fun_dec
 %type<ast> literals_list
-%type<ast> fun_header
 %type<ast> params
 %type<ast> params_list
 %type<ast> param
@@ -127,11 +126,8 @@ literals_list: literal literals_list { $$ = createAST(AST_LIT_LIST, 0, $1, $2, 0
              |                       { $$ = createAST(AST_EMPTY_LIT_LIST, 0, 0, 0, 0, 0); }
              ;
 
-fun_dec: fun_header block { $$ = createAST(AST_FUNC_DECL, 0, $1, $2, 0, 0); }
+fun_dec: '(' type ')' identifier '(' params ')' block { $$ = createAST(AST_FUNC_DECL, 0, $2, $4, $6, $8); }
        ;
-
-fun_header: '(' type ')' identifier '(' params ')' { $$ = createAST(AST_FUNC_HEADER, 0, $2, $4, $6, 0); }
-          ;
 
 params: params_list { $$ = $1; }
       |             { $$ = NULL; }

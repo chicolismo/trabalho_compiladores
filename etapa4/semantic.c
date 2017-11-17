@@ -24,15 +24,19 @@ void semanticSetTypes(AST *node) {
     else if(node->type == AST_ARY_DECL)
         setTypesOfNode(node, SYMBOL_IDENTIFIER_VECTOR, 0, 1);
         
-    else if(node->type == AST_FUNC_HEADER)
+    else if(node->type == AST_FUNC_DECL) {
         setTypesOfNode(node, SYMBOL_IDENTIFIER_FUNCTION, 1, 0);
+        semanticSetTypes(node->son[2]); // Set types for function params
+    }
         
     else if(node->type == AST_PARAM)
         setTypesOfNode(node, SYMBOL_IDENTIFIER_SCALAR, 0, 1);
     
     int i;
-    for(i=0; i<MAX_SONS; i++)
-        semanticSetTypes(node->son[i]);
+    // Apply recursion only for declarations
+    if(node->type == AST_DECL_LIST || node->type == AST_PARAM_LIST)
+        for(i=0; i<MAX_SONS; i++)
+            semanticSetTypes(node->son[i]);
 }
 
 void setTypesOfNode(AST *node, int type, int identifierIndex, int datatypeIndex) {
@@ -124,7 +128,7 @@ void checkFunctionCall(AST *functionCall, AST *node) {
     if(!node)
         return;
     
-    else if(node->type == AST_FUNC_HEADER &&
+    else if(node->type == AST_FUNC_DECL &&
             strcmp(functionCall->son[0]->symbol->string, node->son[1]->symbol->string) == 0) {
         compareArgsAndParams(functionCall, functionCall->son[1], node->son[2]);
         return;

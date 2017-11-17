@@ -44,15 +44,14 @@
 #define AST_READ           32
 #define AST_BLOCK          33
 #define AST_PARAM          34
-#define AST_FUNC_HEADER    35
-#define AST_FUNC_DECL      36
-#define AST_CMD_LIST       37
-#define AST_PARAM_LIST     38
-#define AST_ARY_INDEX      39
-#define AST_FUNC_CALL      40
-#define AST_PARENS_EXPR    41
-#define AST_LIT_LIST       42
-#define AST_EMPTY_LIT_LIST 43
+#define AST_FUNC_DECL      35
+#define AST_CMD_LIST       36
+#define AST_PARAM_LIST     37
+#define AST_ARY_INDEX      38
+#define AST_FUNC_CALL      39
+#define AST_PARENS_EXPR    40
+#define AST_LIT_LIST       41
+#define AST_EMPTY_LIT_LIST 42
 
 typedef struct ASTreeNode {
     int type;
