@@ -211,7 +211,14 @@ int getExpressionDataType(AST *node) {
     
     switch(node->type) {
         case AST_SYMBOL:
-            return node->symbol->dataType;
+            if(node->type == SYMBOL_LIT_INTEGER)
+                return DATATYPE_SHORT;
+            else if(node->type == SYMBOL_LIT_REAL)
+                return DATATYPE_FLOAT;
+            else if(node->type == SYMBOL_LIT_CHAR)
+                return DATATYPE_BYTE;
+            else
+                return node->symbol->dataType;
             
         case AST_ARY_INDEX:
         case AST_FUNC_CALL:
