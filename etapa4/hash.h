@@ -25,7 +25,7 @@
 struct HashNode {
     char *string;
     int type;
-    int datatype;
+    int dataType;
     int lineNumber;
     struct HashNode *next;
 };

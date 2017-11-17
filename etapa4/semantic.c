@@ -27,7 +27,7 @@ void setTypes(AST *node) {
     else if(node->type == AST_FUNC_DECL) {
         setTypesOfNode(node, SYMBOL_IDENTIFIER_FUNCTION, 1, 0);
         setTypes(node->son[2]); // Set types for function params
-        if(checkFunctionReturnType(node->son[3], node->son[1]->symbol->datatype)) {
+        if(checkFunctionReturnType(node->son[3], node->son[1]->symbol->dataType)) {
             fprintf(stderr, "ERRO SEMANTICO: Funcao \"%s\" declarada na linha %d nao possui um retorno com tipo compativel.\n", node->son[1]->symbol->string, node->lineNumber);
             exit(4);
         }
@@ -43,7 +43,7 @@ void setTypes(AST *node) {
             setTypes(node->son[i]);
 }
 
-void setTypesOfNode(AST *node, int type, int identifierIndex, int datatypeIndex) {
+void setTypesOfNode(AST *node, int type, int identifierIndex, int dataTypeIndex) {
     // Nodo ja teve seu tipo redefinido antes, entao ja foi declarado anteriormente
     if(node->son[identifierIndex]->symbol->type != SYMBOL_IDENTIFIER) {
         fprintf(stderr, "ERRO SEMANTICO: Redeclaracao de \"%s\" na linha %d, previamente declarado na linha %d.\n", node->son[identifierIndex]->symbol->string, node->lineNumber, node->son[identifierIndex]->symbol->lineNumber);
@@ -52,24 +52,24 @@ void setTypesOfNode(AST *node, int type, int identifierIndex, int datatypeIndex)
         node->son[identifierIndex]->symbol->type = type;
         node->son[identifierIndex]->symbol->lineNumber = node->lineNumber;
         
-        if(node->son[datatypeIndex]->type == AST_TYPE_BYTE)
-            node->son[identifierIndex]->symbol->datatype = DATATYPE_BYTE;
+        if(node->son[dataTypeIndex]->type == AST_TYPE_BYTE)
+            node->son[identifierIndex]->symbol->dataType = DATATYPE_BYTE;
         
-        else if(node->son[datatypeIndex]->type == AST_TYPE_SHORT)
-            node->son[identifierIndex]->symbol->datatype = DATATYPE_SHORT;
+        else if(node->son[dataTypeIndex]->type == AST_TYPE_SHORT)
+            node->son[identifierIndex]->symbol->dataType = DATATYPE_SHORT;
         
-        else if(node->son[datatypeIndex]->type == AST_TYPE_LONG)
-            node->son[identifierIndex]->symbol->datatype = DATATYPE_LONG;
+        else if(node->son[dataTypeIndex]->type == AST_TYPE_LONG)
+            node->son[identifierIndex]->symbol->dataType = DATATYPE_LONG;
         
-        else if(node->son[datatypeIndex]->type == AST_TYPE_FLOAT)
-            node->son[identifierIndex]->symbol->datatype = DATATYPE_FLOAT;
+        else if(node->son[dataTypeIndex]->type == AST_TYPE_FLOAT)
+            node->son[identifierIndex]->symbol->dataType = DATATYPE_FLOAT;
         
-        else if(node->son[datatypeIndex]->type == AST_TYPE_DOUBLE)
-            node->son[identifierIndex]->symbol->datatype = DATATYPE_DOUBLE;
+        else if(node->son[dataTypeIndex]->type == AST_TYPE_DOUBLE)
+            node->son[identifierIndex]->symbol->dataType = DATATYPE_DOUBLE;
     }
 }
 
-int checkFunctionReturnType(AST *node, int datatype) {
+int checkFunctionReturnType(AST *node, int dataType) {
     // TODO
 }
 
@@ -98,7 +98,7 @@ void checkIdentifiersUsage(AST *node) {
             exit(4);
         }
         
-        if(convertDataTypes(node->son[0]->symbol->datatype,
+        if(convertDataTypes(node->son[0]->symbol->dataType,
                             getExpressionDataType(node->son[1])) == DATATYPE_ERROR) {
             fprintf(stderr, "ERRO SEMANTICO: Incompatibilidade de tipos na atribuicao a variavel \"%s\" na linha %d.\n", node->son[0]->symbol->string, node->lineNumber);
             exit(4);
@@ -111,7 +111,7 @@ void checkIdentifiersUsage(AST *node) {
             exit(4);
         }
         
-        if(convertDataTypes(node->son[0]->symbol->datatype,
+        if(convertDataTypes(node->son[0]->symbol->dataType,
                             getExpressionDataType(node->son[2])) == DATATYPE_ERROR) {
             fprintf(stderr, "ERRO SEMANTICO: Incompatibilidade de tipos na atribuicao a variavel \"%s\" na linha %d.\n", node->son[0]->symbol->string, node->lineNumber);
             exit(4);
@@ -184,11 +184,11 @@ int getExpressionDataType(AST *node) {
     
     switch(node->type) {
         case AST_SYMBOL:
-            return node->symbol->datatype;
+            return node->symbol->dataType;
             
         case AST_ARY_INDEX:
         case AST_FUNC_CALL:
-            return node->son[0]->symbol->datatype;
+            return node->son[0]->symbol->dataType;
             
         case AST_PARENS_EXPR:
             return getExpressionDataType(node->son[0]);
