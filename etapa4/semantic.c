@@ -82,7 +82,10 @@ int checkFunctionReturnType(AST *node, int dataType) {
         return 0;
     
     if(node->type == AST_RETURN) {
-        return 1;
+        if(convertDataTypes(dataType, getExpressionDataType(node->son[0])) != DATATYPE_ERROR)
+            return 1;
+        else
+            return -1000;
     }
     
     int i, returnsSum = 0;

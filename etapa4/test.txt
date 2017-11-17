@@ -35,13 +35,15 @@ d : byte = 65;
         while (a) {
             a = 10
         }
-    }
+    };
+    return (i)
 }
 
 (long) incn(x : long, n : long) {
-    return (x + n)
+    return (x+n*x+(n))
 }
 
 (short) voidfunc() {
+    return (i)
 }
 
