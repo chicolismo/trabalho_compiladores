@@ -26,14 +26,14 @@ void setTypes(AST *node) {
         
     else if(node->type == AST_FUNC_DECL) {
         setTypesOfNode(node, SYMBOL_IDENTIFIER_FUNCTION, 1, 0);
-        setTypes(node->son[2]); // Set types for function params
+        setTypes(node->son[2]); // Define tipos para os parametros da funcao
     }
         
     else if(node->type == AST_PARAM)
         setTypesOfNode(node, SYMBOL_IDENTIFIER_SCALAR, 0, 1);
     
     int i;
-    // Apply recursion only for declarations
+    // Aplica recursao apenas para declaracoes
     if(node->type == AST_DECL_LIST || node->type == AST_PARAM_LIST)
         for(i=0; i<MAX_SONS; i++)
             setTypes(node->son[i]);
@@ -63,26 +63,6 @@ void setTypesOfNode(AST *node, int type, int identifierIndex, int dataTypeIndex)
         else if(node->son[dataTypeIndex]->type == AST_TYPE_DOUBLE)
             node->son[identifierIndex]->symbol->dataType = DATATYPE_DOUBLE;
     }
-}
-
-// Retorna um valor positivo se encontrar apenas retornos com tipo compativel
-// Retorna 0 se nao houver nenhum retorno na funcao
-// Retorna um valor negativo se encontrar retornos com tipo incompativel
-int checkFunctionReturnType(AST *node, int dataType) {
-    if(!node)
-        return 0;
-    
-    if(node->type == AST_RETURN) {
-        if(convertDataTypes(dataType, getExpressionDataType(node->son[0])) != DATATYPE_ERROR)
-            return 1;
-        else
-            return -1000;
-    }
-    
-    int i, returnsSum = 0;
-    for(i=0; i<MAX_SONS; i++)
-        returnsSum += checkFunctionReturnType(node->son[i], dataType);
-    return returnsSum;
 }
 
 void checkUndeclaredIdentifiers(AST *node) {
@@ -157,6 +137,26 @@ void checkIdentifiersUsage(AST *node) {
     int i;
     for(i=0; i<MAX_SONS; i++)
         checkIdentifiersUsage(node->son[i]);
+}
+
+// Retorna um valor positivo se encontrar apenas retornos com tipo compativel
+// Retorna 0 se nao houver nenhum retorno na funcao
+// Retorna um valor negativo se encontrar retornos com tipo incompativel
+int checkFunctionReturnType(AST *node, int dataType) {
+    if(!node)
+        return 0;
+    
+    if(node->type == AST_RETURN) {
+        if(convertDataTypes(dataType, getExpressionDataType(node->son[0])) != DATATYPE_ERROR)
+            return 1;
+        else
+            return -1000;
+    }
+    
+    int i, returnsSum = 0;
+    for(i=0; i<MAX_SONS; i++)
+        returnsSum += checkFunctionReturnType(node->son[i], dataType);
+    return returnsSum;
 }
 
 void checkFunctionCall(AST *functionCall, AST *node) {
