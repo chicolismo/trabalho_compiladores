@@ -31,8 +31,8 @@ d : byte = 65;
     print (5);
     print (1), 2, 3, 4, 5;
     print (3 + 1);
-    while (x) {
-        while (a) {
+    while (x>1) {
+        while (!a<=3) {
             a = 10
         }
     };

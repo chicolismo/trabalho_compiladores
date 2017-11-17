@@ -134,6 +134,14 @@ void checkIdentifiersUsage(AST *node) {
         checkFunctionCall(node, program);
     }
     
+    // Verifica testes do if e while
+    else if(node->type == AST_IF || node->type == AST_IF_ELSE || node->type == AST_WHILE) {
+        if(getExpressionDataType(node->son[0]) != DATATYPE_BOOL) {
+            fprintf(stderr, "ERRO SEMANTICO: Teste condicional na linha %d nao retorna uma expressao booleana.\n", node->son[0]->lineNumber);
+            exit(4);
+        }
+    }
+    
     int i;
     for(i=0; i<MAX_SONS; i++)
         checkIdentifiersUsage(node->son[i]);
