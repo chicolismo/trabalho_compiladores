@@ -27,6 +27,10 @@ void setTypes(AST *node) {
     else if(node->type == AST_FUNC_DECL) {
         setTypesOfNode(node, SYMBOL_IDENTIFIER_FUNCTION, 1, 0);
         setTypes(node->son[2]); // Set types for function params
+        if(checkFunctionReturnType(node->son[3], node->son[1]->symbol->datatype)) {
+            fprintf(stderr, "ERRO SEMANTICO: Funcao \"%s\" declarada na linha %d nao possui um retorno com tipo compativel.\n", node->son[1]->symbol->string, node->lineNumber);
+            exit(4);
+        }
     }
         
     else if(node->type == AST_PARAM)
@@ -63,6 +67,10 @@ void setTypesOfNode(AST *node, int type, int identifierIndex, int datatypeIndex)
         else if(node->son[datatypeIndex]->type == AST_TYPE_DOUBLE)
             node->son[identifierIndex]->symbol->datatype = DATATYPE_DOUBLE;
     }
+}
+
+int checkFunctionReturnType(AST *node, int datatype) {
+    // TODO
 }
 
 void checkUndeclaredIdentifiers(AST *node) {

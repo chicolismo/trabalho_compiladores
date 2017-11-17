@@ -7,6 +7,7 @@
 void semanticVerification(AST *node);
 void setTypes(AST *node);
 void setTypesOfNode(AST *node, int type, int identifierIndex, int datatypeIndex);
+int checkFunctionReturnType(AST *node, int datatype);
 void checkUndeclaredIdentifiers(AST *node);
 void checkIdentifiersUsage(AST *node);
 void checkFunctionCall(AST *functionCall, AST *node);
