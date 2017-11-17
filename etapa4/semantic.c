@@ -124,6 +124,15 @@ void checkIdentifiersUsage(AST *node) {
         }
     }
 
+    // Verifica se indices de vetores sao de tipos inteiros
+    else if(node->type == AST_ARY_INDEX || node->type == AST_ARY_ASSIGN) {
+        int dataType = getExpressionDataType(node->son[1]);
+        if(dataType != DATATYPE_BYTE && dataType != DATATYPE_SHORT && dataType != DATATYPE_LONG) {
+            fprintf(stderr, "ERRO SEMANTICO: Indice do vetor \"%s\" na linha %d deveria ser um inteiro.\n", node->son[0]->symbol->string, node->lineNumber);
+            exit(4);
+        }
+    }
+    
     // Verifica chamada de funcao
     else if(node->type == AST_FUNC_CALL) {
         if(node->son[0]->symbol->type != SYMBOL_IDENTIFIER_FUNCTION) {
