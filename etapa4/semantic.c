@@ -84,8 +84,17 @@ void checkIdentifiersUsage(AST *node) {
     if(!node)
         return;
     
+    // Verifica se indices de vetores sao de tipos inteiros
+    if(node->type == AST_ARY_INDEX || node->type == AST_ARY_ASSIGN) {
+        int dataType = getExpressionDataType(node->son[1]);
+        if(dataType != DATATYPE_BYTE && dataType != DATATYPE_SHORT && dataType != DATATYPE_LONG) {
+            fprintf(stderr, "ERRO SEMANTICO: Indice do vetor \"%s\" na linha %d deveria ser um inteiro.\n", node->son[0]->symbol->string, node->lineNumber);
+            exit(4);
+        }
+    }
+    
     // Verifica tipo de retorno da funcao
-    else if(node->type == AST_FUNC_DECL) {
+    if(node->type == AST_FUNC_DECL) {
         int returnCheck = checkFunctionReturnType(node->son[3], node->son[1]->symbol->dataType);
         if(returnCheck == 0) {
             fprintf(stderr, "ERRO SEMANTICO: Funcao \"%s\" declarada na linha %d nao possui retorno.\n", node->son[1]->symbol->string, node->lineNumber);
@@ -106,15 +115,6 @@ void checkIdentifiersUsage(AST *node) {
         if(convertDataTypes(node->son[0]->symbol->dataType,
                             getExpressionDataType(node->son[1])) == DATATYPE_ERROR) {
             fprintf(stderr, "ERRO SEMANTICO: Incompatibilidade de tipos na atribuicao ao escalar \"%s\" na linha %d.\n", node->son[0]->symbol->string, node->lineNumber);
-            exit(4);
-        }
-    }
-
-    // Verifica se indices de vetores sao de tipos inteiros
-    else if(node->type == AST_ARY_INDEX || node->type == AST_ARY_ASSIGN) {
-        int dataType = getExpressionDataType(node->son[1]);
-        if(dataType != DATATYPE_BYTE && dataType != DATATYPE_SHORT && dataType != DATATYPE_LONG) {
-            fprintf(stderr, "ERRO SEMANTICO: Indice do vetor \"%s\" na linha %d deveria ser um inteiro.\n", node->son[0]->symbol->string, node->lineNumber);
             exit(4);
         }
     }
