@@ -9,7 +9,7 @@ c : byte = 'x';
 d : byte = 65;
 
 (long) main() {
-    a = 10;
+    a = i;
     c = !a;
     v[2] = v[10 - 1];
     print " Digite um numero: \n";
@@ -44,6 +44,7 @@ d : byte = 65;
 }
 
 (short) voidfunc() {
-    return (i)
+    return (test)
 }
 
+test : short = 0;

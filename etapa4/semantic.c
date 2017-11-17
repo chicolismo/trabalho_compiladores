@@ -11,7 +11,7 @@ void semanticVerification(AST *node) {
     program = node;
     setTypes(node);
     checkUndeclaredIdentifiers(node);
-    //checkIdentifiersUsage(node);
+    checkIdentifiersUsage(node);
 }
 
 void setTypes(AST *node) {
@@ -27,15 +27,6 @@ void setTypes(AST *node) {
     else if(node->type == AST_FUNC_DECL) {
         setTypesOfNode(node, SYMBOL_IDENTIFIER_FUNCTION, 1, 0);
         setTypes(node->son[2]); // Set types for function params
-        
-        int returnCheck = checkFunctionReturnType(node->son[3], node->son[1]->symbol->dataType);
-        if(returnCheck == 0) {
-            fprintf(stderr, "ERRO SEMANTICO: Funcao \"%s\" declarada na linha %d nao possui retorno.\n", node->son[1]->symbol->string, node->lineNumber);
-            exit(4);
-        } else if(returnCheck < 0) {
-            fprintf(stderr, "ERRO SEMANTICO: Funcao \"%s\" declarada na linha %d possui retorno com tipo incompativel.\n", node->son[1]->symbol->string, node->lineNumber);
-            exit(4);
-        }
     }
         
     else if(node->type == AST_PARAM)
@@ -113,6 +104,19 @@ void checkIdentifiersUsage(AST *node) {
     if(!node)
         return;
     
+    // Verifica tipo de retorno da funcao
+    else if(node->type == AST_FUNC_DECL) {
+        int returnCheck = checkFunctionReturnType(node->son[3], node->son[1]->symbol->dataType);
+        if(returnCheck == 0) {
+            fprintf(stderr, "ERRO SEMANTICO: Funcao \"%s\" declarada na linha %d nao possui retorno.\n", node->son[1]->symbol->string, node->lineNumber);
+            exit(4);
+        } else if(returnCheck < 0) {
+            fprintf(stderr, "ERRO SEMANTICO: Funcao \"%s\" declarada na linha %d possui retorno com tipo incompativel.\n", node->son[1]->symbol->string, node->lineNumber);
+            exit(4);
+        }
+    }
+    
+    // Verifica atribuicao a escalares
     else if(node->type == AST_VAR_ASSIGN) {
         if(node->son[0]->symbol->type != SYMBOL_IDENTIFIER_SCALAR) {
             fprintf(stderr, "ERRO SEMANTICO: Identificador \"%s\" na linha %d deveria ser um escalar.\n", node->son[0]->symbol->string, node->lineNumber);
@@ -121,11 +125,12 @@ void checkIdentifiersUsage(AST *node) {
         
         if(convertDataTypes(node->son[0]->symbol->dataType,
                             getExpressionDataType(node->son[1])) == DATATYPE_ERROR) {
-            fprintf(stderr, "ERRO SEMANTICO: Incompatibilidade de tipos na atribuicao a variavel \"%s\" na linha %d.\n", node->son[0]->symbol->string, node->lineNumber);
+            fprintf(stderr, "ERRO SEMANTICO: Incompatibilidade de tipos na atribuicao ao escalar \"%s\" na linha %d.\n", node->son[0]->symbol->string, node->lineNumber);
             exit(4);
         }
     }
 
+    // Verifica atribuicao a vetores
     else if(node->type == AST_ARY_ASSIGN) {
         if(node->son[0]->symbol->type != SYMBOL_IDENTIFIER_VECTOR) {
             fprintf(stderr, "ERRO SEMANTICO: Identificador \"%s\" na linha %d deveria ser um vetor.\n", node->son[0]->symbol->string, node->lineNumber);
@@ -134,11 +139,12 @@ void checkIdentifiersUsage(AST *node) {
         
         if(convertDataTypes(node->son[0]->symbol->dataType,
                             getExpressionDataType(node->son[2])) == DATATYPE_ERROR) {
-            fprintf(stderr, "ERRO SEMANTICO: Incompatibilidade de tipos na atribuicao a variavel \"%s\" na linha %d.\n", node->son[0]->symbol->string, node->lineNumber);
+            fprintf(stderr, "ERRO SEMANTICO: Incompatibilidade de tipos na atribuicao ao indice do vetor \"%s\" na linha %d.\n", node->son[0]->symbol->string, node->lineNumber);
             exit(4);
         }
     }
 
+    // Verifica chamada de funcao
     else if(node->type == AST_FUNC_CALL) {
         if(node->son[0]->symbol->type != SYMBOL_IDENTIFIER_FUNCTION) {
             fprintf(stderr, "ERRO SEMANTICO: Identificador \"%s\" na linha %d deveria ser uma chamada de funcao.\n", node->son[0]->symbol->string, node->lineNumber);
