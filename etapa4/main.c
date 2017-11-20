@@ -27,7 +27,7 @@ int main(int argc, char **argv) {
     if (output_file == NULL) {
         fprintf(stderr, "ERRO: Arquivo de saída inexistente.\n");
         fclose(input_file);
-        return 3;
+        return 2;
     }
     set_output_file(output_file);
 
