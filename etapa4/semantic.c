@@ -38,22 +38,21 @@ void setTypes(AST *node) {
 
     int i;
     // Aplica recursao apenas para declaracoes
-    if (node->type == AST_DECL_LIST || node->type == AST_PARAM_LIST)
+    if (node->type == AST_DECL_LIST || node->type == AST_PARAM_LIST) {
         for (i = 0; i < MAX_SONS; i++) {
             setTypes(node->son[i]);
         }
+    }
 }
 
 void setTypesOfNode(AST *node, int type, int identifierIndex, int dataTypeIndex) {
     // Nodo ja teve seu tipo redefinido antes, entao ja foi declarado anteriormente
     if (node->son[identifierIndex]->symbol->type != SYMBOL_IDENTIFIER) {
-        fprintf(stderr,
-                "ERRO SEMANTICO: Redeclaracao de \"%s\" na linha %d, previamente declarado na linha %d.\n",
+        fprintf(stderr, "ERRO SEMANTICO: Redeclaracao de \"%s\" na linha %d, previamente declarado na linha %d.\n",
                 node->son[identifierIndex]->symbol->string, node->lineNumber,
                 node->son[identifierIndex]->symbol->lineNumber);
         exit(4);
-    }
-    else {
+    } else {
         node->son[identifierIndex]->symbol->type = type;
         node->son[identifierIndex]->symbol->lineNumber = node->lineNumber;
 
@@ -121,8 +120,7 @@ void checkIdentifiersUsage(AST *node) {
             exit(4);
         }
         else if (returnCheck < 0) {
-            fprintf(stderr,
-                    "ERRO SEMANTICO: Funcao \"%s\" declarada na linha %d possui retorno com tipo incompativel.\n",
+            fprintf(stderr, "ERRO SEMANTICO: Funcao \"%s\" declarada na linha %d possui retorno com tipo incompativel.\n",
                     node->son[1]->symbol->string, node->lineNumber);
             exit(4);
         }
@@ -138,8 +136,7 @@ void checkIdentifiersUsage(AST *node) {
 
         if (convertDataTypes(node->son[0]->symbol->dataType,
                              getExpressionDataType(node->son[1])) == DATATYPE_ERROR) {
-            fprintf(stderr,
-                    "ERRO SEMANTICO: Incompatibilidade de tipos na atribuicao ao escalar \"%s\" na linha %d.\n",
+            fprintf(stderr, "ERRO SEMANTICO: Incompatibilidade de tipos na atribuicao ao escalar \"%s\" na linha %d.\n",
                     node->son[0]->symbol->string, node->lineNumber);
             exit(4);
         }
@@ -155,8 +152,7 @@ void checkIdentifiersUsage(AST *node) {
 
         if (convertDataTypes(node->son[0]->symbol->dataType,
                              getExpressionDataType(node->son[2])) == DATATYPE_ERROR) {
-            fprintf(stderr,
-                    "ERRO SEMANTICO: Incompatibilidade de tipos na atribuicao ao indice do vetor \"%s\" na linha %d.\n",
+            fprintf(stderr, "ERRO SEMANTICO: Incompatibilidade de tipos na atribuicao ao indice do vetor \"%s\" na linha %d.\n",
                     node->son[0]->symbol->string, node->lineNumber);
             exit(4);
         }
@@ -165,8 +161,7 @@ void checkIdentifiersUsage(AST *node) {
     // Verifica chamada de funcao
     else if (node->type == AST_FUNC_CALL) {
         if (node->son[0]->symbol->type != SYMBOL_IDENTIFIER_FUNCTION) {
-            fprintf(stderr,
-                    "ERRO SEMANTICO: Identificador \"%s\" na linha %d deveria ser uma chamada de funcao.\n",
+            fprintf(stderr, "ERRO SEMANTICO: Identificador \"%s\" na linha %d deveria ser uma chamada de funcao.\n",
                     node->son[0]->symbol->string, node->lineNumber);
             exit(4);
         }
@@ -177,8 +172,7 @@ void checkIdentifiersUsage(AST *node) {
     // Verifica testes do if e while
     else if (node->type == AST_IF || node->type == AST_IF_ELSE || node->type == AST_WHILE) {
         if (getExpressionDataType(node->son[0]) != DATATYPE_BOOL) {
-            fprintf(stderr,
-                    "ERRO SEMANTICO: Teste condicional na linha %d nao retorna uma expressao booleana.\n",
+            fprintf(stderr, "ERRO SEMANTICO: Teste condicional na linha %d nao retorna uma expressao booleana.\n",
                     node->son[0]->lineNumber);
             exit(4);
         }
@@ -201,8 +195,7 @@ int checkFunctionReturnType(AST *node, int dataType) {
     if (node->type == AST_RETURN) {
         if (convertDataTypes(dataType, getExpressionDataType(node->son[0])) != DATATYPE_ERROR) {
             return 1;
-        }
-        else {
+        } else {
             return -1000;
         }
     }
@@ -237,8 +230,7 @@ void compareArgsAndParams(AST *functionCall, AST *args, AST *params) {
     }
 
     if (!args || !params) {
-        fprintf(stderr,
-                "ERRO SEMANTICO: Chamada da funcao \"%s\" na linha %d com um numero incompativel de argumentos.\n",
+        fprintf(stderr, "ERRO SEMANTICO: Chamada da funcao \"%s\" na linha %d com um numero incompativel de argumentos.\n",
                 functionCall->son[0]->symbol->string, functionCall->lineNumber);
         exit(4);
     }
@@ -250,8 +242,7 @@ void compareArgsAndParams(AST *functionCall, AST *args, AST *params) {
     }
 
     if (args->type != AST_LIST || params->type != AST_PARAM_LIST) {
-        fprintf(stderr,
-                "ERRO SEMANTICO: Chamada da funcao \"%s\" na linha %d com um numero incompativel de argumentos.\n",
+        fprintf(stderr, "ERRO SEMANTICO: Chamada da funcao \"%s\" na linha %d com um numero incompativel de argumentos.\n",
                 functionCall->son[0]->symbol->string, functionCall->lineNumber);
         exit(4);
     }
@@ -269,8 +260,7 @@ void compareArgAndParam(AST *functionCall, AST *arg, AST *param) {
     int dataType = convertDataTypes(argDataType, paramDataType);
 
     if (dataType == DATATYPE_ERROR) {
-        fprintf(stderr,
-                "ERRO SEMANTICO: Chamada da funcao \"%s\" na linha %d possui argumentos com tipos incompativeis com a sua declaracao.\n",
+        fprintf(stderr, "ERRO SEMANTICO: Chamada da funcao \"%s\" na linha %d possui argumentos com tipos incompativeis com a sua declaracao.\n",
                 functionCall->son[0]->symbol->string, functionCall->lineNumber);
         exit(4);
     }
@@ -286,15 +276,12 @@ int getExpressionDataType(AST *node) {
     switch (node->type) {
     case AST_SYMBOL:
         if (node->symbol->type == SYMBOL_LIT_INTEGER) {
-            return DATATYPE_SHORT;
-        }
-        else if (node->symbol->type == SYMBOL_LIT_REAL) {
-            return DATATYPE_FLOAT;
-        }
-        else if (node->symbol->type == SYMBOL_LIT_CHAR) {
+            return DATATYPE_LONG;
+        } else if (node->symbol->type == SYMBOL_LIT_REAL) {
+            return DATATYPE_DOUBLE;
+        } else if (node->symbol->type == SYMBOL_LIT_CHAR) {
             return DATATYPE_BYTE;
-        }
-        else {
+        } else {
             return node->symbol->dataType;
         }
 
@@ -322,16 +309,14 @@ int getExpressionDataType(AST *node) {
                                     getExpressionDataType(node->son[1]));
         if (dataType != DATATYPE_ERROR && dataType != DATATYPE_BOOL) {
             return DATATYPE_BOOL;
-        }
-        else {
+        } else {
             return DATATYPE_ERROR;
         }
 
     case AST_NOT:
         if (getExpressionDataType(node->son[0]) == DATATYPE_BOOL) {
             return DATATYPE_BOOL;
-        }
-        else {
+        } else {
             return DATATYPE_ERROR;
         }
 
@@ -340,8 +325,7 @@ int getExpressionDataType(AST *node) {
         if (getExpressionDataType(node->son[0]) == DATATYPE_BOOL &&
                 getExpressionDataType(node->son[1]) == DATATYPE_BOOL) {
             return DATATYPE_BOOL;
-        }
-        else {
+        } else {
             return DATATYPE_ERROR;
         }
 
@@ -357,12 +341,11 @@ int convertDataTypes(int type1, int type2) {
     }
 
     // Se os tipos forem compativeis, retorna o maior deles
-    if (type1 >= DATATYPE_BYTE && type1 <= DATATYPE_DOUBLE && type2 >= DATATYPE_BYTE &&
-            type2 <= DATATYPE_DOUBLE) {
+    if (type1 >= DATATYPE_BYTE && type1 <= DATATYPE_DOUBLE &&
+            type2 >= DATATYPE_BYTE && type2 <= DATATYPE_DOUBLE) {
         if (type1 > type2) {
             return type1;
-        }
-        else {
+        } else {
             return type2;
         }
     }
