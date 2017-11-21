@@ -134,8 +134,8 @@ void checkIdentifiersUsage(AST *node) {
             exit(4);
         }
 
-        if (convertDataTypes(node->son[0]->symbol->dataType,
-                             getExpressionDataType(node->son[1])) == DATATYPE_ERROR) {
+        if (convertDataTypesByClasses(node->son[0]->symbol->dataType,
+                                      getExpressionDataType(node->son[1])) == DATATYPE_ERROR) {
             fprintf(stderr, "ERRO SEMANTICO: Incompatibilidade de tipos na atribuicao ao escalar \"%s\" na linha %d.\n",
                     node->son[0]->symbol->string, node->lineNumber);
             exit(4);
@@ -150,8 +150,8 @@ void checkIdentifiersUsage(AST *node) {
             exit(4);
         }
 
-        if (convertDataTypes(node->son[0]->symbol->dataType,
-                             getExpressionDataType(node->son[2])) == DATATYPE_ERROR) {
+        if (convertDataTypesByClasses(node->son[0]->symbol->dataType,
+                                      getExpressionDataType(node->son[2])) == DATATYPE_ERROR) {
             fprintf(stderr, "ERRO SEMANTICO: Incompatibilidade de tipos na atribuicao ao indice do vetor \"%s\" na linha %d.\n",
                     node->son[0]->symbol->string, node->lineNumber);
             exit(4);
@@ -193,7 +193,7 @@ int checkFunctionReturnType(AST *node, int dataType) {
     }
 
     if (node->type == AST_RETURN) {
-        if (convertDataTypes(dataType, getExpressionDataType(node->son[0])) != DATATYPE_ERROR) {
+        if (convertDataTypesByClasses(dataType, getExpressionDataType(node->son[0])) != DATATYPE_ERROR) {
             return 1;
         } else {
             return -1000;
@@ -257,7 +257,7 @@ void compareArgsAndParams(AST *functionCall, AST *args, AST *params) {
 void compareArgAndParam(AST *functionCall, AST *arg, AST *param) {
     int argDataType = getExpressionDataType(arg);
     int paramDataType = getExpressionDataType(param->son[0]);
-    int dataType = convertDataTypes(argDataType, paramDataType);
+    int dataType = convertDataTypesByClasses(argDataType, paramDataType);
 
     if (dataType == DATATYPE_ERROR) {
         fprintf(stderr, "ERRO SEMANTICO: Chamada da funcao \"%s\" na linha %d possui argumentos com tipos incompativeis com a sua declaracao.\n",
@@ -355,6 +355,41 @@ int convertDataTypes(int type1, int type2) {
         return DATATYPE_BOOL;
     }
 
+    // Tipos nao compativeis
+    return DATATYPE_ERROR;
+}
+
+int convertDataTypesByClasses(int type1, int type2) {
+    // Se os tipos forem equivalentes
+    if (type1 == type2) {
+        return type1;
+    }
+    
+    // Se os tipos forem inteiros, retorna o maior deles
+    if (type1 >= DATATYPE_BYTE && type1 <= DATATYPE_LONG &&
+        type2 >= DATATYPE_BYTE && type2 <= DATATYPE_LONG) {
+        if (type1 > type2) {
+            return type1;
+        } else {
+            return type2;
+        }
+    }
+    
+    // Se os tipos forem reais, retorna o maior deles
+    if (type1 >= DATATYPE_FLOAT && type1 <= DATATYPE_DOUBLE &&
+        type2 >= DATATYPE_FLOAT && type2 <= DATATYPE_DOUBLE) {
+        if (type1 > type2) {
+            return type1;
+        } else {
+            return type2;
+        }
+    }
+    
+    // Se os dois tipos forem booleanos
+    if (type1 == DATATYPE_BOOL && type2 == DATATYPE_BOOL) {
+        return DATATYPE_BOOL;
+    }
+    
     // Tipos nao compativeis
     return DATATYPE_ERROR;
 }

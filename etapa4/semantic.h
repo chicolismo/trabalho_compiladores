@@ -14,5 +14,6 @@ void compareArgsAndParams(AST *functionCall, AST *args, AST *params);
 void compareArgAndParam(AST *functionCall, AST *arg, AST *param);
 int getExpressionDataType(AST *node);
 int convertDataTypes(int type1, int type2);
+int convertDataTypesByClasses(int type1, int type2);
 
 #endif // __SEMANTIC_H__
