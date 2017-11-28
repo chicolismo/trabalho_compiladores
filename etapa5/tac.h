@@ -1,7 +1,10 @@
 #ifndef __TAC_H__
 #define __TAC_H__
 
+#define LABEL_SIZE 15
+
 #include "hash.h"
+#include "astree.h"
 
 // TODO: Temos que descobrir quais símbolos são necessários
 
@@ -33,13 +36,14 @@
 
 #define TAC_BEGINFUN 21
 #define TAC_ENDFUN 22
-#define TAC_IFZ 23
-#define TAC_JUMP 24
-#define TAC_CALL 25
-#define TAC_ARG 26
+#define TAC_IFZ 23 // jump if zero
+#define TAC_IFN 24 // jump if negative
+#define TAC_JUMP 25
+#define TAC_CALL 26
+#define TAC_ARG 27
 
-#define TAC_PARAM_PUSH 27
-#define TAC_PARAM_POP 28
+#define TAC_PARAM_PUSH 28
+#define TAC_PARAM_POP 29
 
 typedef struct TAC {
     int type;
@@ -61,4 +65,22 @@ void TAC_print(TAC *tac);
 // Unir
 TAC *TAC_join(TAC *tac1, TAC *tac2);
 
+
+// Funções auxiliares
+TAC *TAC_get_first(TAC *tac);
+TAC *TAC_get_last(TAC *tac);
+TAC *TAC_reverse_list(TAC *tac);
+
+void TAC_print_forward(TAC *tac);
+
+void TAC_print_backward(TAC *tac);
+
+HashNode *makeLabel();
+HashNode *makeTemp();
+
+TAC *generate_code(AST *node);
+TAC *make_while(TAC *code1, TAC *code2);
+TAC *make_if_then(TAC *code1, TAC *code2);
+TAC *make_if_then_else(TAC *code1, TAC *code2, TAC *code3);
+TAC *make_binary_operator(int type, TAC *code1, TAC *code2);
 #endif // __TAC_H__

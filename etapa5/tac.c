@@ -2,6 +2,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+// Globais
+static int label_counter = 0;
+static int temp_counter = 0;
+
+
 TAC *TAC_create(int type, HashNode *res, HashNode *op1, HashNode *op2) {
     TAC *tac = malloc(sizeof(TAC));
     tac->type = type;
@@ -161,3 +166,219 @@ void TAC_print(TAC *tac) {
     fprintf(stdout, ")\n");
 }
 // }}}
+
+
+// Funções auxiliares
+TAC *TAC_get_first(TAC *tac) {
+    while (tac->prev != NULL) {
+        tac = tac->prev;
+    }
+    return tac;
+}
+
+TAC *TAC_get_last(TAC *tac) {
+    while (tac->next != NULL) {
+        tac = tac->next;
+    }
+    return tac;
+}
+
+TAC *TAC_reverse_list(TAC *last) {
+    if (last == NULL) {
+        return NULL;
+    }
+
+    /*TAC *last = tac;*/
+    /*TAC *prev = tac->prev;*/
+    TAC *prev = last->prev;
+
+    last->prev = NULL;
+    /*last->next = NULL;*/
+
+    if (prev == NULL) {
+        return last;
+    }
+    else {
+        return TAC_join(last, TAC_reverse_list(prev));
+    }
+}
+
+void TAC_print_forward(TAC *tac) {
+    fprintf(stdout, "Printing Forward\n");
+
+    while (tac != NULL) {
+        TAC_print(tac);
+        tac = tac->next;
+    }
+}
+
+void TAC_print_backward(TAC *tac) {
+    fprintf(stdout, "Printing Backward\n");
+
+    while (tac != NULL) {
+        TAC_print(tac);
+        tac = tac->prev;
+    }
+}
+
+
+HashNode *makeLabel() {
+    char *label_name = malloc(sizeof(char) * LABEL_SIZE);
+    sprintf(label_name, "__label%d", label_counter);
+    ++label_counter;
+}
+
+/*HashNode *makeTemp() {*/
+/*}*/
+
+/* {{{
+TAC *generate_code(AST *node) {
+
+    if (node == NULL) {
+        return NULL;
+    }
+
+    TAC *code[MAX_SONS];
+    HashNode *label;
+
+    int i;
+    for (i = 0; i < MAX_SONS; ++i) {
+        if (node->son[i] != NULL) {
+            code[i] = generate_code(node->son[i]);
+        }
+        else {
+            code[i] = NULL;
+        }
+    }
+
+    // TODO: Falta descobrir como faz isso.
+    switch (node->type) {
+    case AST_SYMBOL:
+        ;
+        break;
+    case AST_ADD:
+        ;
+        break;
+    case AST_SUB:
+        ;
+        break;
+    case AST_MUL:
+        ;
+        break;
+    case AST_DIV:
+        ;
+        break;
+    case AST_LT:
+        ;
+        break;
+    case AST_GT:
+        ;
+        break;
+    case AST_NOT:
+        ;
+        break;
+    case AST_LE:
+        ;
+        break;
+    case AST_GE:
+        ;
+        break;
+    case AST_EQ:
+        ;
+        break;
+    case AST_NE:
+        ;
+        break;
+    case AST_AND:
+        ;
+        break;
+    case AST_OR:
+        ;
+        break;
+    case AST_LIST:
+        ;
+        break;
+    case AST_TYPE_BYTE:
+        ;
+        break;
+    case AST_TYPE_SHORT:
+        ;
+        break;
+    case AST_TYPE_LONG:
+        ;
+        break;
+    case AST_TYPE_FLOAT:
+        ;
+        break;
+    case AST_TYPE_DOUBLE:
+        ;
+        break;
+    case AST_DECL_LIST:
+        ;
+        break;
+    case AST_EXPR_LIST:
+        ;
+        break;
+    case AST_VAR_DECL:
+        ;
+        break;
+    case AST_ARY_DECL:
+        ;
+        break;
+    case AST_VAR_ASSIGN:
+        ;
+        break;
+    case AST_ARY_ASSIGN:
+        ;
+        break;
+    case AST_WHILE:
+        ;
+        break;
+    case AST_IF_ELSE:
+        ;
+        break;
+    case AST_IF:
+        ;
+        break;
+    case AST_RETURN:
+        ;
+        break;
+    case AST_PRINT:
+        ;
+        break;
+    case AST_READ:
+        ;
+        break;
+    case AST_BLOCK:
+        ;
+        break;
+    case AST_PARAM:
+        ;
+        break;
+    case AST_FUNC_DECL:
+        ;
+        break;
+    case AST_CMD_LIST:
+        ;
+        break;
+    case AST_PARAM_LIST:
+        ;
+        break;
+    case AST_ARY_INDEX:
+        ;
+        break;
+    case AST_FUNC_CALL:
+        ;
+        break;
+    case AST_PARENS_EXPR:
+        ;
+        break;
+    case AST_LIT_LIST:
+        ;
+        break;
+    case AST_EMPTY_LIT_LIST:
+        ;
+        break;
+    }
+}
+}}} */
