@@ -12,7 +12,8 @@ d: byte = 65;
 (long) main() {
   a = 10;
   v[2] = v[10-1];
-
+  print "Isto é", 10, "\n";
+    
   print " Digite um numero: \n";
   read > i;
   while (i<10) {

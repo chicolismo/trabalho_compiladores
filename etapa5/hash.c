@@ -3,9 +3,12 @@
 #include <string.h>
 #include "hash.h"
 
+// Globais
+static int label_counter = 0; // Contador dos rótulos já criados
+static int temp_counter = 0;  // Contador dos valores temporários
+
 // A tabela hash
 HashNode *hashTable[HASH_SIZE];
-
 
 void initializeHashTable() {
     int i;
@@ -116,3 +119,14 @@ void printHashTable() {
     }
 }
 
+HashNode *makeLabel() {
+    char label_name[LABEL_SIZE];
+    sprintf(label_name, "__label_%d__", label_counter++);
+    return setHashNode(label_name, SYMBOL_LABEL);
+}
+
+HashNode *makeTemp() {
+    char temp_name[TEMP_SIZE];
+    sprintf(temp_name, "__temp_%d__", temp_counter++);
+    return setHashNode(temp_name, SYMBOL_TEMP);
+}

@@ -26,6 +26,22 @@ void printNode(AST *node) {
         fprintf(stdout, "AST_SYMBOL: ");
         break;
 
+    case AST_LIT_INTEGER:
+        fprintf(stdout, "AST_LIT_INTEGER: ");
+        break;
+
+    case AST_LIT_REAL:
+        fprintf(stdout, "AST_LIT_REAL: ");
+        break;
+
+    case AST_LIT_CHAR:
+        fprintf(stdout, "AST_LIT_CHAR: ");
+        break;
+
+    case AST_LIT_STRING:
+        fprintf(stdout, "AST_LIT_STRING: ");
+        break;
+
     case AST_ADD:
         fprintf(stdout, "AST_ADD: ");
         break;
@@ -78,9 +94,9 @@ void printNode(AST *node) {
         fprintf(stdout, "AST_OR: ");
         break;
 
-    case AST_LIST:
-        fprintf(stdout, "AST_LIST: ");
-        break;
+    // case AST_LIST:
+    //     fprintf(stdout, "AST_LIST: ");
+    //     break;
 
     case AST_VAR_DECL:
         fprintf(stdout, "AST_VAR_DECL: ");
@@ -94,8 +110,8 @@ void printNode(AST *node) {
         fprintf(stdout, "AST_DECL_LIST: ");
         break;
 
-    case AST_EXPR_LIST:
-        fprintf(stdout, "AST_DECL_LIST: ");
+    case AST_PRINT_ARGS:
+        fprintf(stdout, "AST_PRINT_ARGS: ");
         break;
 
     case AST_VAR_ASSIGN:
@@ -150,6 +166,10 @@ void printNode(AST *node) {
         fprintf(stdout, "AST_PARAM_LIST: ");
         break;
 
+    case AST_ARG_LIST:
+        fprintf(stdout, "AST_ARG_LIST: ");
+        break;
+
     case AST_ARY_INDEX:
         fprintf(stdout, "AST_ARY_INDEX: ");
         break;
@@ -184,6 +204,10 @@ void printNode(AST *node) {
 
     case AST_EMPTY_LIT_LIST:
         fprintf(stdout, "AST_EMPTY_LIT_LIST: ");
+        break;
+    
+    case AST_PARENS_EXPR:
+        fprintf(stdout, "AST_PARENS_EXPR: ");
         break;
 
     default:
@@ -238,13 +262,17 @@ void generateCode(FILE *out, AST *node) {
 
     switch (node->type) {
     case AST_SYMBOL:
-        d("symbol");
+    case AST_LIT_INTEGER:
+    case AST_LIT_REAL:
+    case AST_LIT_CHAR:
+    case AST_LIT_STRING:
+        d("symbol or literal");
 
         if (node->symbol) {
             fprintf(out, "%s", node->symbol->string);
         }
         else {
-            fprintf(out, "<<Erro ao ler o símbolo no nodo>>");
+            fprintf(out, "<<Erro ao ler o símbolo (ou literal) no nodo>>");
         }
         break;
 
@@ -351,8 +379,16 @@ void generateCode(FILE *out, AST *node) {
         generateCode(out, node->son[1]);
         break;
 
-    case AST_LIST:
-        d("ast_list");
+    // case AST_LIST:
+    //     d("ast_list");
+
+    //     generateCode(out, node->son[0]);
+    //     fprintf(out, ", ");
+    //     generateCode(out, node->son[1]);
+    //     break;
+
+    case AST_ARG_LIST:
+        d("ast_arg_list");
 
         generateCode(out, node->son[0]);
         fprintf(out, ", ");
@@ -395,8 +431,8 @@ void generateCode(FILE *out, AST *node) {
         generateCode(out, node->son[1]);
         break;
 
-    case AST_EXPR_LIST:
-        d("ast_expr_list");
+    case AST_PRINT_ARGS:
+        d("ast_print_args");
 
         generateCode(out, node->son[0]);
         fprintf(out, ", ");

@@ -5,6 +5,7 @@
 #include "astree.h"
 #include "hash.h"
 #include "semantic.h"
+#include "tac.h"
 
 int yylex();
 int yyerror(char *text);
@@ -71,7 +72,7 @@ FILE *output_file = NULL;
 %type<ast> block
 %type<ast> cmd
 %type<ast> cmds
-%type<ast> expressions_list
+%type<ast> print_args
 %type<ast> type
 %type<ast> literal
 %type<ast> expression
@@ -97,8 +98,16 @@ program: declarations {
     $$ = $1;
     fprintf(stdout, "Imprimindo a árvore\n");
     printAST($$, 0);
-    // tac = TAC_reverse(generate_code($1))
-    // TAC_print_list_next(tac);
+
+    /*
+    TAC *tac = TAC_reverse_list(TAC_generate_code($1));
+    if (tac == NULL) {
+        // Ainda precisamos implementar todos os casos da AST possíveis.
+        printf("Temos um problema!!!\n");
+    }
+    TAC_print_forward(tac);
+    */
+
     generateCode(output_file, $$);
     semanticVerification($$);
 };
@@ -118,11 +127,11 @@ var_dec: identifier ':' type '=' literal ';'                           { $$ = cr
 
 identifier: TK_IDENTIFIER { $$ = createAST(AST_SYMBOL, $1, 0, 0, 0, 0); }
 
-literal_integer: LIT_INTEGER { $$ = createAST(AST_SYMBOL, $1, 0, 0, 0, 0); }
+literal_integer: LIT_INTEGER { $$ = createAST(AST_LIT_INTEGER, $1, 0, 0, 0, 0); }
 
-literal_real: LIT_REAL { $$ = createAST(AST_SYMBOL, $1, 0, 0, 0, 0); }
+literal_real: LIT_REAL { $$ = createAST(AST_LIT_REAL, $1, 0, 0, 0, 0); }
 
-literal_char: LIT_CHAR { $$ = createAST(AST_SYMBOL, $1, 0, 0, 0, 0); }
+literal_char: LIT_CHAR { $$ = createAST(AST_LIT_CHAR, $1, 0, 0, 0, 0); }
 
 literals_list: literal literals_list { $$ = createAST(AST_LIT_LIST, 0, $1, $2, 0, 0); }
              |                       { $$ = createAST(AST_EMPTY_LIT_LIST, 0, 0, 0, 0, 0); }
@@ -146,7 +155,7 @@ args: args_list { $$ = $1; }
     |           { $$ = NULL; }
     ;
 
-args_list: expression ',' args_list { $$ = createAST(AST_LIST, 0, $1, $3, 0, 0); }
+args_list: expression ',' args_list { $$ = createAST(AST_ARG_LIST, 0, $1, $3, 0, 0); }
          | expression               { $$ = $1; }
          ;
 
@@ -157,10 +166,11 @@ cmds: cmd ';' cmds { $$ = createAST(AST_CMD_LIST, 0, $1, $3, 0, 0);}
     | cmd { $$ = $1; }
     ;
 
+
 cmd: identifier '=' expression                     { $$ = createAST(AST_VAR_ASSIGN, 0, $1, $3, 0, 0); }
    | identifier '[' expression ']' '=' expression  { $$ = createAST(AST_ARY_ASSIGN, 0, $1, $3, $6, 0); }
    | KW_READ '>' identifier                           { $$ = createAST(AST_READ, 0, $3, 0, 0, 0); }
-   | KW_PRINT expressions_list                        { $$ = createAST(AST_PRINT, 0, $2, 0, 0, 0); }
+   | KW_PRINT print_args                              { $$ = createAST(AST_PRINT, 0, $2, 0, 0, 0); }
    | KW_RETURN expression                             { $$ = createAST(AST_RETURN, 0, $2, 0, 0, 0); }
    | KW_IF '(' expression ')' KW_THEN cmd             { $$ = createAST(AST_IF, 0, $3, $6, 0, 0); }
    | KW_IF '(' expression ')' KW_THEN cmd KW_ELSE cmd { $$ = createAST(AST_IF_ELSE, 0, $3, $6, $8, 0); }
@@ -169,9 +179,6 @@ cmd: identifier '=' expression                     { $$ = createAST(AST_VAR_ASSI
    |                                                  { $$ = NULL; }
    ;
 
-expressions_list: any_expression ',' expressions_list { $$ = createAST(AST_EXPR_LIST, 0, $1, $3, 0, 0); }
-                | any_expression                      { $$ = $1; }
-                ;
 
 type: KW_BYTE   { $$ = createAST(AST_TYPE_BYTE, 0, 0, 0, 0, 0); }
     | KW_SHORT  { $$ = createAST(AST_TYPE_SHORT, 0, 0, 0, 0, 0); }
@@ -181,7 +188,7 @@ type: KW_BYTE   { $$ = createAST(AST_TYPE_BYTE, 0, 0, 0, 0, 0); }
     ;
 
 
-literal_string: LIT_STRING { $$ = createAST(AST_SYMBOL, $1, 0, 0, 0, 0); }
+literal_string: LIT_STRING { $$ = createAST(AST_LIT_STRING, $1, 0, 0, 0, 0); }
 
 
 literal: literal_integer { $$ = $1; }
@@ -189,6 +196,14 @@ literal: literal_integer { $$ = $1; }
        | literal_char    { $$ = $1; }
        ;
 
+
+print_args: any_expression ',' print_args { $$ = createAST(AST_PRINT_ARGS, 0, $1, $3, 0, 0); }
+          | any_expression                { $$ = $1; }
+          ;
+
+any_expression: literal_string { $$ = $1; }
+              | expression { $$ = $1; }
+              ;
 
 expression: literal                            { $$ = $1; }
           | identifier                         { $$ = $1; }
@@ -210,9 +225,6 @@ expression: literal                            { $$ = $1; }
           | expression OPERATOR_OR expression  { $$ = createAST(AST_OR, 0, $1, $3, 0, 0); }
           ;
 
-any_expression: literal_string { $$ = $1; }
-              | expression { $$ = $1; }
-              ;
 
 %%
 

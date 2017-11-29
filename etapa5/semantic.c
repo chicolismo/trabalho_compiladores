@@ -235,13 +235,13 @@ void compareArgsAndParams(AST *functionCall, AST *args, AST *params) {
         exit(4);
     }
 
-    if (args->type != AST_LIST && params->type != AST_PARAM_LIST) {
+    if (args->type != AST_ARG_LIST && params->type != AST_PARAM_LIST) {
         // Compara ultimos elementos das listas
         compareArgAndParam(functionCall, args, params);
         return;
     }
 
-    if (args->type != AST_LIST || params->type != AST_PARAM_LIST) {
+    if (args->type != AST_ARG_LIST || params->type != AST_PARAM_LIST) {
         fprintf(stderr, "ERRO SEMANTICO: Chamada da funcao \"%s\" na linha %d com um numero incompativel de argumentos.\n",
                 functionCall->son[0]->symbol->string, functionCall->lineNumber);
         exit(4);
@@ -275,6 +275,9 @@ int getExpressionDataType(AST *node) {
 
     switch (node->type) {
     case AST_SYMBOL:
+    case AST_LIT_INTEGER:
+    case AST_LIT_REAL:
+    case AST_LIT_CHAR:
         if (node->symbol->type == SYMBOL_LIT_INTEGER) {
             return DATATYPE_LONG;
         } else if (node->symbol->type == SYMBOL_LIT_REAL) {

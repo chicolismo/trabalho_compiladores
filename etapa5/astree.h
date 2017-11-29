@@ -20,7 +20,7 @@
 #define AST_NE             12
 #define AST_AND            13
 #define AST_OR             14
-#define AST_LIST           15
+//#define AST_LIST           15
 
 #define AST_TYPE_BYTE      16
 #define AST_TYPE_SHORT     17
@@ -29,7 +29,7 @@
 #define AST_TYPE_DOUBLE    20
 
 #define AST_DECL_LIST      21
-#define AST_EXPR_LIST      22
+#define AST_PRINT_ARGS     22
 
 #define AST_VAR_DECL       23
 #define AST_ARY_DECL       24
@@ -52,6 +52,14 @@
 #define AST_PARENS_EXPR    40
 #define AST_LIT_LIST       41
 #define AST_EMPTY_LIT_LIST 42
+#define AST_ARG_LIST       43
+
+// Temos que definir tipos para os literais, para diferenciá-los dos símbolos,
+// na hora de tratar argumentos e parâmetros.
+#define AST_LIT_INTEGER    44
+#define AST_LIT_REAL       45
+#define AST_LIT_CHAR       46
+#define AST_LIT_STRING     47
 
 typedef struct ASTreeNode {
     int type;

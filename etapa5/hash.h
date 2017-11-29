@@ -1,7 +1,11 @@
 #ifndef __HASH_H__
 #define __HASH_H__
 
+// O tamanho da tabela hash
 #define HASH_SIZE                  1000
+
+#define LABEL_SIZE                 255
+#define TEMP_SIZE                  255
 
 #define SYMBOL_LIT_INTEGER         1
 #define SYMBOL_LIT_REAL            2
@@ -21,6 +25,9 @@
 #define DATATYPE_BOOL              14
 #define DATATYPE_ERROR             -1
 
+#define SYMBOL_LABEL               15 // Para makeLabel (etapa5)
+#define SYMBOL_TEMP                16 // Para makeTemp (etapa5)
+
 struct HashNode {
     char *string;
     int type;
@@ -38,5 +45,8 @@ HashNode *destroyHashNode(HashNode **node);
 HashNode *getHashNode(const char *string);
 HashNode *setHashNode(const char *string, int type);
 void printHashTable();
+
+HashNode *makeLabel();
+HashNode *makeTemp();
 
 #endif // __HASH_H__
