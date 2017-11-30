@@ -100,13 +100,7 @@ program: declarations {
     printAST($$, 0);
 
     TAC *tac = TAC_reverse_list(TAC_generate_code($1));
-    if (tac == NULL) {
-        // Ainda precisamos implementar todos os casos da AST possíveis.
-        printf("Temos um problema!!!\n");
-    }
     TAC_print_forward(tac);
-    /*
-    */
 
     generateCode(output_file, $$);
     semanticVerification($$);

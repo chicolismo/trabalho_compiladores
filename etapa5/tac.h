@@ -52,6 +52,8 @@
 #define TAC_ARY_DECL 33
 #define TAC_ASSIGN 34
 #define TAC_EMPTY_LIST 35
+#define TAC_ARRAY_ASSIGN 36
+#define TAC_ARRAY_INDEX 37
 
 
 // Define um Nodo TAC (Three address code)
@@ -76,7 +78,6 @@ void TAC_print(TAC *tac);
 // Unir dois TACs
 TAC *TAC_join(TAC *tac1, TAC *tac2);
 
-
 // Funções auxiliares
 TAC *TAC_get_first(TAC *tac);
 TAC *TAC_get_last(TAC *tac);
@@ -86,13 +87,20 @@ void TAC_print_forward(TAC *tac);
 void TAC_print_backward(TAC *tac);
 
 TAC *TAC_make_binary_operator(AST *node, TAC *tac1, TAC *tac2);
-
-TAC *TAC_make_read(AST *node, TAC *tac);
 TAC *TAC_make_print(AST *node, TAC *args);
-
+TAC *TAC_make_read(AST *node, TAC *tac);
 TAC *TAC_make_while(AST *node, TAC *cond, TAC *body);
-
-TAC *TAC_make_arg(AST *node, TAC *tac);
-
+TAC *TAC_make_if(AST *node, TAC *cond, TAC *if_true);
+TAC *TAC_make_if_else(AST *node, TAC *cond, TAC *if_true, TAC *if_false);
+TAC *TAC_make_return(AST *node, TAC *expr);
+TAC *TAC_make_fun_declaration(AST *node, TAC *fn_name, TAC *fn_params, TAC *fn_body);
+TAC *TAC_make_fun_call(AST *node, TAC *fn_name, TAC *fn_args);
+TAC *TAC_make_param(AST *node);
+TAC *TAC_make_var_declaration(AST *node, TAC *symbol, TAC *literal);
+TAC *TAC_make_ary_declaration(AST *node, TAC *symbol, TAC *size, TAC *literals);
+TAC *TAC_make_assign(AST *node, TAC *symbol, TAC *expr);
+TAC *TAC_make_ary_assign(AST *node, TAC *symbol, TAC *index_expr, TAC *val_expr);
+TAC *TAC_make_ary_index(AST *node, TAC *symbol, TAC *index_expr);
 TAC *TAC_generate_code(AST *node);
+
 #endif // __TAC_H__
