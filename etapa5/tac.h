@@ -38,14 +38,20 @@
 #define TAC_ENDFUN 22
 
 #define TAC_JZ 23 // jump if zero
-#define TAC_JN 24 // jump if negative
+//#define TAC_JN 24 // jump if negative
 #define TAC_JMP 25
 
 #define TAC_CALL 26 // op1 = fn, res = res
 
 #define TAC_ARG 27
 
-#define TAC_TYPE 29 // Talvez desse para tratar tipos como símbolos...
+//#define TAC_TYPE 29 // Talvez desse para tratar tipos como símbolos...
+#define TAC_PARAM 30
+#define TAC_LITERAL 31
+#define TAC_VAR_DECL 32
+#define TAC_ARY_DECL 33
+#define TAC_ASSIGN 34
+#define TAC_EMPTY_LIST 35
 
 
 // Define um Nodo TAC (Three address code)
@@ -79,11 +85,10 @@ TAC *TAC_reverse_list(TAC *tac);
 void TAC_print_forward(TAC *tac);
 void TAC_print_backward(TAC *tac);
 
-TAC *TAC_make_print(AST *node, TAC *tac);
 TAC *TAC_make_binary_operator(AST *node, TAC *tac1, TAC *tac2);
 
 TAC *TAC_make_read(AST *node, TAC *tac);
-TAC *TAC_make_print(AST *node, TAC *tac);
+TAC *TAC_make_print(AST *node, TAC *args);
 
 TAC *TAC_make_while(AST *node, TAC *cond, TAC *body);
 

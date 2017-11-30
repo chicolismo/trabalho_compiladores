@@ -5,4 +5,4 @@ mat : long[10];
 f : float = 10.55;
 c : byte = 'x';
 d : byte = 65;
-(long) main()main(long) incn(x : long, n : long)incn(short) voidfunc()voidfunc
+(long) main(argc : long)main(long) incn(x : long, n : long)incn(short) voidfunc()voidfunc

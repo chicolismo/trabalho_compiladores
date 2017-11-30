@@ -21,13 +21,23 @@ TAC *TAC_join(TAC *tac1, TAC *tac2) {
         return tac1;
     }
 
-    TAC *temp = tac2;
-    while (temp->prev != NULL) {
-        temp = temp->prev;
+    TAC *temp2 = tac2;
+    while (temp2->prev != NULL) {
+        temp2 = temp2->prev;
     }
-    temp->prev = tac1;
-    tac1->next = temp; // ?
-    return tac2;
+
+    TAC *temp1 = tac1;
+    while (temp1->next != NULL) {
+        temp1 = temp1->next;
+    }
+    temp2->prev = temp1;
+    temp1->next = temp2;
+
+    while (temp1->prev != NULL) {
+        temp1 = temp1->prev;
+    }
+
+    return temp1;
 }
 
 
@@ -116,8 +126,26 @@ void TAC_print(TAC *tac) {
     case TAC_ARG:
         fprintf(stdout, "TAC_ARG");
         break;
+    case TAC_PARAM:
+        fprintf(stdout, "TAC_PARAM");
+        break;
+    case TAC_LITERAL:
+        fprintf(stdout, "TAC_LITERAL");
+        break;
+    case TAC_VAR_DECL:
+        fprintf(stdout, "TAC_VAR_DECL");
+        break;
+    case TAC_ARY_DECL:
+        fprintf(stdout, "TAC_ARY_DECL");
+        break;
+    case TAC_ASSIGN:
+        fprintf(stdout, "TAC_ASSIGN");
+        break;
+    case TAC_EMPTY_LIST:
+        fprintf(stdout, "TAC_EMPTY_LIST");
+        break;
     default:
-        fprintf(stderr, "!!TAC NÃO RECONHECIDO!!");
+        fprintf(stderr, "!!TAC NÃO RECONHECIDO!!\n");
         break;
     }
 
@@ -187,10 +215,7 @@ TAC *TAC_reverse_list(TAC *last) {
 }
 
 void TAC_print_forward(TAC *tac) {
-    fprintf(stdout, "Printing Forward\n");
-
     while (tac != NULL) {
-        fprintf(stdout, "Printing TAC\n");
         TAC_print(tac);
         tac = tac->next;
     }
@@ -238,14 +263,16 @@ TAC *TAC_make_binary_operator(AST *node, TAC *op1, TAC *op2) {
 }
 
 // Cria um TAC para instrução "print"
-TAC *TAC_make_print(AST *node, TAC *tac) {
+TAC *TAC_make_print(AST *node, TAC *args) {
     if (node->type != AST_PRINT) {
         fprintf(stderr, "ERRO, o nodo não é do tipo AST_PRINT\n");
         printNode(node);
         exit(1);
     }
 
-    return TAC_create(TAC_PRINT, node->symbol, NULL, NULL);
+    TAC *print_tac = TAC_create(TAC_PRINT, node->symbol, NULL, NULL);
+    TAC *empty_list = TAC_create(TAC_EMPTY_LIST, node->symbol, NULL, NULL);
+    return TAC_join(empty_list, TAC_join(args, print_tac));
 }
 
 // Cria um TAC para instrução "read"
@@ -269,43 +296,106 @@ TAC *TAC_make_while(AST *node, TAC *condition, TAC *body) {
 
     HashNode *begin = makeLabel();
     HashNode *end = makeLabel();
-
     TAC *begin_label = TAC_create(TAC_LABEL, begin, NULL, NULL);
     TAC *end_label = TAC_create(TAC_LABEL, end, NULL, NULL);
-
     TAC *goto_end_if_zero = TAC_create(TAC_JZ,
                                        end,
                                        condition == NULL ? NULL : condition->res,
                                        NULL);
-
     TAC *goto_begin = TAC_create(TAC_JMP,
                                 begin,
                                 NULL,
                                 NULL);
-
     return
         TAC_join(begin_label,
             TAC_join(condition,
                 TAC_join(goto_end_if_zero,
                     TAC_join(body,
-                        TAC_join(goto_begin,
-                            end_label
-                            )))));
+                        TAC_join(goto_begin, end_label)))));
 }
 
-/*
-TAC *TAC_make_arg(AST *node, TAC *tac) {
+// if (cond) then (if_true);
+TAC *TAC_make_if(AST *node, TAC *condition, TAC *if_true) {
+    HashNode *label = makeLabel();
+    TAC *jump = TAC_create(TAC_JZ, label, condition == NULL ? NULL : condition->res, NULL);
+    TAC *label_tac = TAC_create(TAC_LABEL, label, NULL, NULL);
+    return TAC_join(TAC_join(TAC_join(condition, jump), if_true), label_tac);
 }
-*/
+
+// if (cond) then (if_true) else (if_false);
+TAC *TAC_make_if_else(AST *node, TAC *condition, TAC *if_true, TAC *if_false) {
+    if (node->type != AST_IF_ELSE) {
+        fprintf(stderr, "Tipo do nodo AST não é AST_IF_ELSE\n");
+        printNode(node);
+        exit(1);
+    }
+
+    HashNode *else_label = makeLabel();
+    HashNode *end_label = makeLabel();
+    TAC *jz_tac = TAC_create(TAC_JZ, else_label, condition == NULL ? NULL : condition->res, NULL);
+    TAC *else_tac = TAC_create(TAC_LABEL, else_label, NULL, NULL);
+    TAC *jmp_tac = TAC_create(TAC_JMP, end_label, NULL, NULL);
+    TAC *end_tac = TAC_create(TAC_LABEL, end_label, NULL, NULL);
+
+    return
+        TAC_join(condition,
+            TAC_join(jz_tac,
+                TAC_join(if_true,
+                    TAC_join(jmp_tac,
+                        TAC_join(else_tac,
+                            TAC_join(if_false, end_tac))))));
+}
+
+// return (expr)
+TAC *TAC_make_return(AST *node, TAC *tac) {
+    TAC *return_tac = TAC_create(TAC_RET, node->symbol, tac == NULL ? NULL : tac->res, NULL);
+    return TAC_join(tac, return_tac);
+}
+
+
+TAC *TAC_make_fun_declaration(AST *node, TAC *fn_name, TAC *fn_params, TAC *fn_body) {
+    TAC *begin_fun_tac = TAC_create(TAC_BEGINFUN, node->symbol, NULL, NULL);
+    TAC *end_fun_tac = TAC_create(TAC_ENDFUN, node->symbol, NULL, NULL);
+
+    // begin name params body end
+    return
+        TAC_join(begin_fun_tac,
+             TAC_join(fn_name,
+                TAC_join(fn_params,
+                    TAC_join(fn_body, end_fun_tac))));
+}
+
+TAC *TAC_make_param(AST *node) {
+    return TAC_create(TAC_PARAM, node->son[0]->symbol, NULL, NULL);
+}
+
+TAC *TAC_make_fun_call(AST *node, TAC *args) {
+    HashNode *temp = makeTemp();
+    TAC *func_call = TAC_create(TAC_CALL, temp, node->symbol, NULL);
+    return TAC_join(args, func_call);
+}
+
+TAC *TAC_make_var_declaration(AST *node, TAC *symbol, TAC *literal) {
+    TAC *decl_tac = TAC_create(TAC_VAR_DECL, node->symbol, NULL, NULL);
+    return TAC_join(literal, TAC_join(symbol, decl_tac));
+}
+
+TAC *TAC_make_ary_declaration(AST *node, TAC *name, TAC *size, TAC *literals) {
+    TAC *ary_decl_tac = TAC_create(TAC_ARY_DECL, node->symbol, NULL, NULL);
+    // Temos que inverter a lista por causa da lista vazia.
+    return TAC_join(literals, TAC_join(size, TAC_join(name, ary_decl_tac)));
+}
+
+TAC *TAC_make_assign(AST *node, TAC *symbol, TAC *expr) {
+    TAC *assign_tac = TAC_create(TAC_ASSIGN, node->symbol, NULL, NULL);
+    return TAC_join(symbol, TAC_join(expr, assign_tac));
+}
 
 // TODO: Temos que terminar isto...
 TAC *TAC_generate_code(AST *node) {
     if (node == NULL) {
         return NULL;
     }
-
-    //fprintf(stdout, "Generating code for: ");
-    //printNode(node);
 
     TAC *codes[MAX_SONS];
     TAC *res = NULL;
@@ -316,7 +406,11 @@ TAC *TAC_generate_code(AST *node) {
         codes[i] = TAC_generate_code(node->son[i]);
     }
 
+    printf("Type: %0.2d\t", node->type);
+    printNode(node);
+
     switch (node->type) {
+
     case AST_SYMBOL:
         res = TAC_create(TAC_SYMBOL, node->symbol, NULL, NULL);
         break;
@@ -336,84 +430,96 @@ TAC *TAC_generate_code(AST *node) {
         res = TAC_make_binary_operator(node, codes[0], codes[1]);
         break;
 
-    case AST_TYPE_BYTE:
-    case AST_TYPE_SHORT:
-    case AST_TYPE_LONG:
-    case AST_TYPE_FLOAT:
-    case AST_TYPE_DOUBLE:
-        res = TAC_create(TAC_TYPE, node->symbol, NULL, NULL);
+    
+    case AST_LIT_INTEGER:
+    case AST_LIT_REAL:
+    case AST_LIT_CHAR:
+    case AST_LIT_STRING:
+        res = TAC_create(TAC_LITERAL, node->symbol, NULL, NULL);
         break;
 
-    case AST_DECL_LIST: 
-        // res = TAC_join(codes[0], codes[1]); Não sei se é assim mesmo...
-        break;
+    // case AST_PRINT_ARGS: break;
 
-    case AST_PRINT_ARGS:
-        ;
-        break;
-
+    // Declarações
     case AST_VAR_DECL:
-        // Temos que implementar isto aqui.
-        break;
-
-    case AST_FUNC_DECL:
-        // Temos que implementar isto aqui também.
+        // codes[0] -> symbol
+        // codes[1] -> type
+        // codes[2] -> literal
+        res = TAC_make_var_declaration(node, codes[0], codes[2]);
         break;
 
     case AST_ARY_DECL:
-        ;
+        // codes[0] -> symbol
+        // codes[1] -> type
+        // codes[2] -> integer (vector size)
+        // codes[3] -> lit_list
+        // printf("ary decl\n");
+        res = TAC_make_ary_declaration(node, codes[0], codes[2], codes[3]);
         break;
+
+    case AST_FUNC_DECL:
+        res = TAC_make_fun_declaration(node, codes[1], codes[2], codes[3]);
+        break;
+
+    case AST_LIT_LIST:
+        // Temos que fazer invertido, para a lista vazia ficar no fim da pilha
+        res = TAC_join(codes[1], codes[0]);
+        break;
+
+    case AST_EMPTY_LIT_LIST:
+        res = TAC_create(TAC_EMPTY_LIST, node->symbol, NULL, NULL);
+        break;
+
+    // Atribuições
     case AST_VAR_ASSIGN:
-        ;
+        // codes[0] -> symbol (a variável)
+        // codes[1] -> expr (o valor sendo atribuido)
+        // printf("var assign\n");
+        // res = TAC_join(codes[1], TAC_create(TAC_ASSIGN, node->symbol, codes[0] ? codes[0]->res : NULL, NULL));
+        res = TAC_make_assign(node, codes[0], codes[1]);
         break;
-    case AST_ARY_ASSIGN:
-        ;
-        break;
+
+    // case AST_ARY_ASSIGN: break;
+
     case AST_WHILE:
         res = TAC_make_while(node, codes[0], codes[1]);
         break;
 
     case AST_IF_ELSE:
-        ;
+        res = TAC_make_if_else(node, codes[0], codes[1], codes[2]);
         break;
+
     case AST_IF:
-        ;
+        res = TAC_make_if(node, codes[0], codes[1]);
         break;
+
     case AST_RETURN:
-        ;
+        res = TAC_make_return(node, codes[0]);
         break;
+
     case AST_PRINT:
-        ;
+        // codes[0] -> print_args
+        res = TAC_make_print(node, codes[0]);
         break;
+
+    case AST_PRINT_ARGS:
+        res = TAC_join(codes[1], codes[0]);
+        break;
+
     case AST_READ:
-        ;
+        res = TAC_make_read(node, codes[0]);
         break;
-    case AST_BLOCK:
-        ;
-        break;
+
     case AST_PARAM:
-        ;
+        //res = codes[0];
+        //TAC_make_param(node, codes[0]);
+        res = TAC_make_param(node);
         break;
-    case AST_CMD_LIST:
-        ;
-        break;
-    case AST_PARAM_LIST:
-        ;
-        break;
-    case AST_ARY_INDEX:
-        ;
-        break;
+
+    // case AST_ARY_INDEX: break;
+
     case AST_FUNC_CALL:
-        ;
-        break;
-    case AST_PARENS_EXPR:
-        ;
-        break;
-    case AST_LIT_LIST:
-        ;
-        break;
-    case AST_EMPTY_LIT_LIST:
-        ;
+        res = TAC_make_fun_call(node, codes[1]);
         break;
 
     default:
