@@ -274,17 +274,6 @@ TAC *TAC_make_fun_call(AST *node, TAC *fn_name, TAC *args) {
     return TAC_join(args, func_call);
 }
 
-TAC *TAC_make_var_declaration(AST *node, TAC *symbol, TAC *literal) {
-    TAC *decl_tac = TAC_create(TAC_VAR_DECL, node->symbol, NULL, NULL);
-    return TAC_join(literal, TAC_join(symbol, decl_tac));
-}
-
-TAC *TAC_make_ary_declaration(AST *node, TAC *name, TAC *size, TAC *literals) {
-    TAC *ary_decl_tac = TAC_create(TAC_ARY_DECL, node->symbol, NULL, NULL);
-    // Temos que inverter a lista por causa da lista vazia.
-    return TAC_join(literals, TAC_join(size, TAC_join(name, ary_decl_tac)));
-}
-
 TAC *TAC_make_assign(AST *node, TAC *symbol, TAC *expr) {
     TAC *assign_tac = TAC_create(TAC_ASSIGN, node->symbol, NULL, NULL);
     return TAC_join(symbol, TAC_join(expr, assign_tac));
