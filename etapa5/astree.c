@@ -26,22 +26,6 @@ void printNode(AST *node) {
         fprintf(stdout, "AST_SYMBOL: ");
         break;
 
-    case AST_LIT_INTEGER:
-        fprintf(stdout, "AST_LIT_INTEGER: ");
-        break;
-
-    case AST_LIT_REAL:
-        fprintf(stdout, "AST_LIT_REAL: ");
-        break;
-
-    case AST_LIT_CHAR:
-        fprintf(stdout, "AST_LIT_CHAR: ");
-        break;
-
-    case AST_LIT_STRING:
-        fprintf(stdout, "AST_LIT_STRING: ");
-        break;
-
     case AST_ADD:
         fprintf(stdout, "AST_ADD: ");
         break;
@@ -262,10 +246,6 @@ void generateCode(FILE *out, AST *node) {
 
     switch (node->type) {
     case AST_SYMBOL:
-    case AST_LIT_INTEGER:
-    case AST_LIT_REAL:
-    case AST_LIT_CHAR:
-    case AST_LIT_STRING:
         d("symbol or literal");
 
         if (node->symbol) {

@@ -275,9 +275,6 @@ int getExpressionDataType(AST *node) {
 
     switch (node->type) {
     case AST_SYMBOL:
-    case AST_LIT_INTEGER:
-    case AST_LIT_REAL:
-    case AST_LIT_CHAR:
         if (node->symbol->type == SYMBOL_LIT_INTEGER) {
             return DATATYPE_LONG;
         } else if (node->symbol->type == SYMBOL_LIT_REAL) {

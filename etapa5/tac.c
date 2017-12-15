@@ -50,40 +50,39 @@ void TAC_print(TAC *tac) {
 
     switch (tac->type) {
 
-    case TAC_SYMBOL: fprintf(stdout, "TAC_SYMBOL"); break;
-    case TAC_LABEL: fprintf(stdout, "TAC_LABEL"); break;
-    case TAC_MOVE: fprintf(stdout, "TAC_MOVE"); break;
-    case TAC_ADD: fprintf(stdout, "TAC_ADD"); break;
-    case TAC_SUB: fprintf(stdout, "TAC_SUB"); break;
-    case TAC_MUL: fprintf(stdout, "TAC_MUL"); break;
-    case TAC_DIV: fprintf(stdout, "TAC_DIV"); break;
-    case TAC_LT: fprintf(stdout, "TAC_LT"); break;
-    case TAC_GT: fprintf(stdout, "TAC_GT"); break;
-    case TAC_LE: fprintf(stdout, "TAC_LE"); break;
-    case TAC_GE: fprintf(stdout, "TAC_GE"); break;
-    case TAC_EQ: fprintf(stdout, "TAC_EQ"); break;
-    case TAC_NE: fprintf(stdout, "TAC_NE"); break;
-    case TAC_AND: fprintf(stdout, "TAC_AND"); break;
-    case TAC_OR: fprintf(stdout, "TAC_OR"); break;
-    case TAC_NOT: fprintf(stdout, "TAC_NOT"); break;
-    case TAC_READ: fprintf(stdout, "TAC_READ"); break;
-    case TAC_RET: fprintf(stdout, "TAC_RET"); break;
-    case TAC_PRINT: fprintf(stdout, "TAC_PRINT"); break;
-    case TAC_BEGINFUN: fprintf(stdout, "TAC_BEGINFUN"); break;
-    case TAC_ENDFUN: fprintf(stdout, "TAC_ENDFUN"); break;
-    case TAC_JZ: fprintf(stdout, "TAC_IFZ"); break;
-    case TAC_JMP: fprintf(stdout, "TAC_JUMP"); break;
-    case TAC_CALL: fprintf(stdout, "TAC_CALL"); break;
-    case TAC_ARG: fprintf(stdout, "TAC_ARG"); break;
-    case TAC_PARAM: fprintf(stdout, "TAC_PARAM"); break;
-    case TAC_LITERAL: fprintf(stdout, "TAC_LITERAL"); break;
-    case TAC_VAR_DECL: fprintf(stdout, "TAC_VAR_DECL"); break;
-    case TAC_ARY_DECL: fprintf(stdout, "TAC_ARY_DECL"); break;
-    case TAC_ASSIGN: fprintf(stdout, "TAC_ASSIGN"); break;
+//    case TAC_SYMBOL:       fprintf(stdout, "TAC_SYMBOL"); break;
+    case TAC_LABEL:        fprintf(stdout, "TAC_LABEL"); break;
+    case TAC_MOVE:         fprintf(stdout, "TAC_MOVE"); break;
+    case TAC_ADD:          fprintf(stdout, "TAC_ADD"); break;
+    case TAC_SUB:          fprintf(stdout, "TAC_SUB"); break;
+    case TAC_MUL:          fprintf(stdout, "TAC_MUL"); break;
+    case TAC_DIV:          fprintf(stdout, "TAC_DIV"); break;
+    case TAC_LT:           fprintf(stdout, "TAC_LT"); break;
+    case TAC_GT:           fprintf(stdout, "TAC_GT"); break;
+    case TAC_LE:           fprintf(stdout, "TAC_LE"); break;
+    case TAC_GE:           fprintf(stdout, "TAC_GE"); break;
+    case TAC_EQ:           fprintf(stdout, "TAC_EQ"); break;
+    case TAC_NE:           fprintf(stdout, "TAC_NE"); break;
+    case TAC_AND:          fprintf(stdout, "TAC_AND"); break;
+    case TAC_OR:           fprintf(stdout, "TAC_OR"); break;
+//    case TAC_NOT:          fprintf(stdout, "TAC_NOT"); break;
+    case TAC_READ:         fprintf(stdout, "TAC_READ"); break;
+    case TAC_RET:          fprintf(stdout, "TAC_RET"); break;
+    case TAC_PRINT:        fprintf(stdout, "TAC_PRINT"); break;
+    case TAC_BEGINFUN:     fprintf(stdout, "TAC_BEGINFUN"); break;
+    case TAC_ENDFUN:       fprintf(stdout, "TAC_ENDFUN"); break;
+    case TAC_JZ:           fprintf(stdout, "TAC_IFZ"); break;
+    case TAC_JMP:          fprintf(stdout, "TAC_JUMP"); break;
+    case TAC_CALL:         fprintf(stdout, "TAC_CALL"); break;
+//    case TAC_ARG:          fprintf(stdout, "TAC_ARG"); break;
+//    case TAC_PARAM:        fprintf(stdout, "TAC_PARAM"); break;
+    case TAC_VAR_DECL:     fprintf(stdout, "TAC_VAR_DECL"); break;
+    case TAC_ARY_DECL:     fprintf(stdout, "TAC_ARY_DECL"); break;
+    case TAC_ASSIGN:       fprintf(stdout, "TAC_ASSIGN"); break;
     case TAC_ARRAY_ASSIGN: fprintf(stdout, "TAC_ARRAY_ASSIGN"); break;
-    case TAC_ARRAY_INDEX: fprintf(stdout, "TAC_ARRAY_INDEX"); break;
-    case TAC_EMPTY_LIST: fprintf(stdout, "TAC_EMPTY_LIST"); break;
-    default: fprintf(stderr, "!!TAC NÃO RECONHECIDO!!\n"); break;
+//    case TAC_ARRAY_INDEX:  fprintf(stdout, "TAC_ARRAY_INDEX"); break;
+//    case TAC_EMPTY_LIST:   fprintf(stdout, "TAC_EMPTY_LIST"); break;
+    default:               fprintf(stderr, "!!TAC NÃO RECONHECIDO!!\n"); break;
     }
 
     // Imprime os membros do TAC, se houver
@@ -167,10 +166,9 @@ TAC *TAC_make_binary_operator(AST *node, TAC *op1, TAC *op2) {
     case AST_ADD: type = TAC_ADD; break;
     case AST_SUB: type = TAC_SUB; break;
     case AST_MUL: type = TAC_MUL; break;
-    case AST_DIV: type = TAC_DIV; 
+    case AST_DIV: type = TAC_DIV;
     case AST_LT: type = TAC_LT; break;
-    case AST_GT: type = TAC_GT; break; 
-    case AST_NOT: type = TAC_NOT; break;
+    case AST_GT: type = TAC_GT; break;
     case AST_LE: type = TAC_LE; break;
     case AST_GE: type = TAC_GE; break;
     case AST_EQ: type = TAC_EQ; break;
@@ -182,12 +180,10 @@ TAC *TAC_make_binary_operator(AST *node, TAC *op1, TAC *op2) {
         printNode(node);
         exit(1);
     }
-    HashNode *temp_result = makeTemp(); // Para ser o resultado da operação
-
-    TAC *tac = TAC_create(type,
-                          temp_result,
-                          op1 == NULL ? NULL : op1->res,
-                          op2 == NULL ? NULL : op2->res);
+    
+    TAC *tac = TAC_create(type, makeTemp(),
+                          op1? op1->res : NULL,
+                          op2? op2->res : NULL);
 
     return TAC_join(TAC_join(op1, op2), tac);
 }
@@ -312,7 +308,6 @@ TAC *TAC_generate_code(AST *node) {
     }
 
     TAC *codes[MAX_SONS];
-    TAC *res = NULL;
 
     // Chama recursivamente em cada um dos filhos do nodo.
     int i;
@@ -327,8 +322,7 @@ TAC *TAC_generate_code(AST *node) {
     switch (node->type) {
 
     case AST_SYMBOL:
-        res = TAC_create(TAC_SYMBOL, node->symbol, NULL, NULL);
-        break;
+        return TAC_create(TAC_SYMBOL, node->symbol, NULL, NULL);
 
     case AST_ADD:
     case AST_SUB:
@@ -342,23 +336,14 @@ TAC *TAC_generate_code(AST *node) {
     case AST_NE:
     case AST_AND:
     case AST_OR:
-        res = TAC_make_binary_operator(node, codes[0], codes[1]);
-        break;
-    
-    case AST_LIT_INTEGER:
-    case AST_LIT_REAL:
-    case AST_LIT_CHAR:
-    case AST_LIT_STRING:
-        res = TAC_create(TAC_LITERAL, node->symbol, NULL, NULL);
-        break;
+        return TAC_make_binary_operator(node, codes[0], codes[1]);
 
     // Declarações
     case AST_VAR_DECL:
         // codes[0] -> symbol
         // codes[1] -> type
         // codes[2] -> literal
-        res = TAC_make_var_declaration(node, codes[0], codes[2]);
-        break;
+        return TAC_make_var_declaration(node, codes[0], codes[2]);
 
     case AST_ARY_DECL:
         // codes[0] -> symbol
@@ -366,92 +351,73 @@ TAC *TAC_generate_code(AST *node) {
         // codes[2] -> integer (vector size)
         // codes[3] -> lit_list
         // printf("ary decl\n");
-        res = TAC_make_ary_declaration(node, codes[0], codes[2], codes[3]);
-        break;
+        return TAC_make_ary_declaration(node, codes[0], codes[2], codes[3]);
 
     case AST_FUNC_DECL:
-        res = TAC_make_fun_declaration(node, codes[1], codes[2], codes[3]);
-        break;
+        return TAC_make_fun_declaration(node, codes[1], codes[2], codes[3]);
 
     case AST_LIT_LIST:
         // Temos que fazer invertido, para a lista vazia ficar no fim da pilha
-        res = TAC_join(codes[1], codes[0]);
-        break;
+        return TAC_join(codes[1], codes[0]);
 
     case AST_EMPTY_LIT_LIST:
-        res = TAC_create(TAC_EMPTY_LIST, node->symbol, NULL, NULL);
-        break;
+        return TAC_create(TAC_EMPTY_LIST, node->symbol, NULL, NULL);
 
     // Atribuições
     case AST_VAR_ASSIGN:
         // codes[0] -> symbol (a variável)
         // codes[1] -> expr (o valor sendo atribuido)
         // printf("var assign\n");
-        // res = TAC_join(codes[1], TAC_create(TAC_ASSIGN, node->symbol, codes[0] ? codes[0]->res : NULL, NULL));
-        res = TAC_make_assign(node, codes[0], codes[1]);
-        break;
+        // return TAC_join(codes[1], TAC_create(TAC_ASSIGN, node->symbol, codes[0] ? codes[0]->res : NULL, NULL));
+        return TAC_make_assign(node, codes[0], codes[1]);
 
     case AST_ARY_ASSIGN:
         // codes[0] -> symbol (o vetor)
         // codes[1] -> expr (vai ser o indice)
         // codes[2] -> expr (o valor a ser salvo no indice)
-        res = TAC_make_ary_assign(node, codes[0], codes[1], codes[2]);
-        break;
+        return TAC_make_ary_assign(node, codes[0], codes[1], codes[2]);
 
     case AST_ARY_INDEX:
         // codes[0] -> symbol (o vetor)
         // codes[1] -> expr (expressao do indice)
-        res = TAC_make_ary_index(node, codes[0], codes[1]);
-        break;
+        return TAC_make_ary_index(node, codes[0], codes[1]);
 
     case AST_WHILE:
-        res = TAC_make_while(node, codes[0], codes[1]);
-        break;
+        return TAC_make_while(node, codes[0], codes[1]);
 
     case AST_IF_ELSE:
-        res = TAC_make_if_else(node, codes[0], codes[1], codes[2]);
-        break;
+        return TAC_make_if_else(node, codes[0], codes[1], codes[2]);
 
     case AST_IF:
-        res = TAC_make_if(node, codes[0], codes[1]);
-        break;
+        return TAC_make_if(node, codes[0], codes[1]);
 
     case AST_RETURN:
-        res = TAC_make_return(node, codes[0]);
-        break;
+        return TAC_make_return(node, codes[0]);
 
     case AST_PRINT:
         // codes[0] -> print_args
-        res = TAC_make_print(node, codes[0]);
-        break;
+        return TAC_make_print(node, codes[0]);
 
     case AST_PRINT_ARGS:
-        res = TAC_join(codes[1], codes[0]);
-        break;
+        return TAC_join(codes[1], codes[0]);
 
     case AST_READ:
-        res = TAC_make_read(node, codes[0]);
-        break;
+        return TAC_make_read(node, codes[0]);
 
     case AST_PARAM:
         //res = codes[0];
         //TAC_make_param(node, codes[0]);
-        res = TAC_make_param(node);
-        break;
+        return TAC_make_param(node);
 
     case AST_FUNC_CALL:
         // codes[0] -> symbol
         // codes[1] -> args
-        res = TAC_make_fun_call(node, codes[0], codes[1]);
-        break;
+        return TAC_make_fun_call(node, codes[0], codes[1]);
 
     case AST_ARG_LIST:
-        res = TAC_join(codes[1], codes[0]);
-        break;
+        return TAC_join(codes[1], codes[0]);
 
     default:
-        res = TAC_join(TAC_join(TAC_join(codes[0], codes[1]), codes[2]), codes[3]);
+        return TAC_join(TAC_join(TAC_join(codes[0], codes[1]), codes[2]), codes[3]);
     }
-
-    return res;
 }

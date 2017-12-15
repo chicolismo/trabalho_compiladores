@@ -20,46 +20,38 @@
 #define AST_NE             12
 #define AST_AND            13
 #define AST_OR             14
-//#define AST_LIST           15
 
-#define AST_TYPE_BYTE      16
-#define AST_TYPE_SHORT     17
-#define AST_TYPE_LONG      18
-#define AST_TYPE_FLOAT     19
-#define AST_TYPE_DOUBLE    20
+#define AST_TYPE_BYTE      15
+#define AST_TYPE_SHORT     16
+#define AST_TYPE_LONG      17
+#define AST_TYPE_FLOAT     18
+#define AST_TYPE_DOUBLE    19
 
-#define AST_DECL_LIST      21
-#define AST_PRINT_ARGS     22
+#define AST_DECL_LIST      20
+#define AST_PRINT_ARGS     21
 
-#define AST_VAR_DECL       23
-#define AST_ARY_DECL       24
-#define AST_VAR_ASSIGN     25
-#define AST_ARY_ASSIGN     26
+#define AST_VAR_DECL       22
+#define AST_ARY_DECL       23
+#define AST_VAR_ASSIGN     24
+#define AST_ARY_ASSIGN     25
 
-#define AST_WHILE          27
-#define AST_IF_ELSE        28
-#define AST_IF             29
-#define AST_RETURN         30
-#define AST_PRINT          31
-#define AST_READ           32
-#define AST_BLOCK          33
-#define AST_PARAM          34
-#define AST_FUNC_DECL      35
-#define AST_CMD_LIST       36
-#define AST_PARAM_LIST     37
-#define AST_ARY_INDEX      38
-#define AST_FUNC_CALL      39
-#define AST_PARENS_EXPR    40
-#define AST_LIT_LIST       41
-#define AST_EMPTY_LIT_LIST 42
-#define AST_ARG_LIST       43
-
-// Temos que definir tipos para os literais, para diferenciá-los dos símbolos,
-// na hora de tratar argumentos e parâmetros.
-#define AST_LIT_INTEGER    44
-#define AST_LIT_REAL       45
-#define AST_LIT_CHAR       46
-#define AST_LIT_STRING     47
+#define AST_WHILE          26
+#define AST_IF_ELSE        27
+#define AST_IF             28
+#define AST_RETURN         29
+#define AST_PRINT          30
+#define AST_READ           31
+#define AST_BLOCK          32
+#define AST_PARAM          33
+#define AST_FUNC_DECL      34
+#define AST_CMD_LIST       35
+#define AST_PARAM_LIST     36
+#define AST_ARY_INDEX      37
+#define AST_FUNC_CALL      38
+#define AST_PARENS_EXPR    39
+#define AST_LIT_LIST       40
+#define AST_EMPTY_LIT_LIST 41
+#define AST_ARG_LIST       42
 
 typedef struct ASTreeNode {
     int type;
