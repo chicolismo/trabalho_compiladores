@@ -50,7 +50,7 @@ void TAC_print(TAC *tac) {
 
     switch (tac->type) {
 
-//    case TAC_SYMBOL:       fprintf(stdout, "TAC_SYMBOL"); break;
+    case TAC_SYMBOL:       return;
     case TAC_LABEL:        fprintf(stdout, "TAC_LABEL"); break;
     case TAC_MOVE:         fprintf(stdout, "TAC_MOVE"); break;
     case TAC_ADD:          fprintf(stdout, "TAC_ADD"); break;
@@ -74,8 +74,6 @@ void TAC_print(TAC *tac) {
     case TAC_JZ:           fprintf(stdout, "TAC_IFZ"); break;
     case TAC_JMP:          fprintf(stdout, "TAC_JUMP"); break;
     case TAC_CALL:         fprintf(stdout, "TAC_CALL"); break;
-//    case TAC_ARG:          fprintf(stdout, "TAC_ARG"); break;
-//    case TAC_PARAM:        fprintf(stdout, "TAC_PARAM"); break;
     case TAC_VAR_DECL:     fprintf(stdout, "TAC_VAR_DECL"); break;
     case TAC_ARY_DECL:     fprintf(stdout, "TAC_ARY_DECL"); break;
     case TAC_ASSIGN:       fprintf(stdout, "TAC_ASSIGN"); break;
@@ -337,21 +335,6 @@ TAC *TAC_generate_code(AST *node) {
     case AST_AND:
     case AST_OR:
         return TAC_make_binary_operator(node, codes[0], codes[1]);
-
-    // Declarações
-    case AST_VAR_DECL:
-        // codes[0] -> symbol
-        // codes[1] -> type
-        // codes[2] -> literal
-        return TAC_make_var_declaration(node, codes[0], codes[2]);
-
-    case AST_ARY_DECL:
-        // codes[0] -> symbol
-        // codes[1] -> type
-        // codes[2] -> integer (vector size)
-        // codes[3] -> lit_list
-        // printf("ary decl\n");
-        return TAC_make_ary_declaration(node, codes[0], codes[2], codes[3]);
 
     case AST_FUNC_DECL:
         return TAC_make_fun_declaration(node, codes[1], codes[2], codes[3]);

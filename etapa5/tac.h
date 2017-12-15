@@ -34,26 +34,21 @@
 
 #define TAC_RET 19 // op1 é o valor a ser retornado
 
-#define TAC_BEGINFUN 21
-#define TAC_ENDFUN 22
+#define TAC_BEGINFUN 20
+#define TAC_ENDFUN 21
 
-#define TAC_JZ 23 // jump if zero
-//#define TAC_JN 24 // jump if negative
-#define TAC_JMP 25
+#define TAC_JZ 22 // jump if zero
+#define TAC_JMP 23
 
-#define TAC_CALL 26 // op1 = fn, res = res
+#define TAC_CALL 24 // op1 = fn, res = res
 
-#define TAC_ARG 27
-
-//#define TAC_TYPE 29 // Talvez desse para tratar tipos como símbolos...
-#define TAC_PARAM 30
-#define TAC_LITERAL 31
-#define TAC_VAR_DECL 32
-#define TAC_ARY_DECL 33
-#define TAC_ASSIGN 34
-#define TAC_EMPTY_LIST 35
-#define TAC_ARRAY_ASSIGN 36
-#define TAC_ARRAY_INDEX 37
+#define TAC_PARAM 25
+#define TAC_VAR_DECL 26
+#define TAC_ARY_DECL 27
+#define TAC_ASSIGN 28
+#define TAC_EMPTY_LIST 29
+#define TAC_ARRAY_ASSIGN 30
+#define TAC_ARRAY_INDEX 31
 
 
 // Define um Nodo TAC (Three address code)
