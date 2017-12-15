@@ -25,8 +25,7 @@
 #define DATATYPE_BOOL              14
 #define DATATYPE_ERROR             -1
 
-#define SYMBOL_LABEL               15 // Para makeLabel (etapa5)
-#define SYMBOL_TEMP                16 // Para makeTemp (etapa5)
+#define SYMBOL_LABEL               15
 
 struct HashNode {
     char *string;
