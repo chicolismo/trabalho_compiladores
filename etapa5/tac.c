@@ -67,13 +67,15 @@ void TAC_print(TAC *tac) {
     case TAC_OR:           strcpy(tac_string, "TAC_OR"); break;
     case TAC_NOT:          strcpy(tac_string, "TAC_NOT"); break;
     case TAC_READ:         strcpy(tac_string, "TAC_READ"); break;
-    case TAC_RET:          strcpy(tac_string, "TAC_RET"); break;
     case TAC_PRINT:        strcpy(tac_string, "TAC_PRINT"); break;
+    case TAC_RET:          strcpy(tac_string, "TAC_RET"); break;
 //    case TAC_BEGINFUN:     strcpy(tac_string, "TAC_BEGINFUN"); break;
 //    case TAC_ENDFUN:       strcpy(tac_string, "TAC_ENDFUN"); break;
     case TAC_JZ:           strcpy(tac_string, "TAC_IFZ"); break;
     case TAC_JMP:          strcpy(tac_string, "TAC_JUMP"); break;
-//    case TAC_CALL:         strcpy(tac_string, "TAC_CALL"); break;
+    case TAC_CALL:         strcpy(tac_string, "TAC_CALL"); break;
+    case TAC_PUSH_ARG:     strcpy(tac_string, "TAC_PUSH_ARG"); break;
+    case TAC_POP_ARG:      strcpy(tac_string, "TAC_POP_ARG"); break;
 //    case TAC_VAR_DECL:     strcpy(tac_string, "TAC_VAR_DECL"); break;
 //    case TAC_ARY_DECL:     strcpy(tac_string, "TAC_ARY_DECL"); break;
 //    case TAC_ASSIGN:       strcpy(tac_string, "TAC_ASSIGN"); break;
@@ -169,39 +171,23 @@ TAC *TAC_make_binary_operator(AST *node, TAC *op1, TAC *op2) {
     return TAC_join(TAC_join(op1, op2), tac);
 }
 
-// Cria um TAC para instrução "print"
-TAC *TAC_make_print(TAC *arg) {
-    return TAC_create(TAC_PRINT, arg->res, NULL, NULL);
-}
-
 // Cria um TAC para instrução "read"
 TAC *TAC_make_read(TAC *expression) {
     return TAC_create(TAC_READ, expression->res, NULL, NULL);
 }
 
-// Cria o conjunto de TACs que representam um "while"
-TAC *TAC_make_while(TAC *condition, TAC *body) {
-    HashNode *begin = makeLabel();
-    HashNode *end = makeLabel();
-    TAC *begin_label = TAC_create(TAC_LABEL, begin, NULL, NULL);
-    TAC *end_label = TAC_create(TAC_LABEL, end, NULL, NULL);
-    TAC *goto_end_if_zero = TAC_create(TAC_JZ,
-                                       end,
-                                       condition == NULL ? NULL : condition->res,
-                                       NULL);
-    TAC *goto_begin = TAC_create(TAC_JMP,
-                                begin,
-                                NULL,
-                                NULL);
-    return
-        TAC_join(begin_label,
-            TAC_join(condition,
-                TAC_join(goto_end_if_zero,
-                    TAC_join(body,
-                        TAC_join(goto_begin, end_label)))));
+// Cria um TAC para instrução "print"
+TAC *TAC_make_print(TAC *arg) {
+    return TAC_create(TAC_PRINT, arg->res, NULL, NULL);
 }
 
-// if (cond) then (if_true);
+// Cria um TAC para instrução "return"
+TAC *TAC_make_return(TAC *expression) {
+    TAC *return_tac = TAC_create(TAC_RET, expression->res, NULL, NULL);
+    return TAC_join(expression, return_tac);
+}
+
+// if (condition) then (if_true);
 TAC *TAC_make_if(TAC *condition, TAC *if_true) {
     HashNode *label = makeLabel();
     TAC *jump = TAC_create(TAC_JZ, label, condition == NULL ? NULL : condition->res, NULL);
@@ -209,7 +195,7 @@ TAC *TAC_make_if(TAC *condition, TAC *if_true) {
     return TAC_join(TAC_join(TAC_join(condition, jump), if_true), label_tac);
 }
 
-// if (cond) then (if_true) else (if_false);
+// if (condition) then (if_true) else (if_false);
 TAC *TAC_make_if_else(TAC *condition, TAC *if_true, TAC *if_false) {
     HashNode *else_label = makeLabel();
     HashNode *end_label = makeLabel();
@@ -227,10 +213,41 @@ TAC *TAC_make_if_else(TAC *condition, TAC *if_true, TAC *if_false) {
                             TAC_join(if_false, end_tac))))));
 }
 
-// return (expr)
-TAC *TAC_make_return(TAC *expression) {
-    TAC *return_tac = TAC_create(TAC_RET, expression->res, NULL, NULL);
-    return TAC_join(expression, return_tac);
+// Cria o conjunto de TACs que representam um "while"
+TAC *TAC_make_while(TAC *condition, TAC *body) {
+    HashNode *begin = makeLabel();
+    HashNode *end = makeLabel();
+    TAC *begin_label = TAC_create(TAC_LABEL, begin, NULL, NULL);
+    TAC *end_label = TAC_create(TAC_LABEL, end, NULL, NULL);
+    TAC *goto_end_if_zero = TAC_create(TAC_JZ,
+                                       end,
+                                       condition == NULL ? NULL : condition->res,
+                                       NULL);
+    TAC *goto_begin = TAC_create(TAC_JMP,
+                                 begin,
+                                 NULL,
+                                 NULL);
+    return
+    TAC_join(begin_label,
+             TAC_join(condition,
+                      TAC_join(goto_end_if_zero,
+                               TAC_join(body,
+                                        TAC_join(goto_begin, end_label)))));
+}
+
+TAC *TAC_make_assign(AST *node, TAC *symbol, TAC *expr) {
+    TAC *assign_tac = TAC_create(TAC_ASSIGN, node->symbol, NULL, NULL);
+    return TAC_join(symbol, TAC_join(expr, assign_tac));
+}
+
+TAC *TAC_make_ary_assign(AST *node, TAC *symbol, TAC *index_expr, TAC *val_expr) {
+    TAC *ary_assign_tac = TAC_create(TAC_ARRAY_ASSIGN, node->symbol, NULL, NULL);
+    return TAC_join(symbol, TAC_join(index_expr, TAC_join(val_expr, ary_assign_tac)));
+}
+
+TAC *TAC_make_ary_index(AST *node, TAC *symbol, TAC *index_expr) {
+    TAC *ary_index_tac = TAC_create(TAC_ARRAY_INDEX, node->symbol, NULL, NULL);
+    return TAC_join(symbol, TAC_join(index_expr, ary_index_tac));
 }
 
 TAC *TAC_make_fun_declaration(AST *node, TAC *fn_name, TAC *fn_params, TAC *fn_body) {
@@ -249,25 +266,30 @@ TAC *TAC_make_param(AST *node) {
     return TAC_create(TAC_PARAM, node->son[0]->symbol, NULL, NULL);
 }
 
-TAC *TAC_make_fun_call(AST *node, TAC *fn_name, TAC *args) {
-    HashNode *temp = makeTemp();
-    TAC *func_call = TAC_create(TAC_CALL, temp, fn_name->res, NULL);
-    return TAC_join(args, func_call);
+TAC *TAC_make_func_call(TAC *func_name, TAC *args) {
+    HashNode *label_node = makeLabel();
+    
+    TAC *func_call = TAC_create(TAC_CALL, makeTemp(), func_name->res, label_node);
+    TAC *label = TAC_create(TAC_LABEL, label_node, NULL, NULL);
+    TAC *pop_args = TAC_make_pop_args(args);
+    
+    return TAC_join(TAC_join(TAC_join(args, func_call), label), pop_args);
 }
 
-TAC *TAC_make_assign(AST *node, TAC *symbol, TAC *expr) {
-    TAC *assign_tac = TAC_create(TAC_ASSIGN, node->symbol, NULL, NULL);
-    return TAC_join(symbol, TAC_join(expr, assign_tac));
+TAC *TAC_make_push_arg(TAC *arg) {
+    return TAC_create(TAC_PUSH_ARG, arg->res, NULL, NULL);
 }
 
-TAC *TAC_make_ary_assign(AST *node, TAC *symbol, TAC *index_expr, TAC *val_expr) {
-    TAC *ary_assign_tac = TAC_create(TAC_ARRAY_ASSIGN, node->symbol, NULL, NULL);
-    return TAC_join(symbol, TAC_join(index_expr, TAC_join(val_expr, ary_assign_tac)));
-}
-
-TAC *TAC_make_ary_index(AST *node, TAC *symbol, TAC *index_expr) {
-    TAC *ary_index_tac = TAC_create(TAC_ARRAY_INDEX, node->symbol, NULL, NULL);
-    return TAC_join(symbol, TAC_join(index_expr, ary_index_tac));
+TAC *TAC_make_pop_args(TAC *args) {
+    TAC *aux = args;
+    TAC *pop_args = NULL;
+    
+    while (aux && aux->type == TAC_PUSH_ARG) {
+        pop_args = TAC_join(pop_args, TAC_create(TAC_POP_ARG, makeTemp(), NULL, NULL));
+        aux = aux->next;
+    }
+    
+    return pop_args;
 }
 
 TAC *TAC_generate_code(AST *node) {
@@ -358,18 +380,15 @@ TAC *TAC_generate_code(AST *node) {
     case AST_READ:
         return TAC_make_read(codes[0]);
 
-    case AST_PARAM:
-        //res = codes[0];
-        //TAC_make_param(node, codes[0]);
-        return TAC_make_param(node);
-
     case AST_FUNC_CALL:
-        // codes[0] -> symbol
-        // codes[1] -> args
-        return TAC_make_fun_call(node, codes[0], codes[1]);
+        return TAC_make_func_call(codes[0], codes[1]);
 
     case AST_ARG_LIST:
-        return TAC_join(codes[1], codes[0]);
+        if (codes[1]->type == TAC_SYMBOL)
+            return TAC_join(TAC_make_push_arg(codes[0]),
+                            TAC_make_push_arg(codes[1]));
+        else
+            return TAC_join(TAC_make_push_arg(codes[0]), codes[1]);
 
     default:
         return TAC_join(TAC_join(TAC_join(codes[0], codes[1]), codes[2]), codes[3]);

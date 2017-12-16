@@ -31,7 +31,6 @@
 
 #define TAC_READ 17
 #define TAC_PRINT 18
-
 #define TAC_RET 19 // op1 é o valor a ser retornado
 
 #define TAC_BEGINFUN 20
@@ -41,14 +40,16 @@
 #define TAC_JMP 23
 
 #define TAC_CALL 24 // op1 = fn, res = res
+#define TAC_PUSH_ARG 25
+#define TAC_POP_ARG 26
 
-#define TAC_PARAM 25
-#define TAC_VAR_DECL 26
-#define TAC_ARY_DECL 27
-#define TAC_ASSIGN 28
-#define TAC_EMPTY_LIST 29
-#define TAC_ARRAY_ASSIGN 30
-#define TAC_ARRAY_INDEX 31
+#define TAC_PARAM 27
+#define TAC_VAR_DECL 28
+#define TAC_ARY_DECL 29
+#define TAC_ASSIGN 30
+#define TAC_ARRAY_ASSIGN 31
+#define TAC_ARRAY_INDEX 32
+#define TAC_EMPTY_LIST 33
 
 
 // Define um Nodo TAC (Three address code)
@@ -82,20 +83,20 @@ void TAC_print_forward(TAC *tac);
 void TAC_print_backward(TAC *tac);
 
 TAC *TAC_make_binary_operator(AST *node, TAC *op1, TAC *op2);
-TAC *TAC_make_print(TAC *arg);
 TAC *TAC_make_read(TAC *expression);
-TAC *TAC_make_while(TAC *condition, TAC *body);
+TAC *TAC_make_print(TAC *arg);
+TAC *TAC_make_return(TAC *expression);
 TAC *TAC_make_if(TAC *condition, TAC *if_true);
 TAC *TAC_make_if_else(TAC *condition, TAC *if_true, TAC *if_false);
-TAC *TAC_make_return(TAC *expression);
-TAC *TAC_make_fun_declaration(AST *node, TAC *fn_name, TAC *fn_params, TAC *fn_body);
-TAC *TAC_make_fun_call(AST *node, TAC *fn_name, TAC *fn_args);
-TAC *TAC_make_param(AST *node);
-TAC *TAC_make_var_declaration(AST *node, TAC *symbol, TAC *literal);
-TAC *TAC_make_ary_declaration(AST *node, TAC *symbol, TAC *size, TAC *literals);
+TAC *TAC_make_while(TAC *condition, TAC *body);
 TAC *TAC_make_assign(AST *node, TAC *symbol, TAC *expr);
 TAC *TAC_make_ary_assign(AST *node, TAC *symbol, TAC *index_expr, TAC *val_expr);
 TAC *TAC_make_ary_index(AST *node, TAC *symbol, TAC *index_expr);
+TAC *TAC_make_fun_declaration(AST *node, TAC *fn_name, TAC *fn_params, TAC *fn_body);
+TAC *TAC_make_param(AST *node);
+TAC *TAC_make_func_call(TAC *func_name, TAC *args);
+TAC *TAC_make_push_arg(TAC *arg);
+TAC *TAC_make_pop_args(TAC *args);
 TAC *TAC_generate_code(AST *node);
 
 #endif // __TAC_H__
