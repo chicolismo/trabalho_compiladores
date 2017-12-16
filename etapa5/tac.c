@@ -83,7 +83,8 @@ void TAC_print(TAC *tac) {
     default:               return;
     }
 
-    fprintf(stdout, "TAC(%s, %s, %s, %s)\n", tac_string,
+    fprintf(stdout, "TAC(%s, %s, %s, %s)\n",
+            tac_string,
             tac->res? tac->res->string : "NULL",
             tac->op1? tac->op1->string : "NULL",
             tac->op2? tac->op2->string : "NULL");
@@ -145,7 +146,7 @@ TAC *TAC_make_binary_operator(AST *node, TAC *op1, TAC *op2) {
     case AST_ADD: type = TAC_ADD; break;
     case AST_SUB: type = TAC_SUB; break;
     case AST_MUL: type = TAC_MUL; break;
-    case AST_DIV: type = TAC_DIV;
+    case AST_DIV: type = TAC_DIV; break;
     case AST_LT: type = TAC_LT; break;
     case AST_GT: type = TAC_GT; break;
     case AST_LE: type = TAC_LE; break;
