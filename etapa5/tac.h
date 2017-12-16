@@ -48,7 +48,8 @@
 #define TAC_ARY_DECL 29
 #define TAC_ASSIGN 30
 #define TAC_ARRAY_ASSIGN 31
-#define TAC_EMPTY_LIST 32
+#define TAC_ARRAY_INDEX 32
+#define TAC_EMPTY_LIST 33
 
 
 // Define um Nodo TAC (Three address code)
@@ -90,6 +91,7 @@ TAC *TAC_make_if_else(TAC *condition, TAC *if_true, TAC *if_false);
 TAC *TAC_make_while(TAC *condition, TAC *body);
 TAC *TAC_make_assign(TAC *identifier, TAC *expression);
 TAC *TAC_make_ary_assign(TAC *identifier, TAC *index, TAC *expression);
+TAC *TAC_make_ary_index(TAC *identifier, TAC *index);
 TAC *TAC_make_fun_declaration(AST *node, TAC *fn_name, TAC *fn_params, TAC *fn_body);
 TAC *TAC_make_param(AST *node);
 TAC *TAC_make_func_call(TAC *func_name, TAC *args);

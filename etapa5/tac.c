@@ -69,19 +69,19 @@ void TAC_print(TAC *tac) {
     case TAC_READ:         strcpy(tac_string, "TAC_READ"); break;
     case TAC_PRINT:        strcpy(tac_string, "TAC_PRINT"); break;
     case TAC_RET:          strcpy(tac_string, "TAC_RET"); break;
-//    case TAC_BEGINFUN:     strcpy(tac_string, "TAC_BEGINFUN"); break;
-//    case TAC_ENDFUN:       strcpy(tac_string, "TAC_ENDFUN"); break;
     case TAC_JZ:           strcpy(tac_string, "TAC_IFZ"); break;
     case TAC_JMP:          strcpy(tac_string, "TAC_JUMP"); break;
+//    case TAC_VAR_DECL:     strcpy(tac_string, "TAC_VAR_DECL"); break;
+//    case TAC_ARY_DECL:     strcpy(tac_string, "TAC_ARY_DECL"); break;
+    case TAC_ASSIGN:       strcpy(tac_string, "TAC_ASSIGN"); break;
+    case TAC_ARRAY_ASSIGN: strcpy(tac_string, "TAC_ARRAY_ASSIGN"); break;
+    case TAC_ARRAY_INDEX:  strcpy(tac_string, "TAC_ARRAY_INDEX"); break;
+//    case TAC_BEGINFUN:     strcpy(tac_string, "TAC_BEGINFUN"); break;
+//    case TAC_ENDFUN:       strcpy(tac_string, "TAC_ENDFUN"); break;
+//    case TAC_EMPTY_LIST:   strcpy(tac_string, "TAC_EMPTY_LIST"); break;
     case TAC_CALL:         strcpy(tac_string, "TAC_CALL"); break;
     case TAC_PUSH_ARG:     strcpy(tac_string, "TAC_PUSH_ARG"); break;
     case TAC_POP_ARG:      strcpy(tac_string, "TAC_POP_ARG"); break;
-//    case TAC_VAR_DECL:     strcpy(tac_string, "TAC_VAR_DECL"); break;
-//    case TAC_ARY_DECL:     strcpy(tac_string, "TAC_ARY_DECL"); break;
-//    case TAC_ASSIGN:       strcpy(tac_string, "TAC_ASSIGN"); break;
-//    case TAC_ARRAY_ASSIGN: strcpy(tac_string, "TAC_ARRAY_ASSIGN"); break;
-//    case TAC_ARRAY_INDEX:  strcpy(tac_string, "TAC_ARRAY_INDEX"); break;
-//    case TAC_EMPTY_LIST:   strcpy(tac_string, "TAC_EMPTY_LIST"); break;
     default:               return;
     }
 
@@ -236,13 +236,19 @@ TAC *TAC_make_while(TAC *condition, TAC *body) {
 }
 
 TAC *TAC_make_assign(TAC *identifier, TAC *expression) {
-    TAC *assign_tac = TAC_create(TAC_ASSIGN, identifier, expression, NULL);
+    TAC *assign_tac = TAC_create(TAC_ASSIGN, identifier->res, expression->res, NULL);
     return TAC_join(expression, assign_tac);
 }
 
 TAC *TAC_make_ary_assign(TAC *identifier, TAC *index, TAC *expression) {
-    TAC *ary_assign_tac = TAC_create(TAC_ARRAY_ASSIGN, identifier, index, expression);
+    TAC *ary_assign_tac = TAC_create(TAC_ARRAY_ASSIGN, identifier->res,
+                                     index->res, expression->res);
     return TAC_join(TAC_join(expression, index), ary_assign_tac);
+}
+
+TAC *TAC_make_ary_index(TAC *identifier, TAC *index) {
+    TAC *ary_index_tac = TAC_create(TAC_ARRAY_INDEX, identifier->res, index->res, NULL);
+    return TAC_join(index, ary_index_tac);
 }
 
 TAC *TAC_make_fun_declaration(AST *node, TAC *fn_name, TAC *fn_params, TAC *fn_body) {
@@ -280,7 +286,7 @@ TAC *TAC_make_pop_args(TAC *args) {
     TAC *pop_args = NULL;
     
     while (aux && aux->type == TAC_PUSH_ARG) {
-        pop_args = TAC_join(pop_args, TAC_create(TAC_POP_ARG, makeTemp(), NULL, NULL));
+        pop_args = TAC_join(pop_args, TAC_create(TAC_POP_ARG, NULL, NULL, NULL));
         aux = aux->next;
     }
     
@@ -327,7 +333,9 @@ TAC *TAC_generate_code(AST *node) {
         return codes[0];
 
     case AST_PRINT_ARGS:
-        if (codes[1]->type == TAC_SYMBOL)
+        if (codes[1] == NULL)
+            return TAC_make_print(codes[0]);
+        else if (codes[1]->type == TAC_SYMBOL)
             return TAC_join(TAC_make_print(codes[0]),
                             TAC_make_print(codes[1]));
         else
@@ -350,6 +358,9 @@ TAC *TAC_generate_code(AST *node) {
 
     case AST_ARY_ASSIGN:
         return TAC_make_ary_assign(codes[0], codes[1], codes[2]);
+
+    case AST_ARY_INDEX:
+        return TAC_make_ary_index(codes[0], codes[1]);
 
     case AST_FUNC_DECL:
         return TAC_make_fun_declaration(node, codes[1], codes[2], codes[3]);

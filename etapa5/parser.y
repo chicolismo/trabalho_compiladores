@@ -192,7 +192,7 @@ literal: literal_integer { $$ = $1; }
 
 
 print_args: any_expression ',' print_args { $$ = createAST(AST_PRINT_ARGS, 0, $1, $3, 0, 0); }
-          | any_expression                { $$ = $1; }
+          | any_expression                { $$ = createAST(AST_PRINT_ARGS, 0, $1, 0, 0, 0); }
           ;
 
 any_expression: literal_string { $$ = $1; }
