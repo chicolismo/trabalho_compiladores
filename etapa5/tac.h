@@ -51,6 +51,8 @@
 #define TAC_ARRAY_INDEX 32
 #define TAC_EMPTY_LIST 33
 
+#define TAC_TEMP 34
+
 
 // Define um Nodo TAC (Three address code)
 typedef struct TAC {

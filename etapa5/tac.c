@@ -164,11 +164,12 @@ TAC *TAC_make_binary_operator(AST *node, TAC *op1, TAC *op2) {
         exit(1);
     }
     
-    TAC *tac = TAC_create(type, makeTemp(),
+    TAC *temp_tac = TAC_create(TAC_TEMP, makeTemp(), NULL, NULL);
+    TAC *tac = TAC_create(type, temp_tac->res,
                           op1? op1->res : NULL,
                           op2? op2->res : NULL);
 
-    return TAC_join(TAC_join(op1, op2), tac);
+    return TAC_join(TAC_join(TAC_join(temp_tac, op1), op2), tac);
 }
 
 // Cria um TAC para instrução "read"
@@ -237,18 +238,20 @@ TAC *TAC_make_while(TAC *condition, TAC *body) {
 
 TAC *TAC_make_assign(TAC *identifier, TAC *expression) {
     TAC *assign_tac = TAC_create(TAC_ASSIGN, identifier->res, expression->res, NULL);
-    return TAC_join(expression, assign_tac);
+    return TAC_join(TAC_join(identifier, expression), assign_tac);
 }
 
 TAC *TAC_make_ary_assign(TAC *identifier, TAC *index, TAC *expression) {
     TAC *ary_assign_tac = TAC_create(TAC_ARRAY_ASSIGN, identifier->res,
                                      index->res, expression->res);
-    return TAC_join(TAC_join(expression, index), ary_assign_tac);
+    return TAC_join(TAC_join(TAC_join(identifier, index), expression), ary_assign_tac);
 }
 
 TAC *TAC_make_ary_index(TAC *identifier, TAC *index) {
-    TAC *ary_index_tac = TAC_create(TAC_ARRAY_INDEX, identifier->res, index->res, NULL);
-    return TAC_join(index, ary_index_tac);
+    TAC *temp_tac = TAC_create(TAC_TEMP, makeTemp(), NULL, NULL);
+    TAC *ary_index_tac = TAC_create(TAC_ARRAY_INDEX, temp_tac->res,
+                                    identifier->res, index->res);
+    return TAC_join(TAC_join(TAC_join(temp_tac, identifier), index), ary_index_tac);
 }
 
 TAC *TAC_make_fun_declaration(AST *node, TAC *fn_name, TAC *fn_params, TAC *fn_body) {
@@ -270,11 +273,13 @@ TAC *TAC_make_param(AST *node) {
 TAC *TAC_make_func_call(TAC *func_name, TAC *args) {
     HashNode *label_node = makeLabel();
     
-    TAC *func_call = TAC_create(TAC_CALL, makeTemp(), func_name->res, label_node);
+    TAC *temp_tac = TAC_create(TAC_TEMP, makeTemp(), NULL, NULL);
+    TAC *func_call = TAC_create(TAC_CALL, temp_tac->res, func_name->res, label_node);
     TAC *label = TAC_create(TAC_LABEL, label_node, NULL, NULL);
     TAC *pop_args = TAC_make_pop_args(args);
     
-    return TAC_join(TAC_join(TAC_join(args, func_call), label), pop_args);
+    TAC *func_call_join = TAC_join(TAC_join(TAC_join(args, func_call), label), pop_args);
+    return TAC_join(temp_tac, func_call_join);
 }
 
 TAC *TAC_make_push_arg(TAC *arg) {
