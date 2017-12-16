@@ -187,19 +187,17 @@ TAC *TAC_make_binary_operator(AST *node, TAC *op1, TAC *op2) {
 }
 
 // Cria um TAC para instrução "print"
-TAC *TAC_make_print(AST *node, TAC *args) {
-    TAC *print_tac = TAC_create(TAC_PRINT, node->symbol, NULL, NULL);
-    TAC *empty_list = TAC_create(TAC_EMPTY_LIST, node->symbol, NULL, NULL);
-    return TAC_join(empty_list, TAC_join(args, print_tac));
+TAC *TAC_make_print(TAC *arg) {
+    return TAC_create(TAC_PRINT, arg->res, NULL, NULL);
 }
 
 // Cria um TAC para instrução "read"
-TAC *TAC_make_read(AST *node, TAC *tac) {
-    return TAC_create(TAC_READ, node->symbol, NULL, NULL);
+TAC *TAC_make_read(TAC *expression) {
+    return TAC_create(TAC_READ, expression->res, NULL, NULL);
 }
 
 // Cria o conjunto de TACs que representam um "while"
-TAC *TAC_make_while(AST *node, TAC *condition, TAC *body) {
+TAC *TAC_make_while(TAC *condition, TAC *body) {
     HashNode *begin = makeLabel();
     HashNode *end = makeLabel();
     TAC *begin_label = TAC_create(TAC_LABEL, begin, NULL, NULL);
@@ -221,7 +219,7 @@ TAC *TAC_make_while(AST *node, TAC *condition, TAC *body) {
 }
 
 // if (cond) then (if_true);
-TAC *TAC_make_if(AST *node, TAC *condition, TAC *if_true) {
+TAC *TAC_make_if(TAC *condition, TAC *if_true) {
     HashNode *label = makeLabel();
     TAC *jump = TAC_create(TAC_JZ, label, condition == NULL ? NULL : condition->res, NULL);
     TAC *label_tac = TAC_create(TAC_LABEL, label, NULL, NULL);
@@ -229,7 +227,7 @@ TAC *TAC_make_if(AST *node, TAC *condition, TAC *if_true) {
 }
 
 // if (cond) then (if_true) else (if_false);
-TAC *TAC_make_if_else(AST *node, TAC *condition, TAC *if_true, TAC *if_false) {
+TAC *TAC_make_if_else(TAC *condition, TAC *if_true, TAC *if_false) {
     HashNode *else_label = makeLabel();
     HashNode *end_label = makeLabel();
     TAC *jz_tac = TAC_create(TAC_JZ, else_label, condition == NULL ? NULL : condition->res, NULL);
@@ -247,9 +245,9 @@ TAC *TAC_make_if_else(AST *node, TAC *condition, TAC *if_true, TAC *if_false) {
 }
 
 // return (expr)
-TAC *TAC_make_return(AST *node, TAC *expr) {
-    TAC *return_tac = TAC_create(TAC_RET, node->symbol, NULL, NULL);
-    return TAC_join(expr, return_tac);
+TAC *TAC_make_return(TAC *expression) {
+    TAC *return_tac = TAC_create(TAC_RET, expression->res, NULL, NULL);
+    return TAC_join(expression, return_tac);
 }
 
 TAC *TAC_make_fun_declaration(AST *node, TAC *fn_name, TAC *fn_params, TAC *fn_body) {
@@ -302,10 +300,6 @@ TAC *TAC_generate_code(AST *node) {
         codes[i] = TAC_generate_code(node->son[i]);
     }
 
-    // DEBUG: Imprime o código e o nodo da AST recebido.
-    // printf("Type: %0.2d\t", node->type);
-    // printNode(node);
-
     switch (node->type) {
 
     case AST_SYMBOL:
@@ -355,26 +349,30 @@ TAC *TAC_generate_code(AST *node) {
         return TAC_make_ary_index(node, codes[0], codes[1]);
 
     case AST_WHILE:
-        return TAC_make_while(node, codes[0], codes[1]);
+        return TAC_make_while(codes[0], codes[1]);
 
     case AST_IF_ELSE:
-        return TAC_make_if_else(node, codes[0], codes[1], codes[2]);
+        return TAC_make_if_else(codes[0], codes[1], codes[2]);
 
     case AST_IF:
-        return TAC_make_if(node, codes[0], codes[1]);
+        return TAC_make_if(codes[0], codes[1]);
 
     case AST_RETURN:
-        return TAC_make_return(node, codes[0]);
+        return TAC_make_return(codes[0]);
 
     case AST_PRINT:
         // codes[0] -> print_args
-        return TAC_make_print(node, codes[0]);
+        return codes[0];
 
     case AST_PRINT_ARGS:
-        return TAC_join(codes[1], codes[0]);
+        if (codes[1]->type == TAC_SYMBOL)
+            return TAC_join(TAC_make_print(codes[0]),
+                            TAC_make_print(codes[1]));
+        else
+            return TAC_join(TAC_make_print(codes[0]), codes[1]);
 
     case AST_READ:
-        return TAC_make_read(node, codes[0]);
+        return TAC_make_read(codes[0]);
 
     case AST_PARAM:
         //res = codes[0];
