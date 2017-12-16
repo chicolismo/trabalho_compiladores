@@ -235,19 +235,14 @@ TAC *TAC_make_while(TAC *condition, TAC *body) {
                                         TAC_join(goto_begin, end_label)))));
 }
 
-TAC *TAC_make_assign(AST *node, TAC *symbol, TAC *expr) {
-    TAC *assign_tac = TAC_create(TAC_ASSIGN, node->symbol, NULL, NULL);
-    return TAC_join(symbol, TAC_join(expr, assign_tac));
+TAC *TAC_make_assign(TAC *identifier, TAC *expression) {
+    TAC *assign_tac = TAC_create(TAC_ASSIGN, identifier, expression, NULL);
+    return TAC_join(expression, assign_tac);
 }
 
-TAC *TAC_make_ary_assign(AST *node, TAC *symbol, TAC *index_expr, TAC *val_expr) {
-    TAC *ary_assign_tac = TAC_create(TAC_ARRAY_ASSIGN, node->symbol, NULL, NULL);
-    return TAC_join(symbol, TAC_join(index_expr, TAC_join(val_expr, ary_assign_tac)));
-}
-
-TAC *TAC_make_ary_index(AST *node, TAC *symbol, TAC *index_expr) {
-    TAC *ary_index_tac = TAC_create(TAC_ARRAY_INDEX, node->symbol, NULL, NULL);
-    return TAC_join(symbol, TAC_join(index_expr, ary_index_tac));
+TAC *TAC_make_ary_assign(TAC *identifier, TAC *index, TAC *expression) {
+    TAC *ary_assign_tac = TAC_create(TAC_ARRAY_ASSIGN, identifier, index, expression);
+    return TAC_join(TAC_join(expression, index), ary_assign_tac);
 }
 
 TAC *TAC_make_fun_declaration(AST *node, TAC *fn_name, TAC *fn_params, TAC *fn_body) {
@@ -350,6 +345,12 @@ TAC *TAC_generate_code(AST *node) {
     case AST_WHILE:
         return TAC_make_while(codes[0], codes[1]);
 
+    case AST_VAR_ASSIGN:
+        return TAC_make_assign(codes[0], codes[1]);
+
+    case AST_ARY_ASSIGN:
+        return TAC_make_ary_assign(codes[0], codes[1], codes[2]);
+
     case AST_FUNC_DECL:
         return TAC_make_fun_declaration(node, codes[1], codes[2], codes[3]);
 
@@ -359,25 +360,6 @@ TAC *TAC_generate_code(AST *node) {
 
     case AST_EMPTY_LIT_LIST:
         return TAC_create(TAC_EMPTY_LIST, node->symbol, NULL, NULL);
-
-    // Atribuições
-    case AST_VAR_ASSIGN:
-        // codes[0] -> symbol (a variável)
-        // codes[1] -> expr (o valor sendo atribuido)
-        // printf("var assign\n");
-        // return TAC_join(codes[1], TAC_create(TAC_ASSIGN, node->symbol, codes[0] ? codes[0]->res : NULL, NULL));
-        return TAC_make_assign(node, codes[0], codes[1]);
-
-    case AST_ARY_ASSIGN:
-        // codes[0] -> symbol (o vetor)
-        // codes[1] -> expr (vai ser o indice)
-        // codes[2] -> expr (o valor a ser salvo no indice)
-        return TAC_make_ary_assign(node, codes[0], codes[1], codes[2]);
-
-    case AST_ARY_INDEX:
-        // codes[0] -> symbol (o vetor)
-        // codes[1] -> expr (expressao do indice)
-        return TAC_make_ary_index(node, codes[0], codes[1]);
 
     case AST_FUNC_CALL:
         return TAC_make_func_call(codes[0], codes[1]);
