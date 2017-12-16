@@ -325,6 +325,31 @@ TAC *TAC_generate_code(AST *node) {
     case AST_NOT:
         return TAC_make_binary_operator(node, codes[0], codes[1]);
 
+    case AST_READ:
+        return TAC_make_read(codes[0]);
+
+    case AST_PRINT:
+        return codes[0];
+
+    case AST_PRINT_ARGS:
+        if (codes[1]->type == TAC_SYMBOL)
+            return TAC_join(TAC_make_print(codes[0]),
+                            TAC_make_print(codes[1]));
+        else
+            return TAC_join(TAC_make_print(codes[0]), codes[1]);
+
+    case AST_RETURN:
+        return TAC_make_return(codes[0]);
+
+    case AST_IF:
+        return TAC_make_if(codes[0], codes[1]);
+
+    case AST_IF_ELSE:
+        return TAC_make_if_else(codes[0], codes[1], codes[2]);
+
+    case AST_WHILE:
+        return TAC_make_while(codes[0], codes[1]);
+
     case AST_FUNC_DECL:
         return TAC_make_fun_declaration(node, codes[1], codes[2], codes[3]);
 
@@ -353,32 +378,6 @@ TAC *TAC_generate_code(AST *node) {
         // codes[0] -> symbol (o vetor)
         // codes[1] -> expr (expressao do indice)
         return TAC_make_ary_index(node, codes[0], codes[1]);
-
-    case AST_WHILE:
-        return TAC_make_while(codes[0], codes[1]);
-
-    case AST_IF_ELSE:
-        return TAC_make_if_else(codes[0], codes[1], codes[2]);
-
-    case AST_IF:
-        return TAC_make_if(codes[0], codes[1]);
-
-    case AST_RETURN:
-        return TAC_make_return(codes[0]);
-
-    case AST_PRINT:
-        // codes[0] -> print_args
-        return codes[0];
-
-    case AST_PRINT_ARGS:
-        if (codes[1]->type == TAC_SYMBOL)
-            return TAC_join(TAC_make_print(codes[0]),
-                            TAC_make_print(codes[1]));
-        else
-            return TAC_join(TAC_make_print(codes[0]), codes[1]);
-
-    case AST_READ:
-        return TAC_make_read(codes[0]);
 
     case AST_FUNC_CALL:
         return TAC_make_func_call(codes[0], codes[1]);
