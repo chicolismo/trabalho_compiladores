@@ -65,7 +65,7 @@ void TAC_print(TAC *tac) {
     case TAC_NE:           fprintf(stdout, "TAC_NE"); break;
     case TAC_AND:          fprintf(stdout, "TAC_AND"); break;
     case TAC_OR:           fprintf(stdout, "TAC_OR"); break;
-//    case TAC_NOT:          fprintf(stdout, "TAC_NOT"); break;
+    case TAC_NOT:          fprintf(stdout, "TAC_NOT"); break;
     case TAC_READ:         fprintf(stdout, "TAC_READ"); break;
     case TAC_RET:          fprintf(stdout, "TAC_RET"); break;
     case TAC_PRINT:        fprintf(stdout, "TAC_PRINT"); break;
@@ -173,6 +173,7 @@ TAC *TAC_make_binary_operator(AST *node, TAC *op1, TAC *op2) {
     case AST_NE: type = TAC_NE; break;
     case AST_AND: type = TAC_AND; break;
     case AST_OR: type = TAC_OR; break;
+    case AST_NOT: type = TAC_NOT; break;
     default:
         fprintf(stderr, "ERRO: operador binário não reconhecido\n");
         printNode(node);
@@ -317,6 +318,7 @@ TAC *TAC_generate_code(AST *node) {
     case AST_NE:
     case AST_AND:
     case AST_OR:
+    case AST_NOT:
         return TAC_make_binary_operator(node, codes[0], codes[1]);
 
     case AST_FUNC_DECL:
