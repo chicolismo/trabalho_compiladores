@@ -52,7 +52,6 @@ void TAC_print(TAC *tac) {
     switch (tac->type) {
     case TAC_SYMBOL:       return;
     case TAC_LABEL:        strcpy(tac_string, "TAC_LABEL"); break;
-    case TAC_MOVE:         strcpy(tac_string, "TAC_MOVE"); break;
     case TAC_ADD:          strcpy(tac_string, "TAC_ADD"); break;
     case TAC_SUB:          strcpy(tac_string, "TAC_SUB"); break;
     case TAC_MUL:          strcpy(tac_string, "TAC_MUL"); break;
@@ -71,8 +70,6 @@ void TAC_print(TAC *tac) {
     case TAC_RET:          strcpy(tac_string, "TAC_RET"); break;
     case TAC_JZ:           strcpy(tac_string, "TAC_IFZ"); break;
     case TAC_JMP:          strcpy(tac_string, "TAC_JUMP"); break;
-//    case TAC_VAR_DECL:     strcpy(tac_string, "TAC_VAR_DECL"); break;
-//    case TAC_ARY_DECL:     strcpy(tac_string, "TAC_ARY_DECL"); break;
     case TAC_ASSIGN:       strcpy(tac_string, "TAC_ASSIGN"); break;
     case TAC_ARRAY_ASSIGN: strcpy(tac_string, "TAC_ARRAY_ASSIGN"); break;
     case TAC_ARRAY_INDEX:  strcpy(tac_string, "TAC_ARRAY_INDEX"); break;
@@ -178,8 +175,8 @@ TAC *TAC_make_read(TAC *expression) {
 }
 
 // Cria um TAC para instrução "print"
-TAC *TAC_make_print(TAC *arg) {
-    return TAC_create(TAC_PRINT, arg->res, NULL, NULL);
+TAC *TAC_make_print(TAC *expression) {
+    return TAC_create(TAC_PRINT, expression->res, NULL, NULL);
 }
 
 // Cria um TAC para instrução "return"
@@ -264,10 +261,6 @@ TAC *TAC_make_fun_declaration(AST *node, TAC *fn_name, TAC *fn_params, TAC *fn_b
              TAC_join(fn_name,
                 TAC_join(fn_params,
                     TAC_join(fn_body, end_fun_tac))));
-}
-
-TAC *TAC_make_param(AST *node) {
-    return TAC_create(TAC_PARAM, node->son[0]->symbol, NULL, NULL);
 }
 
 TAC *TAC_make_func_call(TAC *func_name, TAC *args) {
