@@ -1,6 +1,7 @@
 #include "tac.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 // Cria um TAC (obviamente)
 TAC *TAC_create(int type, HashNode *res, HashNode *op1, HashNode *op2) {
@@ -46,66 +47,46 @@ void TAC_print(TAC *tac) {
         return;
     }
 
-    fprintf(stdout, "TAC(");
+    char tac_string[TAC_STRING_SIZE] = "\0";
 
     switch (tac->type) {
-
     case TAC_SYMBOL:       return;
-    case TAC_LABEL:        fprintf(stdout, "TAC_LABEL"); break;
-    case TAC_MOVE:         fprintf(stdout, "TAC_MOVE"); break;
-    case TAC_ADD:          fprintf(stdout, "TAC_ADD"); break;
-    case TAC_SUB:          fprintf(stdout, "TAC_SUB"); break;
-    case TAC_MUL:          fprintf(stdout, "TAC_MUL"); break;
-    case TAC_DIV:          fprintf(stdout, "TAC_DIV"); break;
-    case TAC_LT:           fprintf(stdout, "TAC_LT"); break;
-    case TAC_GT:           fprintf(stdout, "TAC_GT"); break;
-    case TAC_LE:           fprintf(stdout, "TAC_LE"); break;
-    case TAC_GE:           fprintf(stdout, "TAC_GE"); break;
-    case TAC_EQ:           fprintf(stdout, "TAC_EQ"); break;
-    case TAC_NE:           fprintf(stdout, "TAC_NE"); break;
-    case TAC_AND:          fprintf(stdout, "TAC_AND"); break;
-    case TAC_OR:           fprintf(stdout, "TAC_OR"); break;
-    case TAC_NOT:          fprintf(stdout, "TAC_NOT"); break;
-    case TAC_READ:         fprintf(stdout, "TAC_READ"); break;
-    case TAC_RET:          fprintf(stdout, "TAC_RET"); break;
-    case TAC_PRINT:        fprintf(stdout, "TAC_PRINT"); break;
-    case TAC_BEGINFUN:     fprintf(stdout, "TAC_BEGINFUN"); break;
-    case TAC_ENDFUN:       fprintf(stdout, "TAC_ENDFUN"); break;
-    case TAC_JZ:           fprintf(stdout, "TAC_IFZ"); break;
-    case TAC_JMP:          fprintf(stdout, "TAC_JUMP"); break;
-    case TAC_CALL:         fprintf(stdout, "TAC_CALL"); break;
-    case TAC_VAR_DECL:     fprintf(stdout, "TAC_VAR_DECL"); break;
-    case TAC_ARY_DECL:     fprintf(stdout, "TAC_ARY_DECL"); break;
-    case TAC_ASSIGN:       fprintf(stdout, "TAC_ASSIGN"); break;
-    case TAC_ARRAY_ASSIGN: fprintf(stdout, "TAC_ARRAY_ASSIGN"); break;
-//    case TAC_ARRAY_INDEX:  fprintf(stdout, "TAC_ARRAY_INDEX"); break;
-//    case TAC_EMPTY_LIST:   fprintf(stdout, "TAC_EMPTY_LIST"); break;
-    default:               fprintf(stderr, "!!TAC NÃO RECONHECIDO!!\n"); break;
+    case TAC_LABEL:        strcpy(tac_string, "TAC_LABEL"); break;
+    case TAC_MOVE:         strcpy(tac_string, "TAC_MOVE"); break;
+    case TAC_ADD:          strcpy(tac_string, "TAC_ADD"); break;
+    case TAC_SUB:          strcpy(tac_string, "TAC_SUB"); break;
+    case TAC_MUL:          strcpy(tac_string, "TAC_MUL"); break;
+    case TAC_DIV:          strcpy(tac_string, "TAC_DIV"); break;
+    case TAC_LT:           strcpy(tac_string, "TAC_LT"); break;
+    case TAC_GT:           strcpy(tac_string, "TAC_GT"); break;
+    case TAC_LE:           strcpy(tac_string, "TAC_LE"); break;
+    case TAC_GE:           strcpy(tac_string, "TAC_GE"); break;
+    case TAC_EQ:           strcpy(tac_string, "TAC_EQ"); break;
+    case TAC_NE:           strcpy(tac_string, "TAC_NE"); break;
+    case TAC_AND:          strcpy(tac_string, "TAC_AND"); break;
+    case TAC_OR:           strcpy(tac_string, "TAC_OR"); break;
+    case TAC_NOT:          strcpy(tac_string, "TAC_NOT"); break;
+    case TAC_READ:         strcpy(tac_string, "TAC_READ"); break;
+    case TAC_RET:          strcpy(tac_string, "TAC_RET"); break;
+    case TAC_PRINT:        strcpy(tac_string, "TAC_PRINT"); break;
+//    case TAC_BEGINFUN:     strcpy(tac_string, "TAC_BEGINFUN"); break;
+//    case TAC_ENDFUN:       strcpy(tac_string, "TAC_ENDFUN"); break;
+    case TAC_JZ:           strcpy(tac_string, "TAC_IFZ"); break;
+    case TAC_JMP:          strcpy(tac_string, "TAC_JUMP"); break;
+//    case TAC_CALL:         strcpy(tac_string, "TAC_CALL"); break;
+//    case TAC_VAR_DECL:     strcpy(tac_string, "TAC_VAR_DECL"); break;
+//    case TAC_ARY_DECL:     strcpy(tac_string, "TAC_ARY_DECL"); break;
+//    case TAC_ASSIGN:       strcpy(tac_string, "TAC_ASSIGN"); break;
+//    case TAC_ARRAY_ASSIGN: strcpy(tac_string, "TAC_ARRAY_ASSIGN"); break;
+//    case TAC_ARRAY_INDEX:  strcpy(tac_string, "TAC_ARRAY_INDEX"); break;
+//    case TAC_EMPTY_LIST:   strcpy(tac_string, "TAC_EMPTY_LIST"); break;
+    default:               return;
     }
 
-    // Imprime os membros do TAC, se houver
-    if (tac->res != NULL) {
-        fprintf(stdout, ", %s", tac->res->string);
-    }
-    else {
-        fprintf(stdout, ", NULL");
-    }
-
-    if (tac->op1 != NULL) {
-        fprintf(stdout, ", %s", tac->op1->string);
-    }
-    else {
-        fprintf(stdout, ", NULL");
-    }
-
-    if (tac->op2 != NULL) {
-        fprintf(stdout, ", %s", tac->op2->string);
-    }
-    else {
-        fprintf(stdout, ", NULL");
-    }
-
-    fprintf(stdout, ")\n");
+    fprintf(stdout, "TAC(%s, %s, %s, %s)\n", tac_string,
+            tac->res? tac->res->string : "NULL",
+            tac->op1? tac->op1->string : "NULL",
+            tac->op2? tac->op2->string : "NULL");
 }
 
 // Funções auxiliares

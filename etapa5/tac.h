@@ -4,7 +4,7 @@
 #include "hash.h"
 #include "astree.h"
 
-// TODO: Temos que descobrir quais símbolos são necessários
+#define TAC_STRING_SIZE 20
 
 #define TAC_SYMBOL 1
 #define TAC_LABEL 2
