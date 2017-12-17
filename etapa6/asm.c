@@ -6,7 +6,6 @@
 #include "tac.h"
 
 FILE *output_file;
-char *filename = "\0";
 
 void generate_scalar_var(HashNode *identifier) {
 }
@@ -16,10 +15,10 @@ void generate_vector_var(HashNode *identifier) {
 
 void generate_asm(TAC *tac_list) {
     // Open output file
-    char *name;
-    name = calloc(sizeof(char), strlen(filename)+3);
-    sprintf(name,"%s.s", filename);
-    output_file = fopen(name,"w");
+    char *filename;
+    filename = calloc(sizeof(char), strlen(output_filename)+3);
+    sprintf(filename,"%s.s", output_filename);
+    output_file = fopen(filename,"w");
 
     // Create var for all hash nodes
     HashNode *scan;

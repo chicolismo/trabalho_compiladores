@@ -1,8 +1,8 @@
 #ifndef __HASH_H__
 #define __HASH_H__
 
-// O tamanho da tabela hash
 #define HASH_SIZE                  1000
+#define FILENAME_SIZE              50
 
 #define LABEL_SIZE                 255
 #define TEMP_SIZE                  255
@@ -48,7 +48,7 @@ void printHashTable();
 HashNode *makeLabel();
 HashNode *makeTemp();
 
-// A tabela hash
 HashNode *hashTable[HASH_SIZE];
+char output_filename[FILENAME_SIZE];
 
 #endif // __HASH_H__
