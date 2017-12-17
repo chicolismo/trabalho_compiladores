@@ -48,4 +48,7 @@ void printHashTable();
 HashNode *makeLabel();
 HashNode *makeTemp();
 
+// A tabela hash
+HashNode *hashTable[HASH_SIZE];
+
 #endif // __HASH_H__

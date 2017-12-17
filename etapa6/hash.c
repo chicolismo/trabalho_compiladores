@@ -7,9 +7,6 @@
 static int label_counter = 0; // Contador dos rótulos já criados
 static int temp_counter = 0;  // Contador dos valores temporários
 
-// A tabela hash
-HashNode *hashTable[HASH_SIZE];
-
 void initializeHashTable() {
     int i;
     for (i = 0; i < HASH_SIZE; ++i) {
