@@ -6,6 +6,7 @@
 #include "hash.h"
 #include "semantic.h"
 #include "tac.h"
+#include "asm.h"
 
 int yylex();
 int yyerror(char *text);
@@ -96,14 +97,17 @@ FILE *output_file = NULL;
 
 program: declarations {
     $$ = $1;
+    
     fprintf(stdout, "Imprimindo a árvore\n");
     printAST($$, 0);
+//    generateCode(output_file, $$);
 
+    semanticVerification($$);
+    
     TAC *tac = TAC_reverse_list(TAC_generate_code($1));
     TAC_print_forward(tac);
-
-    generateCode(output_file, $$);
-    semanticVerification($$);
+    
+    generate_asm(tac);
 };
 
 declarations: dec declarations { $$ = createAST(AST_DECL_LIST, 0, $1, $2, 0, 0); }
