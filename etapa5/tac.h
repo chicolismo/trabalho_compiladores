@@ -86,6 +86,7 @@ TAC *TAC_make_while(TAC *condition, TAC *body);
 TAC *TAC_make_assign(TAC *identifier, TAC *expression);
 TAC *TAC_make_ary_assign(TAC *identifier, TAC *index, TAC *expression);
 TAC *TAC_make_ary_index(TAC *identifier, TAC *index);
+TAC *TAC_make_ary_decl_assign(TAC *identifier, TAC *index, TAC *expression);
 TAC *TAC_make_fun_declaration(AST *node, TAC *fn_name, TAC *fn_params, TAC *fn_body);
 TAC *TAC_make_func_call(TAC *func_name, TAC *args);
 TAC *TAC_make_push_arg(TAC *arg);

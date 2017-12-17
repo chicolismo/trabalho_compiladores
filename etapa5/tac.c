@@ -251,6 +251,34 @@ TAC *TAC_make_ary_index(TAC *identifier, TAC *index) {
     return TAC_join(TAC_join(TAC_join(temp_tac, identifier), index), ary_index_tac);
 }
 
+TAC *TAC_make_ary_decl_assign(TAC *identifier, TAC *index, TAC *expression) {
+    int i, n = atoi(index->res->string);
+    TAC *ary_decl_tac = NULL;
+    TAC *ary_assign_tac = NULL;
+    TAC *aux_expression = expression;
+
+    for (i=0; i<n; i++) {
+        if (!aux_expression) {
+            fprintf(stderr, "ERRO SEMANTICO: Vetor %s na linha %d inicializado com número incompatível de índices.\n",
+                    identifier->res->string, identifier->res->lineNumber);
+            exit(4);
+        }
+
+        char index_string[10];
+        sprintf(index_string, "%d", i);
+        
+        ary_assign_tac = TAC_create(TAC_ARRAY_ASSIGN, identifier->res,
+                                    setHashNode(index_string, SYMBOL_LIT_INTEGER),
+                                    aux_expression->res);
+        
+        ary_decl_tac = TAC_join(ary_decl_tac, ary_assign_tac);
+        
+        aux_expression = aux_expression->next;
+    }
+    
+    return ary_decl_tac;
+}
+
 TAC *TAC_make_fun_declaration(AST *node, TAC *fn_name, TAC *fn_params, TAC *fn_body) {
     TAC *begin_fun_tac = TAC_create(TAC_BEGINFUN, node->symbol, NULL, NULL);
     TAC *end_fun_tac = TAC_create(TAC_ENDFUN, node->symbol, NULL, NULL);
@@ -360,15 +388,20 @@ TAC *TAC_generate_code(AST *node) {
     case AST_ARY_INDEX:
         return TAC_make_ary_index(codes[0], codes[1]);
 
-    case AST_FUNC_DECL:
-        return TAC_make_fun_declaration(node, codes[1], codes[2], codes[3]);
+    case AST_VAR_DECL:
+        return TAC_make_assign(codes[0], codes[2]);
+
+    case AST_ARY_DECL:
+        return TAC_make_ary_decl_assign(codes[0], codes[2], codes[3]);
 
     case AST_LIT_LIST:
-        // Temos que fazer invertido, para a lista vazia ficar no fim da pilha
-        return TAC_join(codes[1], codes[0]);
+        return TAC_join(codes[0], codes[1]);
 
     case AST_EMPTY_LIT_LIST:
-        return TAC_create(TAC_EMPTY_LIST, node->symbol, NULL, NULL);
+        return NULL;
+
+    case AST_FUNC_DECL:
+        return TAC_make_fun_declaration(node, codes[1], codes[2], codes[3]);
 
     case AST_FUNC_CALL:
         return TAC_make_func_call(codes[0], codes[1]);
