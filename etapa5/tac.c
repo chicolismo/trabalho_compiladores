@@ -170,12 +170,14 @@ TAC *TAC_make_binary_operator(AST *node, TAC *op1, TAC *op2) {
 
 // Cria um TAC para instrução "read"
 TAC *TAC_make_read(TAC *expression) {
-    return TAC_create(TAC_READ, expression->res, NULL, NULL);
+    TAC *read_tac = TAC_create(TAC_READ, expression->res, NULL, NULL);
+    return TAC_join(expression, read_tac);
 }
 
 // Cria um TAC para instrução "print"
 TAC *TAC_make_print(TAC *expression) {
-    return TAC_create(TAC_PRINT, expression->res, NULL, NULL);
+    TAC *print_tac = TAC_create(TAC_PRINT, expression->res, NULL, NULL);
+    return TAC_join(expression, print_tac);
 }
 
 // Cria um TAC para instrução "return"

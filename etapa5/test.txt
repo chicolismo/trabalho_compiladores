@@ -2,7 +2,7 @@
 
 a : short = 0;
 i : long = 0;
-v : long[10] 0 0 0 0 0 0 0 0 0 0;
+v : long[10] 0 10 20 30 40 50 60 70 80 90;
 mat : long[0];
 f : float = 10.55;
 c : byte = 'x';
