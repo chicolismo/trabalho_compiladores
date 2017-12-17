@@ -73,9 +73,8 @@ void TAC_print(TAC *tac) {
     case TAC_ASSIGN:       strcpy(tac_string, "TAC_ASSIGN"); break;
     case TAC_ARRAY_ASSIGN: strcpy(tac_string, "TAC_ARRAY_ASSIGN"); break;
     case TAC_ARRAY_INDEX:  strcpy(tac_string, "TAC_ARRAY_INDEX"); break;
-//    case TAC_BEGINFUN:     strcpy(tac_string, "TAC_BEGINFUN"); break;
-//    case TAC_ENDFUN:       strcpy(tac_string, "TAC_ENDFUN"); break;
-//    case TAC_EMPTY_LIST:   strcpy(tac_string, "TAC_EMPTY_LIST"); break;
+    case TAC_BEGIN_FUNC:   strcpy(tac_string, "TAC_BEGIN_FUNC"); break;
+    case TAC_END_FUNC:     strcpy(tac_string, "TAC_END_FUNC"); break;
     case TAC_CALL:         strcpy(tac_string, "TAC_CALL"); break;
     case TAC_PUSH_ARG:     strcpy(tac_string, "TAC_PUSH_ARG"); break;
     case TAC_POP_ARG:      strcpy(tac_string, "TAC_POP_ARG"); break;
@@ -279,16 +278,11 @@ TAC *TAC_make_ary_decl_assign(TAC *identifier, TAC *index, TAC *expression) {
     return ary_decl_tac;
 }
 
-TAC *TAC_make_fun_declaration(AST *node, TAC *fn_name, TAC *fn_params, TAC *fn_body) {
-    TAC *begin_fun_tac = TAC_create(TAC_BEGINFUN, node->symbol, NULL, NULL);
-    TAC *end_fun_tac = TAC_create(TAC_ENDFUN, node->symbol, NULL, NULL);
+TAC *TAC_make_func_declaration(TAC *func_name, TAC *func_params, TAC *func_body) {
+    TAC *begin_func_tac = TAC_create(TAC_BEGIN_FUNC, func_name->res, NULL, NULL);
+    TAC *end_func_tac = TAC_create(TAC_END_FUNC, func_name->res, NULL, NULL);
 
-    // begin name params body end
-    return
-        TAC_join(begin_fun_tac,
-             TAC_join(fn_name,
-                TAC_join(fn_params,
-                    TAC_join(fn_body, end_fun_tac))));
+    return TAC_join(TAC_join(TAC_join(begin_func_tac, func_params), func_body), end_func_tac);
 }
 
 TAC *TAC_make_func_call(TAC *func_name, TAC *args) {
@@ -401,7 +395,13 @@ TAC *TAC_generate_code(AST *node) {
         return NULL;
 
     case AST_FUNC_DECL:
-        return TAC_make_fun_declaration(node, codes[1], codes[2], codes[3]);
+        return TAC_make_func_declaration(codes[1], codes[2], codes[3]);
+
+    case AST_PARAM_LIST:
+        return TAC_join(codes[0], codes[1]);
+
+    case AST_PARAM:
+        return codes[0];
 
     case AST_FUNC_CALL:
         return TAC_make_func_call(codes[0], codes[1]);
