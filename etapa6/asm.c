@@ -30,6 +30,7 @@ void generate_math_operation(TAC *tac) {
         case TAC_SUB: strcpy(operation, "subl"); break;
         case TAC_MUL: strcpy(operation, "imull"); break;
         case TAC_DIV: strcpy(operation, "idivl"); break;
+        default: return;
     }
     
     fprintf(output_file, "\tmovl\t%s(%%rip), %%eax\n", tac->op1->string);
@@ -39,7 +40,23 @@ void generate_math_operation(TAC *tac) {
 }
 
 void generate_compare_operation(TAC *tac) {
+    char operation[6] = "\0";
+    switch (tac->type) {
+        case TAC_LT: strcpy(operation, "setl"); break;
+        case TAC_GT: strcpy(operation, "setg"); break;
+        case TAC_LE: strcpy(operation, "setle"); break;
+        case TAC_GE: strcpy(operation, "setge"); break;
+        case TAC_EQ: strcpy(operation, "sete"); break;
+        case TAC_NE: strcpy(operation, "setne"); break;
+        default: return;
+    }
     
+    fprintf(output_file, "\tmovl\t%s(%%rip), %%ecx\n", tac->op1->string);
+    fprintf(output_file, "\tcmpl\t%s(%%rip), %%ecx\n", tac->op2->string);
+    fprintf(output_file, "\t%s\t%%dl\n", operation);
+    fprintf(output_file, "\tandb\t$1, %%dl\n");
+    fprintf(output_file, "\tmovzbl\t%%dl, %%ecx\n");
+    fprintf(output_file, "\tmovl\t%%ecx, %s(%%rip)\n", tac->res->string);
 }
 
 void generate_logic_operation(TAC *tac) {
