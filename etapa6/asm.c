@@ -209,4 +209,6 @@ void generate_asm(TAC *tac_list) {
         
         tac = tac->next;
     }
+    
+    fclose(output_file);
 }
