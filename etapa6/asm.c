@@ -16,7 +16,7 @@ void generate_vector_var(HashNode *identifier) {
 }
 
 void generate_label(TAC *tac) {
-    
+    fprintf(output_file, "%s:\n", tac->res->string);
 }
 
 void generate_temp(TAC *tac) {
