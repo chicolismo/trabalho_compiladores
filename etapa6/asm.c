@@ -80,11 +80,13 @@ void generate_return(TAC *tac) {
 }
 
 void generate_jz(TAC *tac) {
-    
+    fprintf(output_file, "\tmovl\t%s(%%rip), %%eax\n", tac->op1->string);
+    fprintf(output_file, "\tcmpl\t$0, %%eax\n");
+    fprintf(output_file, "\tje %s\n", tac->res->string);
 }
 
 void generate_jump(TAC *tac) {
-    
+    fprintf(output_file, "\tjmp %s\n", tac->res->string);
 }
 
 void generate_assign(TAC *tac) {
