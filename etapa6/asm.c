@@ -24,7 +24,18 @@ void generate_temp(TAC *tac) {
 }
 
 void generate_math_operation(TAC *tac) {
+    char operation[6] = "\0";
+    switch (tac->type) {
+        case TAC_ADD: strcpy(operation, "addl"); break;
+        case TAC_SUB: strcpy(operation, "subl"); break;
+        case TAC_MUL: strcpy(operation, "imull"); break;
+        case TAC_DIV: strcpy(operation, "idivl"); break;
+    }
     
+    fprintf(output_file, "\tmovl\t%s(%%rip), %%eax\n", tac->op1->string);
+    fprintf(output_file, "\tmovl\t%s(%%rip), %%ebx\n", tac->op2->string);
+    fprintf(output_file, "\t%s\t%%ebx, %%eax\n", operation);
+    fprintf(output_file, "\tmovl\t%%eax, %s(%%rip)\n", tac->res->string);
 }
 
 void generate_compare_operation(TAC *tac) {
