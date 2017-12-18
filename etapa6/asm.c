@@ -60,7 +60,7 @@ void generate_jump(TAC *tac) {
 }
 
 void generate_assign(TAC *tac) {
-    
+    fprintf(output_file, "\tmovl\t%s(%%rip), %s(%%rip)\n", tac->op1->string, tac->res->string);
 }
 
 void generate_array_assign(TAC *tac) {
