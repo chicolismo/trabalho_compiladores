@@ -206,5 +206,7 @@ void generate_asm(TAC *tac_list) {
         default:
             break;
         }
+        
+        tac = tac->next;
     }
 }
