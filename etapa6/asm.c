@@ -62,7 +62,13 @@ void generate_compare_operation(TAC *tac) {
 }
 
 void generate_not(TAC *tac) {
-    
+    fprintf(output_file, "\tmovl\t%s(%%rip), %%ecx\n", tac->op1->string);
+    fprintf(output_file, "\tcmpl\t$0, %%ecx\n");
+    fprintf(output_file, "\tsetne\t%%dl\n");
+    fprintf(output_file, "\txorb\t$-1, %%dl\n");
+    fprintf(output_file, "\tandb\t$1, %%dl\n");
+    fprintf(output_file, "\tmovzbl\t%%dl, %%edx\n");
+    fprintf(output_file, "\tmovl\t%%edx, %s(%%rip)\n", tac->res->string);
 }
 
 void generate_read(TAC *tac) {
