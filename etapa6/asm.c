@@ -90,7 +90,7 @@ void generate_read(TAC *tac) {
     fprintf(output_file, "\tjmp\tL_%d\n", end_label);
     
     fprintf(output_file, "L_%d:\n", format_label);
-    fprintf(output_file, "\t.asciz\t\"%%ld\"\n");
+    fprintf(output_file, "\t.asciz\t\"%%d\"\n");
     
     fprintf(output_file, "L_%d:\n", end_label);
 }
@@ -100,7 +100,7 @@ void generate_print(TAC *tac) {
     int end_label = label_index++;
     
     fprintf(output_file, "\tleaq\tL_%d(%%rip), %%rdi\n", format_label);
-    fprintf(output_file, "\tmovq\t%s(%%rip), %%rsi\n", tac->res->string);
+    fprintf(output_file, "\tmovl\t%s(%%rip), %%esi\n", tac->res->string);
     fprintf(output_file, "\tmovb\t$0, %%al\n");
     fprintf(output_file, "\tcallq\t_printf\n");
     fprintf(output_file, "\tjmp\tL_%d\n", end_label);
@@ -108,9 +108,9 @@ void generate_print(TAC *tac) {
     fprintf(output_file, "L_%d:\n", format_label);
     
     if (tac->res->type == SYMBOL_STRING) {
-        fprintf(output_file, "\t.asciz\t\"%s\"\n", tac->res->string);
+        fprintf(output_file, "\t.asciz\t%s\n", tac->res->string);
     } else {
-        fprintf(output_file, "\t.asciz\t\"%%ld\"\n");
+        fprintf(output_file, "\t.asciz\t\"%%d\"\n");
     }
     
     fprintf(output_file, "L_%d:\n", end_label);
@@ -182,6 +182,18 @@ void generate_asm(TAC *tac_list) {
     // Define asm version for macOS
     fprintf(output_file, "\t.section\t__TEXT,__text,regular,pure_instructions\n");
     fprintf(output_file, "\t.macosx_version_min\t10, 13\n");
+    fprintf(output_file, "\t.globl\t_main\n");
+    fprintf(output_file, "\t.p2align\t4, 0x90\n");
+    fprintf(output_file, "_main:\n");
+    fprintf(output_file, "\t.cfi_startproc\n");
+    fprintf(output_file, "\tpushq\t%%rbp\n");
+    fprintf(output_file, "Lcfi0:\n");
+    fprintf(output_file, "\t.cfi_def_cfa_offset\t16\n");
+    fprintf(output_file, "Lcfi1:\n");
+    fprintf(output_file, "\t.cfi_offset %%rbp,\t-16\n");
+    fprintf(output_file, "\tmovq\t%%rsp, %%rbp\n");
+    fprintf(output_file, "Lcfi2:\n");
+    fprintf(output_file, "\t.cfi_def_cfa_register\t%%rbp\n");
     
     // Create var for all hash nodes
     HashNode *scan;
@@ -286,6 +298,8 @@ void generate_asm(TAC *tac_list) {
         
         tac = tac->next;
     }
+    
+    fprintf(output_file, "\t.cfi_endproc\n\n");
     
     fclose(output_file);
 }
