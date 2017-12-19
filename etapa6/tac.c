@@ -357,9 +357,6 @@ TAC *TAC_generate_code(AST *node) {
     case AST_PRINT_ARGS:
         if (codes[1] == NULL)
             return TAC_make_print(codes[0]);
-//        else if (codes[1]->type == TAC_SYMBOL)
-//            return TAC_join(TAC_make_print(codes[0]),
-//                            TAC_make_print(codes[1]));
         else
             return TAC_join(TAC_make_print(codes[0]), codes[1]);
 

@@ -66,7 +66,7 @@ HashNode *createHashNode(const char *string, int type) {
             break;
             
         default:
-            node->asm_string = NULL;
+            node->asm_string = node->string;
             break;
     }
     
