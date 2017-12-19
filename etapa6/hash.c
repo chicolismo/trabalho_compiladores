@@ -32,6 +32,8 @@ int generateHash(const char *string) {
 
 
 HashNode *createHashNode(const char *string, int type) {
+    char aux[5];
+    
     HashNode *node = malloc(sizeof(HashNode));
     size_t size = strlen(string) + 1;
     node->string = malloc(sizeof(char) * size);
@@ -54,6 +56,13 @@ HashNode *createHashNode(const char *string, int type) {
             node->asm_string[1] = '_';
             node->asm_string[2] = node->string[1];
             node->asm_string[3] = '\0';
+            break;
+            
+        case SYMBOL_STRING:
+            sprintf(aux, "%d", string_counter++);
+            node->asm_string = malloc(sizeof(char) * 12);
+            strcpy(node->asm_string, "L_.str\0");
+            strcat(node->asm_string, aux);
             break;
             
         default:

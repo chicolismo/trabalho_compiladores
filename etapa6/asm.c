@@ -9,13 +9,14 @@
 
 FILE *output_file;
 static int label_index = 0;
-static int has_data_section_init = 0;
+static int has_text_section_init = 0;
 
 char *get_string(HashNode *node) {
     switch (node->type) {
         case SYMBOL_LIT_INTEGER:
         case SYMBOL_LIT_REAL:
         case SYMBOL_LIT_CHAR:
+        case SYMBOL_STRING:
             return node->asm_string;
             
         default:
@@ -23,9 +24,18 @@ char *get_string(HashNode *node) {
     }
 }
 
+void init_text_section() {
+    fprintf(output_file, "\t.section\t__TEXT,__cstring,cstring_literals\n");
+    has_text_section_init = 1;
+}
+
 void generate_scalar_var(HashNode *identifier) {
     if (identifier->type == SYMBOL_STRING) {
-        return;
+        if (!has_text_section_init)
+            init_text_section();
+        
+        fprintf(output_file, "%s:\n", identifier->asm_string);
+        fprintf(output_file, "\t.asciz\t%s\n", identifier->string);
     } else {
         fprintf(output_file, "\t.comm\t%s,4,2\n", get_string(identifier));
     }
@@ -294,7 +304,6 @@ void generate_asm(TAC *tac_list) {
                 case SYMBOL_LIT_INTEGER:
                 case SYMBOL_LIT_REAL:
                 case SYMBOL_LIT_CHAR:
-                case SYMBOL_STRING:
                 case SYMBOL_IDENTIFIER_SCALAR:
                     generate_scalar_var(scan); break;
                     
@@ -302,6 +311,16 @@ void generate_asm(TAC *tac_list) {
                     generate_vector_var(scan); break;
             }
             
+            scan = scan->next;
+        }
+    }
+    
+    for (i=0; i<HASH_SIZE; i++) {
+        scan = hashTable[i];
+        while(scan != NULL) {
+            if (scan->type == SYMBOL_STRING) {
+                generate_scalar_var(scan);
+            }
             scan = scan->next;
         }
     }
