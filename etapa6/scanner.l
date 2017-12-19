@@ -19,7 +19,7 @@ void initMe();
 [0-9]+          { yylval.symbol = setHashNode(yytext, SYMBOL_LIT_INTEGER); return LIT_INTEGER; }
 [0-9]+"."[0-9]+ { yylval.symbol = setHashNode(yytext, SYMBOL_LIT_REAL);    return LIT_REAL; }
 '([^\\]|\\.)'   { yylval.symbol = setHashNode(yytext, SYMBOL_LIT_CHAR);    return LIT_CHAR; }
-\"(\\.|[^"])*\" { yylval.symbol = setHashNode(yytext, LIT_STRING);  return LIT_STRING; }
+\"(\\.|[^"])*\" { yylval.symbol = setHashNode(yytext, SYMBOL_STRING);      return LIT_STRING; }
 
 [\,\;\:\(\)\[\]\{\}\+\-\*\/\<\>\=\!\&\$\#]  return yytext[0];
 

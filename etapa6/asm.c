@@ -76,20 +76,37 @@ void generate_read(TAC *tac) {
     int format_label = label_index++;
     int end_label = label_index++;
     
-    fprintf(output_file, "\tleaq\tLabel%d(%%rip), %%rdi\n", format_label);
+    fprintf(output_file, "\tleaq\tL_%d(%%rip), %%rdi\n", format_label);
     fprintf(output_file, "\tleaq\t%s(%%rip), %%rsi\n", tac->res->string);
     fprintf(output_file, "\tmovb\t$0, %%al\n");
     fprintf(output_file, "\tcallq\t_scanf\n");
-    fprintf(output_file, "\tjmp\tLabel%d\n", end_label);
+    fprintf(output_file, "\tjmp\tL_%d\n", end_label);
     
-    fprintf(output_file, "Label%d:\n", format_label);
+    fprintf(output_file, "L_%d:\n", format_label);
     fprintf(output_file, "\t.asciz\t\"%%ld\"\n");
     
-    fprintf(output_file, "Label%d:\n", end_label);
+    fprintf(output_file, "L_%d:\n", end_label);
 }
 
 void generate_print(TAC *tac) {
+    int format_label = label_index++;
+    int end_label = label_index++;
     
+    fprintf(output_file, "\tleaq\tL_%d(%%rip), %%rdi\n", format_label);
+    fprintf(output_file, "\tmovq\t%s(%%rip), %%rsi\n", tac->res->string);
+    fprintf(output_file, "\tmovb\t$0, %%al\n");
+    fprintf(output_file, "\tcallq\t_printf\n");
+    fprintf(output_file, "\tjmp\tL_%d\n", end_label);
+    
+    fprintf(output_file, "L_%d:\n", format_label);
+    
+    if (tac->res->type == SYMBOL_STRING) {
+        fprintf(output_file, "\t.asciz\t\"%s\"\n", tac->res->string);
+    } else {
+        fprintf(output_file, "\t.asciz\t\"%%ld\"\n");
+    }
+    
+    fprintf(output_file, "L_%d:\n", end_label);
 }
 
 void generate_return(TAC *tac) {
