@@ -8,6 +8,7 @@
 #define AUX_LABEL "__"
 
 FILE *output_file;
+static int has_data_section_init = 0;
 
 char *get_string(HashNode *node) {
     switch (node->type) {
@@ -39,6 +40,13 @@ void init_main_section() {
     fprintf(output_file, "\t.cfi_def_cfa_register\t%%rbp\n");
 }
 
+void init_data_section() {
+    if (!has_data_section_init) {
+        fprintf(output_file, "\t.section\t__DATA,__data\n");
+        has_data_section_init = 1;
+    }
+}
+
 void init_text_section() {
     fprintf(output_file, "\t.section\t__TEXT,__cstring,cstring_literals\n");
     fprintf(output_file, "L_.str:\n");
@@ -46,11 +54,26 @@ void init_text_section() {
 }
 
 void generate_scalar_var(HashNode *identifier) {
-    if (identifier->type == SYMBOL_STRING) {
-        fprintf(output_file, "%s:\n", identifier->asm_string);
-        fprintf(output_file, "\t.asciz\t%s\n", identifier->string);
-    } else {
-        fprintf(output_file, "\t.comm\t%s,4,2\n", get_string(identifier));
+    switch (identifier->type) {
+        case SYMBOL_LIT_INTEGER:
+        case SYMBOL_LIT_REAL:
+        case SYMBOL_LIT_CHAR:
+            init_data_section();
+            fprintf(output_file, "\t.globl\t%s\n", identifier->asm_string);
+            fprintf(output_file, "\t.p2align\t2\n");
+            fprintf(output_file, "%s:\n", identifier->asm_string);
+            fprintf(output_file, "\t.long\t%s\n", identifier->string);
+            break;
+            break;
+            
+        case SYMBOL_STRING:
+            fprintf(output_file, "%s:\n", identifier->asm_string);
+            fprintf(output_file, "\t.asciz\t%s\n", identifier->string);
+            break;
+            
+        default:
+            fprintf(output_file, "\t.comm\t%s,4,2\n", get_string(identifier));
+            break;
     }
 }
 
@@ -282,9 +305,6 @@ void generate_asm(TAC *tac_list) {
         
         while(scan != NULL) {
             switch(scan->type) {
-                case SYMBOL_LIT_INTEGER:
-                case SYMBOL_LIT_REAL:
-                case SYMBOL_LIT_CHAR:
                 case SYMBOL_IDENTIFIER_SCALAR:
                     generate_scalar_var(scan); break;
                     
@@ -296,13 +316,31 @@ void generate_asm(TAC *tac_list) {
         }
     }
     
+    // Create section for constants
+    init_data_section();
+    
+    for (i=0; i<HASH_SIZE; i++) {
+        scan = hashTable[i];
+        while(scan != NULL) {
+            switch(scan->type) {
+                case SYMBOL_LIT_INTEGER:
+                case SYMBOL_LIT_REAL:
+                case SYMBOL_LIT_CHAR:
+                    generate_scalar_var(scan); break;
+            }
+            scan = scan->next;
+        }
+    }
+    
+    // Create section for strings
     init_text_section();
     
     for (i=0; i<HASH_SIZE; i++) {
         scan = hashTable[i];
         while(scan != NULL) {
-            if (scan->type == SYMBOL_STRING) {
-                generate_scalar_var(scan);
+            switch(scan->type) {
+                case SYMBOL_STRING:
+                    generate_scalar_var(scan); break;
             }
             scan = scan->next;
         }
