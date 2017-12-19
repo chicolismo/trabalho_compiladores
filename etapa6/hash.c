@@ -6,6 +6,7 @@
 // Globais
 static int label_counter = 0; // Contador dos rótulos já criados
 static int temp_counter = 0;  // Contador dos valores temporários
+static int string_counter = 0;
 
 void initializeHashTable() {
     int i;
@@ -38,6 +39,28 @@ HashNode *createHashNode(const char *string, int type) {
     node->string[size - 1] = '\0';
     node->type = type;
     node->next = NULL;
+    
+    switch (node->type) {
+        case SYMBOL_LIT_INTEGER:
+        case SYMBOL_LIT_REAL:
+            node->asm_string = malloc(sizeof(char) * 20);
+            strcpy(node->asm_string, "__\0");
+            strcat(node->asm_string, node->string);
+            break;
+            
+        case SYMBOL_LIT_CHAR:
+            node->asm_string = malloc(sizeof(char) * 4);
+            node->asm_string[0] = '_';
+            node->asm_string[1] = '_';
+            node->asm_string[2] = node->string[1];
+            node->asm_string[3] = '\0';
+            break;
+            
+        default:
+            node->asm_string = NULL;
+            break;
+    }
+    
     return node;
 }
 

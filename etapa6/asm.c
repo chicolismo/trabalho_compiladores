@@ -5,11 +5,30 @@
 #include "hash.h"
 #include "tac.h"
 
+#define AUX_LABEL "__"
+
 FILE *output_file;
 static int label_index = 0;
+static int has_data_section_init = 0;
+
+char *get_string(HashNode *node) {
+    switch (node->type) {
+        case SYMBOL_LIT_INTEGER:
+        case SYMBOL_LIT_REAL:
+        case SYMBOL_LIT_CHAR:
+            return node->asm_string;
+            
+        default:
+            return node->string;
+    }
+}
 
 void generate_scalar_var(HashNode *identifier) {
-    
+    if (identifier->type == SYMBOL_STRING) {
+        return;
+    } else {
+        fprintf(output_file, "\t.comm\t%s,4,2\n", get_string(identifier));
+    }
 }
 
 void generate_vector_var(HashNode *identifier) {
@@ -18,17 +37,6 @@ void generate_vector_var(HashNode *identifier) {
 
 void generate_label(TAC *tac) {
     fprintf(output_file, "%s:\n", tac->res->string);
-}
-
-void generate_temp(TAC *tac) {
-    int end_label = label_index++;
-    
-    fprintf(output_file, "\tjmp\tL_%d\n", end_label);
-    fprintf(output_file, "%s:\n", tac->res->string);
-    
-    generate_scalar_var(tac->res);
-    
-    fprintf(output_file, "L_%d:\n", end_label);
 }
 
 void generate_math_or_logic_operation(TAC *tac) {
@@ -43,10 +51,10 @@ void generate_math_or_logic_operation(TAC *tac) {
         default: return;
     }
     
-    fprintf(output_file, "\tmovl\t%s(%%rip), %%eax\n", tac->op1->string);
-    fprintf(output_file, "\tmovl\t%s(%%rip), %%ebx\n", tac->op2->string);
+    fprintf(output_file, "\tmovl\t%s(%%rip), %%eax\n", get_string(tac->op1));
+    fprintf(output_file, "\tmovl\t%s(%%rip), %%ebx\n", get_string(tac->op2));
     fprintf(output_file, "\t%s\t%%ebx, %%eax\n", operation);
-    fprintf(output_file, "\tmovl\t%%eax, %s(%%rip)\n", tac->res->string);
+    fprintf(output_file, "\tmovl\t%%eax, %s(%%rip)\n", get_string(tac->res));
 }
 
 void generate_compare_operation(TAC *tac) {
@@ -61,68 +69,68 @@ void generate_compare_operation(TAC *tac) {
         default: return;
     }
     
-    fprintf(output_file, "\tmovl\t%s(%%rip), %%ecx\n", tac->op1->string);
-    fprintf(output_file, "\tcmpl\t%s(%%rip), %%ecx\n", tac->op2->string);
+    fprintf(output_file, "\tmovl\t%s(%%rip), %%ecx\n", get_string(tac->op1));
+    fprintf(output_file, "\tcmpl\t%s(%%rip), %%ecx\n", get_string(tac->op2));
     fprintf(output_file, "\t%s\t%%dl\n", operation);
     fprintf(output_file, "\tandb\t$1, %%dl\n");
     fprintf(output_file, "\tmovzbl\t%%dl, %%ecx\n");
-    fprintf(output_file, "\tmovl\t%%ecx, %s(%%rip)\n", tac->res->string);
+    fprintf(output_file, "\tmovl\t%%ecx, %s(%%rip)\n", get_string(tac->res));
 }
 
 void generate_not(TAC *tac) {
-    fprintf(output_file, "\tmovl\t%s(%%rip), %%ecx\n", tac->op1->string);
+    fprintf(output_file, "\tmovl\t%s(%%rip), %%ecx\n", get_string(tac->op1));
     fprintf(output_file, "\tcmpl\t$0, %%ecx\n");
     fprintf(output_file, "\tsetne\t%%dl\n");
     fprintf(output_file, "\txorb\t$-1, %%dl\n");
     fprintf(output_file, "\tandb\t$1, %%dl\n");
     fprintf(output_file, "\tmovzbl\t%%dl, %%edx\n");
-    fprintf(output_file, "\tmovl\t%%edx, %s(%%rip)\n", tac->res->string);
+    fprintf(output_file, "\tmovl\t%%edx, %s(%%rip)\n", get_string(tac->res));
 }
 
 void generate_read(TAC *tac) {
     int format_label = label_index++;
     int end_label = label_index++;
     
-    fprintf(output_file, "\tleaq\tL_%d(%%rip), %%rdi\n", format_label);
-    fprintf(output_file, "\tleaq\t%s(%%rip), %%rsi\n", tac->res->string);
+    fprintf(output_file, "\tleaq\t%s%d(%%rip), %%rdi\n", AUX_LABEL, format_label);
+    fprintf(output_file, "\tleaq\t%s(%%rip), %%rsi\n", get_string(tac->res));
     fprintf(output_file, "\tmovb\t$0, %%al\n");
     fprintf(output_file, "\tcallq\t_scanf\n");
-    fprintf(output_file, "\tjmp\tL_%d\n", end_label);
+    fprintf(output_file, "\tjmp\t%s%d\n", AUX_LABEL, end_label);
     
-    fprintf(output_file, "L_%d:\n", format_label);
+    fprintf(output_file, "%s%d:\n", AUX_LABEL, format_label);
     fprintf(output_file, "\t.asciz\t\"%%d\"\n");
     
-    fprintf(output_file, "L_%d:\n", end_label);
+    fprintf(output_file, "%s%d:\n", AUX_LABEL, end_label);
 }
 
 void generate_print(TAC *tac) {
     int format_label = label_index++;
     int end_label = label_index++;
     
-    fprintf(output_file, "\tleaq\tL_%d(%%rip), %%rdi\n", format_label);
-    fprintf(output_file, "\tmovl\t%s(%%rip), %%esi\n", tac->res->string);
+    fprintf(output_file, "\tleaq\t%s%d(%%rip), %%rdi\n", AUX_LABEL, format_label);
+    fprintf(output_file, "\tmovl\t%s(%%rip), %%esi\n", get_string(tac->res));
     fprintf(output_file, "\tmovb\t$0, %%al\n");
     fprintf(output_file, "\tcallq\t_printf\n");
-    fprintf(output_file, "\tjmp\tL_%d\n", end_label);
+    fprintf(output_file, "\tjmp\t%s%d\n", AUX_LABEL, end_label);
     
-    fprintf(output_file, "L_%d:\n", format_label);
+    fprintf(output_file, "%s%d:\n", AUX_LABEL, format_label);
     
     if (tac->res->type == SYMBOL_STRING) {
-        fprintf(output_file, "\t.asciz\t%s\n", tac->res->string);
+        fprintf(output_file, "\t.asciz\t%s\n", get_string(tac->res));
     } else {
         fprintf(output_file, "\t.asciz\t\"%%d\"\n");
     }
     
-    fprintf(output_file, "L_%d:\n", end_label);
+    fprintf(output_file, "%s%d:\n", AUX_LABEL, end_label);
 }
 
 void generate_return(TAC *tac) {
     if(tac->res->type == SYMBOL_LIT_INTEGER ||
        tac->res->type == SYMBOL_LIT_REAL ||
        tac->res->type == SYMBOL_LIT_CHAR) {
-        fprintf(output_file, "\tmovl\t$%s, %%eax\n", tac->res->string);
+        fprintf(output_file, "\tmovl\t$%s, %%eax\n", get_string(tac->res));
     } else {
-        fprintf(output_file, "\tmovl\t%s(%%rip), %%eax\n", tac->res->string);
+        fprintf(output_file, "\tmovl\t%s(%%rip), %%eax\n", get_string(tac->res));
     }
     
     fprintf(output_file, "\tpopq\t%%rbp\n");
@@ -130,18 +138,18 @@ void generate_return(TAC *tac) {
 }
 
 void generate_jz(TAC *tac) {
-    fprintf(output_file, "\tmovl\t%s(%%rip), %%eax\n", tac->op1->string);
+    fprintf(output_file, "\tmovl\t%s(%%rip), %%eax\n", get_string(tac->op1));
     fprintf(output_file, "\tcmpl\t$0, %%eax\n");
-    fprintf(output_file, "\tje\t%s\n", tac->res->string);
+    fprintf(output_file, "\tje\t%s\n", get_string(tac->res));
 }
 
 void generate_jump(TAC *tac) {
-    fprintf(output_file, "\tjmp\t%s\n", tac->res->string);
+    fprintf(output_file, "\tjmp\t%s\n", get_string(tac->res));
 }
 
 void generate_assign(TAC *tac) {
-    fprintf(output_file, "\tmovl\t%s(%%rip), %%eax\n", tac->op1->string);
-    fprintf(output_file, "\tmovl\t%%eax, %s(%%rip)\n", tac->res->string);
+    fprintf(output_file, "\tmovl\t%s(%%rip), %%eax\n", get_string(tac->op1));
+    fprintf(output_file, "\tmovl\t%%eax, %s(%%rip)\n", get_string(tac->res));
 }
 
 void generate_array_assign(TAC *tac) {
@@ -195,30 +203,6 @@ void generate_asm(TAC *tac_list) {
     fprintf(output_file, "Lcfi2:\n");
     fprintf(output_file, "\t.cfi_def_cfa_register\t%%rbp\n");
     
-    // Create var for all hash nodes
-    HashNode *scan;
-    int i;
-    
-    for (i=0; i<HASH_SIZE; i++) {
-        scan = hashTable[i];
-
-        while(scan != NULL) {
-            switch(scan->type) {
-                case SYMBOL_LIT_INTEGER:
-                case SYMBOL_LIT_REAL:
-                case SYMBOL_LIT_CHAR:
-                case SYMBOL_STRING:
-                case SYMBOL_IDENTIFIER_SCALAR:
-                    generate_scalar_var(scan); break;
-
-                case SYMBOL_IDENTIFIER_VECTOR:
-                    generate_vector_var(scan); break;
-            }
-
-            scan = scan->next;
-        }
-    }
-    
     // Read TAC and generate asm
     int tac_index = 0;
     TAC *tac = tac_list;
@@ -230,9 +214,6 @@ void generate_asm(TAC *tac_list) {
 
             case TAC_LABEL:
                 generate_label(tac); break;
-
-            case TAC_TEMP:
-                generate_temp(tac); break;
 
             case TAC_ADD:
             case TAC_SUB:
@@ -300,6 +281,30 @@ void generate_asm(TAC *tac_list) {
     }
     
     fprintf(output_file, "\t.cfi_endproc\n\n");
+    
+    // Create var for all hash nodes
+    HashNode *scan;
+    int i;
+    
+    for (i=0; i<HASH_SIZE; i++) {
+        scan = hashTable[i];
+        
+        while(scan != NULL) {
+            switch(scan->type) {
+                case SYMBOL_LIT_INTEGER:
+                case SYMBOL_LIT_REAL:
+                case SYMBOL_LIT_CHAR:
+                case SYMBOL_STRING:
+                case SYMBOL_IDENTIFIER_SCALAR:
+                    generate_scalar_var(scan); break;
+                    
+                case SYMBOL_IDENTIFIER_VECTOR:
+                    generate_vector_var(scan); break;
+            }
+            
+            scan = scan->next;
+        }
+    }
     
     fclose(output_file);
 }

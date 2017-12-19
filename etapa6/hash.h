@@ -28,6 +28,7 @@
 #define SYMBOL_LABEL               15
 
 struct HashNode {
+    char *asm_string;
     char *string;
     int type;
     int dataType;
