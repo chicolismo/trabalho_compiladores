@@ -8,8 +8,6 @@
 #define AUX_LABEL "__"
 
 FILE *output_file;
-static int label_index = 0;
-static int has_text_section_init = 0;
 
 char *get_string(HashNode *node) {
     switch (node->type) {
@@ -24,16 +22,31 @@ char *get_string(HashNode *node) {
     }
 }
 
+void init_main_section() {
+    fprintf(output_file, "\t.section\t__TEXT,__text,regular,pure_instructions\n");
+    fprintf(output_file, "\t.macosx_version_min\t10, 13\n");
+    fprintf(output_file, "\t.globl\t_main\n");
+    fprintf(output_file, "\t.p2align\t4, 0x90\n");
+    fprintf(output_file, "_main:\n");
+    fprintf(output_file, "\t.cfi_startproc\n");
+    fprintf(output_file, "\tpushq\t%%rbp\n");
+    fprintf(output_file, "Lcfi0:\n");
+    fprintf(output_file, "\t.cfi_def_cfa_offset\t16\n");
+    fprintf(output_file, "Lcfi1:\n");
+    fprintf(output_file, "\t.cfi_offset %%rbp,\t-16\n");
+    fprintf(output_file, "\tmovq\t%%rsp, %%rbp\n");
+    fprintf(output_file, "Lcfi2:\n");
+    fprintf(output_file, "\t.cfi_def_cfa_register\t%%rbp\n");
+}
+
 void init_text_section() {
     fprintf(output_file, "\t.section\t__TEXT,__cstring,cstring_literals\n");
-    has_text_section_init = 1;
+    fprintf(output_file, "L_.str:\n");
+    fprintf(output_file, "\t.asciz\t\"%%d\"\n");
 }
 
 void generate_scalar_var(HashNode *identifier) {
     if (identifier->type == SYMBOL_STRING) {
-        if (!has_text_section_init)
-            init_text_section();
-        
         fprintf(output_file, "%s:\n", identifier->asm_string);
         fprintf(output_file, "\t.asciz\t%s\n", identifier->string);
     } else {
@@ -98,40 +111,22 @@ void generate_not(TAC *tac) {
 }
 
 void generate_read(TAC *tac) {
-    int format_label = label_index++;
-    int end_label = label_index++;
-    
-    fprintf(output_file, "\tleaq\t%s%d(%%rip), %%rdi\n", AUX_LABEL, format_label);
+    fprintf(output_file, "\tleaq\t%s(%%rip), %%rdi\n", tac->res->asm_string);
     fprintf(output_file, "\tleaq\t%s(%%rip), %%rsi\n", get_string(tac->res));
     fprintf(output_file, "\tmovb\t$0, %%al\n");
     fprintf(output_file, "\tcallq\t_scanf\n");
-    fprintf(output_file, "\tjmp\t%s%d\n", AUX_LABEL, end_label);
-    
-    fprintf(output_file, "%s%d:\n", AUX_LABEL, format_label);
-    fprintf(output_file, "\t.asciz\t\"%%d\"\n");
-    
-    fprintf(output_file, "%s%d:\n", AUX_LABEL, end_label);
 }
 
 void generate_print(TAC *tac) {
-    int format_label = label_index++;
-    int end_label = label_index++;
+    if (tac->res->type == SYMBOL_STRING) {
+        fprintf(output_file, "\tleaq\t%s(%%rip), %%rdi\n", tac->res->asm_string);
+    } else {
+        fprintf(output_file, "\tleaq\tL_.str(%%rip), %%rdi\n");
+    }
     
-    fprintf(output_file, "\tleaq\t%s%d(%%rip), %%rdi\n", AUX_LABEL, format_label);
     fprintf(output_file, "\tmovl\t%s(%%rip), %%esi\n", get_string(tac->res));
     fprintf(output_file, "\tmovb\t$0, %%al\n");
     fprintf(output_file, "\tcallq\t_printf\n");
-    fprintf(output_file, "\tjmp\t%s%d\n", AUX_LABEL, end_label);
-    
-    fprintf(output_file, "%s%d:\n", AUX_LABEL, format_label);
-    
-    if (tac->res->type == SYMBOL_STRING) {
-        fprintf(output_file, "\t.asciz\t%s\n", get_string(tac->res));
-    } else {
-        fprintf(output_file, "\t.asciz\t\"%%d\"\n");
-    }
-    
-    fprintf(output_file, "%s%d:\n", AUX_LABEL, end_label);
 }
 
 void generate_return(TAC *tac) {
@@ -197,21 +192,7 @@ void generate_asm(TAC *tac_list) {
     sprintf(filename,"%s.s", output_filename);
     output_file = fopen(filename,"w");
 
-    // Define asm version for macOS
-    fprintf(output_file, "\t.section\t__TEXT,__text,regular,pure_instructions\n");
-    fprintf(output_file, "\t.macosx_version_min\t10, 13\n");
-    fprintf(output_file, "\t.globl\t_main\n");
-    fprintf(output_file, "\t.p2align\t4, 0x90\n");
-    fprintf(output_file, "_main:\n");
-    fprintf(output_file, "\t.cfi_startproc\n");
-    fprintf(output_file, "\tpushq\t%%rbp\n");
-    fprintf(output_file, "Lcfi0:\n");
-    fprintf(output_file, "\t.cfi_def_cfa_offset\t16\n");
-    fprintf(output_file, "Lcfi1:\n");
-    fprintf(output_file, "\t.cfi_offset %%rbp,\t-16\n");
-    fprintf(output_file, "\tmovq\t%%rsp, %%rbp\n");
-    fprintf(output_file, "Lcfi2:\n");
-    fprintf(output_file, "\t.cfi_def_cfa_register\t%%rbp\n");
+    init_main_section();
     
     // Read TAC and generate asm
     int tac_index = 0;
@@ -314,6 +295,8 @@ void generate_asm(TAC *tac_list) {
             scan = scan->next;
         }
     }
+    
+    init_text_section();
     
     for (i=0; i<HASH_SIZE; i++) {
         scan = hashTable[i];
