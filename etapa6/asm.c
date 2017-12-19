@@ -110,9 +110,9 @@ void generate_print(TAC *tac) {
 }
 
 void generate_return(TAC *tac) {
-    if(tac->op1->type == SYMBOL_LIT_INTEGER ||
-       tac->op1->type == SYMBOL_LIT_REAL ||
-       tac->op1->type == SYMBOL_LIT_CHAR) {
+    if(tac->res->type == SYMBOL_LIT_INTEGER ||
+       tac->res->type == SYMBOL_LIT_REAL ||
+       tac->res->type == SYMBOL_LIT_CHAR) {
         fprintf(output_file, "\tmovl\t$%s, %%eax\n", tac->res->string);
     } else {
         fprintf(output_file, "\tmovl\t%s(%%rip), %%eax\n", tac->res->string);
