@@ -132,8 +132,8 @@ void generate_not(TAC *tac) {
 }
 
 void generate_read(TAC *tac) {
-    fprintf(output_file, "\tleaq\t%s(%%rip), %%rdi\n", tac->res->asm_string);
-    fprintf(output_file, "\tleaq\t%s(%%rip), %%rsi\n", get_string(tac->res));
+    fprintf(output_file, "\tleaq\tL_.str(%%rip), %%rdi\n");
+    fprintf(output_file, "\tleaq\t%s(%%rip), %%rsi\n", tac->res->asm_string);
     fprintf(output_file, "\tmovb\t$0, %%al\n");
     fprintf(output_file, "\tcallq\t_scanf\n");
 }
