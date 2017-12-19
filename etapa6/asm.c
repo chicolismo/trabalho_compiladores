@@ -6,6 +6,7 @@
 #include "tac.h"
 
 FILE *output_file;
+static int label_index = 0;
 
 void generate_scalar_var(HashNode *identifier) {
     
@@ -72,7 +73,19 @@ void generate_not(TAC *tac) {
 }
 
 void generate_read(TAC *tac) {
+    int format_label = label_index++;
+    int end_label = label_index++;
     
+    fprintf(output_file, "\tleaq\tLabel%d(%%rip), %%rdi\n", format_label);
+    fprintf(output_file, "\tleaq\t%s(%%rip), %%rsi\n", tac->res->string);
+    fprintf(output_file, "\tmovb\t$0, %%al\n");
+    fprintf(output_file, "\tcallq\t_scanf\n");
+    fprintf(output_file, "\tjmp\tLabel%d\n", end_label);
+    
+    fprintf(output_file, "Label%d:\n", format_label);
+    fprintf(output_file, "\t.asciz\t\"%%ld\"\n");
+    
+    fprintf(output_file, "Label%d:\n", end_label);
 }
 
 void generate_print(TAC *tac) {
@@ -86,11 +99,11 @@ void generate_return(TAC *tac) {
 void generate_jz(TAC *tac) {
     fprintf(output_file, "\tmovl\t%s(%%rip), %%eax\n", tac->op1->string);
     fprintf(output_file, "\tcmpl\t$0, %%eax\n");
-    fprintf(output_file, "\tje %s\n", tac->res->string);
+    fprintf(output_file, "\tje\t%s\n", tac->res->string);
 }
 
 void generate_jump(TAC *tac) {
-    fprintf(output_file, "\tjmp %s\n", tac->res->string);
+    fprintf(output_file, "\tjmp\t%s\n", tac->res->string);
 }
 
 void generate_assign(TAC *tac) {
