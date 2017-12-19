@@ -5,8 +5,6 @@
 #include "hash.h"
 #include "tac.h"
 
-#define AUX_LABEL "__"
-
 FILE *output_file;
 static int has_data_section_init = 0;
 
@@ -42,13 +40,13 @@ void init_main_section() {
 
 void init_data_section() {
     if (!has_data_section_init) {
-        fprintf(output_file, "\t.section\t__DATA,__data\n");
+        fprintf(output_file, "\n\t.section\t__DATA,__data\n");
         has_data_section_init = 1;
     }
 }
 
 void init_text_section() {
-    fprintf(output_file, "\t.section\t__TEXT,__cstring,cstring_literals\n");
+    fprintf(output_file, "\n\t.section\t__TEXT,__cstring,cstring_literals\n");
     fprintf(output_file, "L_.str:\n");
     fprintf(output_file, "\t.asciz\t\"%%d\"\n");
 }
