@@ -21,7 +21,14 @@ void generate_label(TAC *tac) {
 }
 
 void generate_temp(TAC *tac) {
+    int end_label = label_index++;
     
+    fprintf(output_file, "\tjmp\tL_%d\n", end_label);
+    fprintf(output_file, "%s:\n", tac->res->string);
+    
+    generate_scalar_var(tac->res);
+    
+    fprintf(output_file, "L_%d:\n", end_label);
 }
 
 void generate_math_or_logic_operation(TAC *tac) {
