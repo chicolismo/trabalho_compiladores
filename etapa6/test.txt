@@ -7,6 +7,10 @@ mat: long[10];
 c: byte = 'x';
 d: byte = 65;
 
+(long) sum(x: long, y: long) {
+    return (x + y)
+}
+
 (long) main() {
     print "Oi, o trabalho de compiladores funciona! Digite um numero:\n";
 
@@ -22,8 +26,8 @@ d: byte = 65;
     i = 0;
     while (i < 10) {
         print "v[", i, "] = ", v[i], "\n";
-        i = i + 1
+        i = sum(i, 1)
     };
 
-    return (d)
+    return (0)
 }

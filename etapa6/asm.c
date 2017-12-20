@@ -161,7 +161,7 @@ void generate_return(TAC *tac) {
     if(tac->res->type == SYMBOL_LIT_INTEGER ||
        tac->res->type == SYMBOL_LIT_REAL ||
        tac->res->type == SYMBOL_LIT_CHAR) {
-        fprintf(output_file, "\tmovl\t$%s, %%eax\n", get_string(tac->res));
+        fprintf(output_file, "\tmovl\t$%s, %%eax\n", tac->res->string);
     } else {
         fprintf(output_file, "\tmovl\t%s(%%rip), %%eax\n", get_string(tac->res));
     }
@@ -218,6 +218,7 @@ void generate_end_func(TAC *tac) {
 
 void generate_call(TAC *tac) {
     fprintf(output_file, "\tcallq\t_%s\n", get_string(tac->op1));
+    fprintf(output_file, "\tmovl\t%%eax, %s(%%rip)\n", get_string(tac->res));
 }
 
 void generate_push_arg(TAC *tac) {
