@@ -7,6 +7,7 @@
 
 FILE *output_file;
 static int has_data_section_init = 0;
+static int lcfi_counter = 0;
 
 char *get_string(HashNode *node) {
     switch (node->type) {
@@ -26,16 +27,6 @@ void init_main_section() {
     fprintf(output_file, "\t.macosx_version_min\t10, 13\n");
     fprintf(output_file, "\t.globl\t_main\n");
     fprintf(output_file, "\t.p2align\t4, 0x90\n");
-    fprintf(output_file, "_main:\n");
-    fprintf(output_file, "\t.cfi_startproc\n");
-    fprintf(output_file, "\tpushq\t%%rbp\n");
-    fprintf(output_file, "Lcfi0:\n");
-    fprintf(output_file, "\t.cfi_def_cfa_offset\t16\n");
-    fprintf(output_file, "Lcfi1:\n");
-    fprintf(output_file, "\t.cfi_offset %%rbp,\t-16\n");
-    fprintf(output_file, "\tmovq\t%%rsp, %%rbp\n");
-    fprintf(output_file, "Lcfi2:\n");
-    fprintf(output_file, "\t.cfi_def_cfa_register\t%%rbp\n");
 }
 
 void init_data_section() {
@@ -187,11 +178,20 @@ void generate_array_index(TAC *tac) {
 }
 
 void generate_begin_func(TAC *tac) {
-    
+    fprintf(output_file, "_%s:\n", get_string(tac->res));
+    fprintf(output_file, "\t.cfi_startproc\n");
+    fprintf(output_file, "\tpushq\t%%rbp\n");
+    fprintf(output_file, "Lcfi%d:\n", lcfi_counter++);
+    fprintf(output_file, "\t.cfi_def_cfa_offset\t16\n");
+    fprintf(output_file, "Lcfi%d:\n", lcfi_counter++);
+    fprintf(output_file, "\t.cfi_offset %%rbp,\t-16\n");
+    fprintf(output_file, "\tmovq\t%%rsp, %%rbp\n");
+    fprintf(output_file, "Lcfi%d:\n", lcfi_counter++);
+    fprintf(output_file, "\t.cfi_def_cfa_register\t%%rbp\n");
 }
 
 void generate_end_func(TAC *tac) {
-    
+    fprintf(output_file, "\t.cfi_endproc\n\n");
 }
 
 void generate_call(TAC *tac) {
@@ -291,8 +291,6 @@ void generate_asm(TAC *tac_list) {
         
         tac = tac->next;
     }
-    
-    fprintf(output_file, "\t.cfi_endproc\n\n");
     
     // Create var for all hash nodes
     HashNode *scan;

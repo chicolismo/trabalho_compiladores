@@ -290,7 +290,7 @@ TAC *TAC_make_ary_decl_assign(TAC *identifier, TAC *index, TAC *expression) {
 
 TAC *TAC_make_func_declaration(TAC *func_name, TAC *func_params, TAC *func_body) {
     TAC *begin_func_tac = TAC_create(TAC_BEGIN_FUNC, func_name->res, NULL, NULL);
-    TAC *end_func_tac = TAC_create(TAC_END_FUNC, func_name->res, NULL, NULL);
+    TAC *end_func_tac = TAC_create(TAC_END_FUNC, NULL, NULL, NULL);
 
     return TAC_join(TAC_join(TAC_join(begin_func_tac, func_params), func_body), end_func_tac);
 }
