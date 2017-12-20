@@ -173,7 +173,10 @@ void generate_assign(TAC *tac) {
 }
 
 void generate_array_assign(TAC *tac) {
-    
+    fprintf(output_file, "\tmovq\t%s@GOTPCREL(%%rip), %%rcx\n", get_string(tac->res));
+    fprintf(output_file, "\tmovl\t%s(%%rip), %%eax\n", get_string(tac->op2));
+    fprintf(output_file, "\tmovslq\t%s(%%rip), %%rdx\n", get_string(tac->op1));
+    fprintf(output_file, "\tmovl\t%%eax, (%%rcx,%%rdx,4)\n");
 }
 
 void generate_array_index(TAC *tac) {

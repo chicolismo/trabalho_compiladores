@@ -16,6 +16,46 @@ Lcfi2:
 	movl	%eax, a(%rip)
 	movl	__0(%rip), %eax
 	movl	%eax, i(%rip)
+	movq	v@GOTPCREL(%rip), %rcx
+	movl	__1(%rip), %eax
+	movslq	__0(%rip), %rdx
+	movl	%eax, (%rcx,%rdx,4)
+	movq	v@GOTPCREL(%rip), %rcx
+	movl	__1(%rip), %eax
+	movslq	__1(%rip), %rdx
+	movl	%eax, (%rcx,%rdx,4)
+	movq	v@GOTPCREL(%rip), %rcx
+	movl	__2(%rip), %eax
+	movslq	__2(%rip), %rdx
+	movl	%eax, (%rcx,%rdx,4)
+	movq	v@GOTPCREL(%rip), %rcx
+	movl	__3(%rip), %eax
+	movslq	__3(%rip), %rdx
+	movl	%eax, (%rcx,%rdx,4)
+	movq	v@GOTPCREL(%rip), %rcx
+	movl	__5(%rip), %eax
+	movslq	__4(%rip), %rdx
+	movl	%eax, (%rcx,%rdx,4)
+	movq	v@GOTPCREL(%rip), %rcx
+	movl	__8(%rip), %eax
+	movslq	__5(%rip), %rdx
+	movl	%eax, (%rcx,%rdx,4)
+	movq	v@GOTPCREL(%rip), %rcx
+	movl	__13(%rip), %eax
+	movslq	__6(%rip), %rdx
+	movl	%eax, (%rcx,%rdx,4)
+	movq	v@GOTPCREL(%rip), %rcx
+	movl	__21(%rip), %eax
+	movslq	__7(%rip), %rdx
+	movl	%eax, (%rcx,%rdx,4)
+	movq	v@GOTPCREL(%rip), %rcx
+	movl	__34(%rip), %eax
+	movslq	__8(%rip), %rdx
+	movl	%eax, (%rcx,%rdx,4)
+	movq	v@GOTPCREL(%rip), %rcx
+	movl	__55(%rip), %eax
+	movslq	__9(%rip), %rdx
+	movl	%eax, (%rcx,%rdx,4)
 	movl	__x(%rip), %eax
 	movl	%eax, c(%rip)
 	movl	__65(%rip), %eax
@@ -72,7 +112,47 @@ __label_0__:
 	callq	_printf
 	jmp	__label_0__
 __label_1__:
+	movl	__0(%rip), %eax
+	movl	%eax, i(%rip)
+__label_2__:
+	movl	i(%rip), %ecx
+	cmpl	__10(%rip), %ecx
+	setl	%dl
+	andb	$1, %dl
+	movzbl	%dl, %ecx
+	movl	%ecx, __temp_2__(%rip)
+	movl	__temp_2__(%rip), %eax
+	cmpl	$0, %eax
+	je	__label_3__
+	leaq	L_.str4(%rip), %rdi
+	movl	L_.str4(%rip), %esi
+	movb	$0, %al
+	callq	_printf
+	leaq	L_.str(%rip), %rdi
+	movl	i(%rip), %esi
+	movb	$0, %al
+	callq	_printf
+	leaq	L_.str5(%rip), %rdi
+	movl	L_.str5(%rip), %esi
+	movb	$0, %al
+	callq	_printf
+	leaq	L_.str(%rip), %rdi
+	movl	__temp_3__(%rip), %esi
+	movb	$0, %al
+	callq	_printf
+	leaq	L_.str2(%rip), %rdi
+	movl	L_.str2(%rip), %esi
+	movb	$0, %al
+	callq	_printf
 	movl	i(%rip), %eax
+	movl	__1(%rip), %ebx
+	addl	%ebx, %eax
+	movl	%eax, __temp_4__(%rip)
+	movl	__temp_4__(%rip), %eax
+	movl	%eax, i(%rip)
+	jmp	__label_2__
+__label_3__:
+	movl	d(%rip), %eax
 	popq	%rbp
 	retq
 	.cfi_endproc
@@ -82,9 +162,12 @@ __label_1__:
 	.comm	d,4,2
 	.comm	i,4,2
 	.comm	v,40,4
+	.comm	__temp_2__,4,2
 	.comm	__temp_0__,4,2
+	.comm	__temp_3__,4,2
 	.comm	__temp_1__,4,2
 	.comm	mat,40,4
+	.comm	__temp_4__,4,2
 
 	.section	__DATA,__data
 	.globl	__0
@@ -161,6 +244,10 @@ L_.str:
 	.asciz	"%d"
 L_.str1:
 	.asciz	"Voce digitou "
+L_.str5:
+	.asciz	"] = "
+L_.str4:
+	.asciz	"v["
 L_.str2:
 	.asciz	"\n"
 L_.str3:

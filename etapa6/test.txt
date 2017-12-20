@@ -12,12 +12,18 @@ d: byte = 65;
 
     read > i;
     a = i;
-    print "Voce digitou ", (a), "\n";
+    print "Voce digitou ", a, "\n";
 
     while (i < 10) {
         i = i + 1;
         print "Incrementado para ", i, "\n"
     };
 
-    return (i)
+    i = 0;
+    while (i < 10) {
+        print "v[", i, "] = ", v[i], "\n";
+        i = i + 1
+    };
+
+    return (d)
 }
