@@ -16,6 +16,10 @@ Lcfi2:
 	movl	%eax, a(%rip)
 	movl	__0(%rip), %eax
 	movl	%eax, i(%rip)
+	movl	__x(%rip), %eax
+	movl	%eax, c(%rip)
+	movl	__65(%rip), %eax
+	movl	%eax, d(%rip)
 	leaq	L_.str0(%rip), %rdi
 	movl	L_.str0(%rip), %esi
 	movb	$0, %al
@@ -74,9 +78,13 @@ __label_1__:
 	.cfi_endproc
 
 	.comm	a,4,2
+	.comm	c,4,2
+	.comm	d,4,2
 	.comm	i,4,2
+	.comm	v,40,4
 	.comm	__temp_0__,4,2
 	.comm	__temp_1__,4,2
+	.comm	mat,40,4
 
 	.section	__DATA,__data
 	.globl	__0
@@ -87,10 +95,66 @@ __0:
 	.p2align	2
 __1:
 	.long	1
+	.globl	__2
+	.p2align	2
+__2:
+	.long	2
+	.globl	__3
+	.p2align	2
+__3:
+	.long	3
+	.globl	__4
+	.p2align	2
+__4:
+	.long	4
+	.globl	__5
+	.p2align	2
+__5:
+	.long	5
+	.globl	__6
+	.p2align	2
+__6:
+	.long	6
+	.globl	__7
+	.p2align	2
+__7:
+	.long	7
+	.globl	__8
+	.p2align	2
+__8:
+	.long	8
+	.globl	__9
+	.p2align	2
+__9:
+	.long	9
+	.globl	__x
+	.p2align	2
+__x:
+	.long	'x'
 	.globl	__10
 	.p2align	2
 __10:
 	.long	10
+	.globl	__21
+	.p2align	2
+__21:
+	.long	21
+	.globl	__13
+	.p2align	2
+__13:
+	.long	13
+	.globl	__34
+	.p2align	2
+__34:
+	.long	34
+	.globl	__55
+	.p2align	2
+__55:
+	.long	55
+	.globl	__65
+	.p2align	2
+__65:
+	.long	65
 
 	.section	__TEXT,__cstring,cstring_literals
 L_.str:

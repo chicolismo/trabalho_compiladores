@@ -1,7 +1,11 @@
 // UFRGS - Compiladores - Marcelo Johann - 2017/2
 
-a : short = 0;
-i : long = 0;
+a: short = 0;
+i: long = 0;
+v: long[10] 1 1 2 3 5 8 13 21 34 55; 
+mat: long[10];
+c: byte = 'x';
+d: byte = 65;
 
 (long) main() {
     print "Oi, o trabalho de compiladores funciona! Digite um numero:\n";

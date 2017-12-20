@@ -69,7 +69,8 @@ void generate_scalar_var(HashNode *identifier) {
 }
 
 void generate_vector_var(HashNode *identifier) {
-    
+    int length = 4 * identifier->length;
+    fprintf(output_file, "\t.comm\t%s,%d,4\n", get_string(identifier), length);
 }
 
 void generate_label(TAC *tac) {

@@ -28,10 +28,11 @@
 #define SYMBOL_LABEL               15
 
 struct HashNode {
-    char *asm_string;
+    char *asm_string; // Just used in asm generation
     char *string;
     int type;
     int dataType;
+    int length; // Just used for vectors identifiers in asm generation
     int lineNumber;
     struct HashNode *next;
 };

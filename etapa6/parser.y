@@ -120,7 +120,7 @@ dec: var_dec { $$ = $1; }
 
 
 var_dec: identifier ':' type '=' literal ';'                           { $$ = createAST(AST_VAR_DECL, 0, $1, $3, $5, 0); }
-       | identifier ':' type '[' literal_integer ']' literals_list ';' { $$ = createAST(AST_ARY_DECL, 0, $1, $3, $5, $7); }
+       | identifier ':' type '[' literal_integer ']' literals_list ';' { $1->symbol->length = atoi($5->symbol->string); $$ = createAST(AST_ARY_DECL, 0, $1, $3, $5, $7); }
        ;
 
 identifier: TK_IDENTIFIER { $$ = createAST(AST_SYMBOL, $1, 0, 0, 0, 0); }
