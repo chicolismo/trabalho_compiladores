@@ -136,6 +136,10 @@ __label_2__:
 	movl	L_.str5(%rip), %esi
 	movb	$0, %al
 	callq	_printf
+	movq	v@GOTPCREL(%rip), %rcx
+	movslq	i(%rip), %rdx
+	movl	(%rcx,%rdx,4), %eax
+	movl	%eax, __temp_3__(%rip)
 	leaq	L_.str(%rip), %rdi
 	movl	__temp_3__(%rip), %esi
 	movb	$0, %al

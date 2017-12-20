@@ -180,7 +180,10 @@ void generate_array_assign(TAC *tac) {
 }
 
 void generate_array_index(TAC *tac) {
-    
+    fprintf(output_file, "\tmovq\t%s@GOTPCREL(%%rip), %%rcx\n", get_string(tac->op1));
+    fprintf(output_file, "\tmovslq\t%s(%%rip), %%rdx\n", get_string(tac->op2));
+    fprintf(output_file, "\tmovl\t(%%rcx,%%rdx,4), %%eax\n");
+    fprintf(output_file, "\tmovl\t%%eax, %s(%%rip)\n", get_string(tac->res));
 }
 
 void generate_begin_func(TAC *tac) {
