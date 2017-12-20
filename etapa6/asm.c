@@ -58,18 +58,18 @@ void init_data_section() {
     }
 }
 
+void init_text_section() {
+    fprintf(output_file, "\n\t.section\t__TEXT,__cstring,cstring_literals\n");
+    fprintf(output_file, "L_.str:\n");
+    fprintf(output_file, "\t.asciz\t\"%%d\"\n");
+}
+
 void generate_literal_const(HashNode *identifier) {
     init_data_section();
     fprintf(output_file, "\t.globl\t%s\n", identifier->asm_string);
     fprintf(output_file, "\t.p2align\t2\n");
     fprintf(output_file, "%s:\n", identifier->asm_string);
     fprintf(output_file, "\t.long\t%s\n", identifier->string);
-}
-
-void init_text_section() {
-    fprintf(output_file, "\n\t.section\t__TEXT,__cstring,cstring_literals\n");
-    fprintf(output_file, "L_.str:\n");
-    fprintf(output_file, "\t.asciz\t\"%%d\"\n");
 }
 
 void generate_string_const(HashNode *identifier) {
