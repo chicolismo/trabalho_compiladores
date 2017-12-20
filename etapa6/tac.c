@@ -128,6 +128,8 @@ void TAC_print_forward(TAC *tac) {
         TAC_print(tac);
         tac = tac->next;
     }
+    
+    fprintf(stdout, "\n");
 }
 
 void TAC_print_backward(TAC *tac) {
@@ -135,6 +137,8 @@ void TAC_print_backward(TAC *tac) {
         TAC_print(tac);
         tac = tac->prev;
     }
+    
+    fprintf(stdout, "\n");
 }
 
 // Cria TACs de instruções de operações binárias (e unária)

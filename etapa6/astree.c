@@ -8,7 +8,6 @@ extern int getLineNumber();
 
 AST *createAST(int type, HashNode *symbol, AST *son0, AST *son1, AST *son2, AST *son3) {
     AST *newNode;
-    //newNode = (AST *) calloc(1, sizeof(AST));
     newNode = malloc(sizeof(AST));
     newNode->type = type;
     newNode->symbol = symbol;
@@ -77,10 +76,6 @@ void printNode(AST *node) {
     case AST_OR:
         fprintf(stdout, "AST_OR: ");
         break;
-
-    // case AST_LIST:
-    //     fprintf(stdout, "AST_LIST: ");
-    //     break;
 
     case AST_VAR_DECL:
         fprintf(stdout, "AST_VAR_DECL: ");
@@ -204,7 +199,6 @@ void printNode(AST *node) {
         fprintf(stdout, "%s\n", node->symbol->string);
     }
     else {
-        /*fprintf(stdout, "0\n");*/
         fprintf(stdout, "\n");
     }
 }
@@ -233,8 +227,6 @@ void printAST(AST *node, int level) {
 #define d(text)
 
 void generateCode(FILE *out, AST *node) {
-    // TODO: Implementar a geração de código.
-
     if (out == NULL) {
         fprintf(stderr, "Arquivo de saída é inválido\n");
         return;
@@ -358,14 +350,6 @@ void generateCode(FILE *out, AST *node) {
         fprintf(out, " || ");
         generateCode(out, node->son[1]);
         break;
-
-    // case AST_LIST:
-    //     d("ast_list");
-
-    //     generateCode(out, node->son[0]);
-    //     fprintf(out, ", ");
-    //     generateCode(out, node->son[1]);
-    //     break;
 
     case AST_ARG_LIST:
         d("ast_arg_list");

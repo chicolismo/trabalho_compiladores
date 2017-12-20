@@ -98,13 +98,13 @@ FILE *output_file = NULL;
 program: declarations {
     $$ = $1;
     
-    fprintf(stdout, "Imprimindo a árvore\n");
+    fprintf(stdout, "\nImprimindo a árvore abstrata de símbolos (AST):\n");
     printAST($$, 0);
-//    generateCode(output_file, $$);
 
     semanticVerification($$);
     
-    TAC *tac = TAC_reverse_list(TAC_generate_code($1));
+    fprintf(stdout, "\nImprimindo as instruções de três endereços (TAC):\n");
+    TAC *tac = TAC_reverse_list(TAC_generate_code($$));
     TAC_print_forward(tac);
     
     generate_asm(tac);
