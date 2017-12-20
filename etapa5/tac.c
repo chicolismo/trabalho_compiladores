@@ -260,9 +260,13 @@ TAC *TAC_make_ary_decl_assign(TAC *identifier, TAC *index, TAC *expression) {
 
     for (i=0; i<n; i++) {
         if (!aux_expression) {
-            fprintf(stderr, "ERRO SEMANTICO: Vetor %s na linha %d inicializado com número incompatível de índices.\n",
-                    identifier->res->string, identifier->res->lineNumber);
-            exit(4);
+            if (i == 0) {
+                return NULL; // Declaracao sem inicializacao
+            } else {
+                fprintf(stderr, "ERRO SEMANTICO: Vetor %s na linha %d inicializado com número incompatível de índices.\n",
+                        identifier->res->string, identifier->res->lineNumber);
+                exit(4);
+            } 
         }
 
         char index_string[10];
