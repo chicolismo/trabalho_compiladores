@@ -72,9 +72,9 @@ AST *createAST(
 );
 
 void printNode(AST *node);
-
 void printAST(AST *node, int level);
-
 void generateCode(FILE *output_file, AST *node);
+
+AST *ast_root;
 
 #endif // __ASTREE_H__

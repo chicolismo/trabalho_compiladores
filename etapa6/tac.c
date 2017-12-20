@@ -77,7 +77,6 @@ void TAC_print(TAC *tac) {
     case TAC_END_FUNC:     strcpy(tac_string, "TAC_END_FUNC"); break;
     case TAC_CALL:         strcpy(tac_string, "TAC_CALL"); break;
     case TAC_PUSH_ARG:     strcpy(tac_string, "TAC_PUSH_ARG"); break;
-    case TAC_POP_ARG:      strcpy(tac_string, "TAC_POP_ARG"); break;
     default:               return;
     }
 
@@ -301,26 +300,13 @@ TAC *TAC_make_func_call(TAC *func_name, TAC *args) {
     TAC *temp_tac = TAC_create(TAC_TEMP, makeTemp(), NULL, NULL);
     TAC *func_call = TAC_create(TAC_CALL, temp_tac->res, func_name->res, label_node);
     TAC *label = TAC_create(TAC_LABEL, label_node, NULL, NULL);
-    TAC *pop_args = TAC_make_pop_args(args);
     
-    TAC *func_call_join = TAC_join(TAC_join(TAC_join(args, func_call), label), pop_args);
+    TAC *func_call_join = TAC_join(TAC_join(args, func_call), label);
     return TAC_join(temp_tac, func_call_join);
 }
 
 TAC *TAC_make_push_arg(TAC *arg) {
     return TAC_create(TAC_PUSH_ARG, arg->res, NULL, NULL);
-}
-
-TAC *TAC_make_pop_args(TAC *args) {
-    TAC *aux = args;
-    TAC *pop_args = NULL;
-    
-    while (aux && aux->type == TAC_PUSH_ARG) {
-        pop_args = TAC_join(pop_args, TAC_create(TAC_POP_ARG, NULL, NULL, NULL));
-        aux = aux->next;
-    }
-    
-    return pop_args;
 }
 
 TAC *TAC_generate_code(AST *node) {
@@ -415,10 +401,10 @@ TAC *TAC_generate_code(AST *node) {
 
     case AST_ARG_LIST:
         if (codes[1]->type == TAC_SYMBOL)
-            return TAC_join(TAC_make_push_arg(codes[0]),
-                            TAC_make_push_arg(codes[1]));
+            return TAC_join(TAC_make_push_arg(codes[1]),
+                            TAC_make_push_arg(codes[0]));
         else
-            return TAC_join(TAC_make_push_arg(codes[0]), codes[1]);
+            return TAC_join(TAC_make_push_arg(codes[1]), codes[0]);
 
     default:
         return TAC_join(TAC_join(TAC_join(codes[0], codes[1]), codes[2]), codes[3]);

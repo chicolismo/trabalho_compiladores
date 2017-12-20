@@ -8,6 +8,7 @@
 #include "tac.h"
 #include "asm.h"
 
+void set_AST_root(AST *root);
 int yylex();
 int yyerror(char *text);
 extern int getLineNumber();
@@ -98,6 +99,7 @@ FILE *output_file = NULL;
 program: declarations {
     $$ = $1;
     
+    set_AST_root($$);
     fprintf(stdout, "\nImprimindo a árvore abstrata de símbolos (AST):\n");
     printAST($$, 0);
 
@@ -225,6 +227,10 @@ expression: literal                            { $$ = $1; }
 
 
 %%
+
+void set_AST_root(AST *root) {
+    ast_root = root;
+}
 
 void set_output_file(FILE *fh) {
     output_file = fh;

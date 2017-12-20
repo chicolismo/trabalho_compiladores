@@ -22,6 +22,28 @@ char *get_string(HashNode *node) {
     }
 }
 
+AST *get_function_params(AST *ast, char *function_name) {
+    if (!ast) {
+        return NULL;
+    }
+    
+    if (ast->type == AST_FUNC_DECL &&
+        strcmp(function_name, ast->son[1]->symbol->string) == 0) {
+        return ast->son[2];
+    }
+    
+    AST *aux;
+    int i;
+    for (i=0; i<MAX_SONS; i++) {
+        aux = get_function_params(ast->son[i], function_name);
+        if (aux) {
+            return aux;
+        }
+    }
+    
+    return NULL;
+}
+
 void init_main_section() {
     fprintf(output_file, "\t.section\t__TEXT,__text,regular,pure_instructions\n");
     fprintf(output_file, "\t.macosx_version_min\t10, 13\n");
@@ -195,15 +217,37 @@ void generate_end_func(TAC *tac) {
 }
 
 void generate_call(TAC *tac) {
-    
+    fprintf(output_file, "\tcallq\t_%s\n", get_string(tac->op1));
 }
 
 void generate_push_arg(TAC *tac) {
+    TAC *next_tac = tac->next;
+    int param_index = 0;
     
-}
-
-void generate_pop_arg(TAC *tac) {
+    // Find function call and param index
+    while (next_tac && next_tac->type != TAC_CALL) {
+        param_index++;
+        next_tac = next_tac->next;
+    }
     
+    // Find params list for function name
+    AST *params = get_function_params(ast_root, next_tac->op1->string);
+    
+    // Find param for arg
+    while (params && param_index) {
+        param_index--;
+        params = params->son[1];
+    }
+    
+    if (params) {
+        if (params->type == AST_PARAM_LIST) {
+            params = params->son[0];
+        }
+        
+        fprintf(output_file, "\tmovl\t%s(%%rip), %%eax\n", get_string(tac->res));
+        fprintf(output_file, "\tmovl\t%%eax, %s(%%rip)\n",
+                get_string(params->son[0]->symbol));
+    }
 }
 
 void generate_asm(TAC *tac_list) {
@@ -281,9 +325,6 @@ void generate_asm(TAC *tac_list) {
 
             case TAC_PUSH_ARG:
                 generate_push_arg(tac); break;
-
-            case TAC_POP_ARG:
-                generate_pop_arg(tac); break;
 
             default:
                 break;
