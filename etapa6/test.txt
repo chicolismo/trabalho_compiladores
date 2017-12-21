@@ -2,7 +2,7 @@
 
 a: short = 0;
 i: long = 0;
-v: long[10] 1 1 2 3 5 8 13 21 34 55; 
+v: long[10] 0 0 0 0 0 0 0 0 0 0; 
 mat: long[10];
 c: byte = 'x';
 d: byte = 65;
@@ -24,7 +24,11 @@ d: byte = 65;
     };
 
     i = 0;
-    while (i < 10) {
+    while (!(i == 10)) {
+        if (i > 0) then {
+            v[i] = sum(2, v[i-1])
+        };
+
         print "v[", i, "] = ", v[i], "\n";
         i = sum(i, 1)
     };

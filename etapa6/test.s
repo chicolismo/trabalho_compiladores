@@ -7,43 +7,43 @@
 	movl	__0(%rip), %eax
 	movl	%eax, i(%rip)
 	movq	v@GOTPCREL(%rip), %rcx
-	movl	__1(%rip), %eax
+	movl	__0(%rip), %eax
 	movslq	__0(%rip), %rdx
 	movl	%eax, (%rcx,%rdx,4)
 	movq	v@GOTPCREL(%rip), %rcx
-	movl	__1(%rip), %eax
+	movl	__0(%rip), %eax
 	movslq	__1(%rip), %rdx
 	movl	%eax, (%rcx,%rdx,4)
 	movq	v@GOTPCREL(%rip), %rcx
-	movl	__2(%rip), %eax
+	movl	__0(%rip), %eax
 	movslq	__2(%rip), %rdx
 	movl	%eax, (%rcx,%rdx,4)
 	movq	v@GOTPCREL(%rip), %rcx
-	movl	__3(%rip), %eax
+	movl	__0(%rip), %eax
 	movslq	__3(%rip), %rdx
 	movl	%eax, (%rcx,%rdx,4)
 	movq	v@GOTPCREL(%rip), %rcx
-	movl	__5(%rip), %eax
+	movl	__0(%rip), %eax
 	movslq	__4(%rip), %rdx
 	movl	%eax, (%rcx,%rdx,4)
 	movq	v@GOTPCREL(%rip), %rcx
-	movl	__8(%rip), %eax
+	movl	__0(%rip), %eax
 	movslq	__5(%rip), %rdx
 	movl	%eax, (%rcx,%rdx,4)
 	movq	v@GOTPCREL(%rip), %rcx
-	movl	__13(%rip), %eax
+	movl	__0(%rip), %eax
 	movslq	__6(%rip), %rdx
 	movl	%eax, (%rcx,%rdx,4)
 	movq	v@GOTPCREL(%rip), %rcx
-	movl	__21(%rip), %eax
+	movl	__0(%rip), %eax
 	movslq	__7(%rip), %rdx
 	movl	%eax, (%rcx,%rdx,4)
 	movq	v@GOTPCREL(%rip), %rcx
-	movl	__34(%rip), %eax
+	movl	__0(%rip), %eax
 	movslq	__8(%rip), %rdx
 	movl	%eax, (%rcx,%rdx,4)
 	movq	v@GOTPCREL(%rip), %rcx
-	movl	__55(%rip), %eax
+	movl	__0(%rip), %eax
 	movslq	__9(%rip), %rdx
 	movl	%eax, (%rcx,%rdx,4)
 	movl	__x(%rip), %eax
@@ -133,16 +133,52 @@ __label_0__:
 __label_1__:
 	movl	__0(%rip), %eax
 	movl	%eax, i(%rip)
-__label_3__:
+__label_5__:
 	movl	i(%rip), %ecx
 	cmpl	__10(%rip), %ecx
-	setl	%dl
+	sete	%dl
 	andb	$1, %dl
 	movzbl	%dl, %ecx
 	movl	%ecx, __temp_3__(%rip)
-	movl	__temp_3__(%rip), %eax
+	movl	__temp_3__(%rip), %ecx
+	cmpl	$0, %ecx
+	setne	%dl
+	xorb	$-1, %dl
+	andb	$1, %dl
+	movzbl	%dl, %edx
+	movl	%edx, __temp_4__(%rip)
+	movl	__temp_4__(%rip), %eax
 	cmpl	$0, %eax
-	je	__label_4__
+	je	__label_6__
+	movl	i(%rip), %ecx
+	cmpl	__0(%rip), %ecx
+	setg	%dl
+	andb	$1, %dl
+	movzbl	%dl, %ecx
+	movl	%ecx, __temp_5__(%rip)
+	movl	__temp_5__(%rip), %eax
+	cmpl	$0, %eax
+	je	__label_3__
+	movl	i(%rip), %eax
+	movl	__1(%rip), %ebx
+	subl	%ebx, %eax
+	movl	%eax, __temp_6__(%rip)
+	movq	v@GOTPCREL(%rip), %rcx
+	movslq	__temp_6__(%rip), %rdx
+	movl	(%rcx,%rdx,4), %eax
+	movl	%eax, __temp_7__(%rip)
+	movl	__temp_7__(%rip), %eax
+	movl	%eax, y(%rip)
+	movl	__2(%rip), %eax
+	movl	%eax, x(%rip)
+	callq	_sum
+	movl	%eax, __temp_8__(%rip)
+__label_2__:
+	movq	v@GOTPCREL(%rip), %rcx
+	movl	__temp_8__(%rip), %eax
+	movslq	i(%rip), %rdx
+	movl	%eax, (%rcx,%rdx,4)
+__label_3__:
 	leaq	L_.str4(%rip), %rdi
 	movl	L_.str4(%rip), %esi
 	movb	$0, %al
@@ -158,9 +194,9 @@ __label_3__:
 	movq	v@GOTPCREL(%rip), %rcx
 	movslq	i(%rip), %rdx
 	movl	(%rcx,%rdx,4), %eax
-	movl	%eax, __temp_4__(%rip)
+	movl	%eax, __temp_9__(%rip)
 	leaq	L_.str(%rip), %rdi
-	movl	__temp_4__(%rip), %esi
+	movl	__temp_9__(%rip), %esi
 	movb	$0, %al
 	callq	_printf
 	leaq	L_.str2(%rip), %rdi
@@ -172,12 +208,12 @@ __label_3__:
 	movl	i(%rip), %eax
 	movl	%eax, x(%rip)
 	callq	_sum
-	movl	%eax, __temp_5__(%rip)
-__label_2__:
-	movl	__temp_5__(%rip), %eax
-	movl	%eax, i(%rip)
-	jmp	__label_3__
+	movl	%eax, __temp_10__(%rip)
 __label_4__:
+	movl	__temp_10__(%rip), %eax
+	movl	%eax, i(%rip)
+	jmp	__label_5__
+__label_6__:
 	movl	$0, %eax
 	popq	%rbp
 	retq
@@ -190,13 +226,18 @@ __label_4__:
 	.comm	v,40,4
 	.comm	x,4,2
 	.comm	__temp_2__,4,2
+	.comm	__temp_7__,4,2
+	.comm	__temp_10__,4,2
 	.comm	y,4,2
 	.comm	__temp_0__,4,2
 	.comm	__temp_5__,4,2
 	.comm	__temp_3__,4,2
+	.comm	__temp_8__,4,2
 	.comm	__temp_1__,4,2
+	.comm	__temp_6__,4,2
 	.comm	mat,40,4
 	.comm	__temp_4__,4,2
+	.comm	__temp_9__,4,2
 
 	.section	__DATA,__data
 	.globl	__0
@@ -247,22 +288,6 @@ __x:
 	.p2align	2
 __10:
 	.long	10
-	.globl	__21
-	.p2align	2
-__21:
-	.long	21
-	.globl	__13
-	.p2align	2
-__13:
-	.long	13
-	.globl	__34
-	.p2align	2
-__34:
-	.long	34
-	.globl	__55
-	.p2align	2
-__55:
-	.long	55
 	.globl	__65
 	.p2align	2
 __65:
