@@ -43,10 +43,12 @@ extern int getLineNumber();
 
 %token TOKEN_ERROR
 
-%left '+'
-%left '-'
-%left '*'
-%left '/'
+%right '='
+%left OPERATOR_AND OPERATOR_OR
+%left '!'
+%left '<' '>' OPERATOR_LE OPERATOR_GE OPERATOR_EQ OPERATOR_NE
+%left '+''-'
+%left '*''/'
 
 %start program
 

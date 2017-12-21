@@ -84,11 +84,12 @@ FILE *output_file = NULL;
 %type<symbol> LIT_CHAR
 %type<symbol> LIT_STRING
 
-
-%left '+'
-%left '-'
-%left '*'
-%left '/'
+%right '='
+%left OPERATOR_AND OPERATOR_OR
+%left '!'
+%left '<' '>' OPERATOR_LE OPERATOR_GE OPERATOR_EQ OPERATOR_NE
+%left '+''-'
+%left '*''/'
 
 %start program
 
