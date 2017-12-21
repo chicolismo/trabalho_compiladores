@@ -26,6 +26,7 @@
 #define DATATYPE_ERROR             -1
 
 #define SYMBOL_LABEL               15
+#define SYMBOL_TEMP                16
 
 struct HashNode {
     char *asm_string; // Just used in asm generation

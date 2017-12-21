@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-int x[4];
+int x[4] = {10, 20, 30, 40};
 int y[501];
 int z = 0;
 

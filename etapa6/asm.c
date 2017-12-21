@@ -22,20 +22,20 @@ char *get_string(HashNode *node) {
     }
 }
 
-AST *get_function_params(AST *ast, char *function_name) {
+AST *get_declaration(char *identifier, int type, int id_index, int data_index, AST *ast) {
     if (!ast) {
         return NULL;
     }
     
-    if (ast->type == AST_FUNC_DECL &&
-        strcmp(function_name, ast->son[1]->symbol->string) == 0) {
-        return ast->son[2];
+    if (ast->type == type &&
+        strcmp(identifier, ast->son[id_index]->symbol->string) == 0) {
+        return ast->son[data_index];
     }
     
     AST *aux;
     int i;
     for (i=0; i<MAX_SONS; i++) {
-        aux = get_function_params(ast->son[i], function_name);
+        aux = get_declaration(identifier, type, id_index, data_index, ast->son[i]);
         if (aux) {
             return aux;
         }
@@ -64,26 +64,46 @@ void init_text_section() {
     fprintf(output_file, "\t.asciz\t\"%%d\"\n");
 }
 
-void generate_literal_const(HashNode *identifier) {
-    init_data_section();
-    fprintf(output_file, "\t.globl\t%s\n", identifier->asm_string);
-    fprintf(output_file, "\t.p2align\t2\n");
-    fprintf(output_file, "%s:\n", identifier->asm_string);
-    fprintf(output_file, "\t.long\t%s\n", identifier->string);
-}
-
 void generate_string_const(HashNode *identifier) {
     fprintf(output_file, "%s:\n", identifier->asm_string);
     fprintf(output_file, "\t.asciz\t%s\n", identifier->string);
 }
 
-void generate_scalar_var(HashNode *identifier) {
-    fprintf(output_file, "\t.comm\t%s,4,2\n", get_string(identifier));
+void generate_not_initialized_scalar_var(HashNode *identifier) {
+    fprintf(output_file, "\t.comm\t%s,2,2\n", get_string(identifier));
 }
 
-void generate_vector_var(HashNode *identifier) {
+void generate_not_initialized_vector_var(HashNode *identifier) {
     int length = 4 * identifier->length;
     fprintf(output_file, "\t.comm\t%s,%d,4\n", get_string(identifier), length);
+}
+
+void generate_initialized_scalar_var(HashNode *identifier, AST *value) {
+    init_data_section();
+    
+    fprintf(output_file, "\t.globl\t%s\n", identifier->asm_string);
+    fprintf(output_file, "\t.p2align\t2\n");
+    fprintf(output_file, "%s:\n", identifier->asm_string);
+    
+    if (identifier->type == SYMBOL_IDENTIFIER_SCALAR) {
+        fprintf(output_file, "\t.long\t%s\n", value->symbol->string);
+    } else {
+        fprintf(output_file, "\t.long\t%s\n", identifier->string);
+    }
+}
+
+void generate_initialized_vector_var(HashNode *identifier, AST *values) {
+    init_data_section();
+    
+    fprintf(output_file, "\t.globl\t%s\n", identifier->asm_string);
+    fprintf(output_file, "\t.p2align\t4\n");
+    fprintf(output_file, "%s:\n", identifier->asm_string);
+    
+    AST *aux = values;
+    do {
+        fprintf(output_file, "\t.long\t%s\n", aux->son[0]->symbol->string);
+        aux = aux->son[1];
+    } while(aux->type == AST_LIT_LIST);
 }
 
 void generate_label(TAC *tac) {
@@ -234,7 +254,7 @@ void generate_push_arg(TAC *tac) {
     }
     
     // Find params list for function name
-    AST *params = get_function_params(ast_root, next_tac->op1->string);
+    AST *params = get_declaration(next_tac->op1->string, AST_FUNC_DECL, 1, 2, ast_root);
     
     // Find param for arg
     while (params && param_index) {
@@ -336,8 +356,9 @@ void generate_asm(TAC *tac_list) {
         tac = tac->next;
     }
     
-    // Create var for all hash nodes
+    // Create not initialized variables
     HashNode *scan;
+    AST *value;
     int i;
     
     for (i=0; i<HASH_SIZE; i++) {
@@ -346,17 +367,28 @@ void generate_asm(TAC *tac_list) {
         while(scan != NULL) {
             switch(scan->type) {
                 case SYMBOL_IDENTIFIER_SCALAR:
-                    generate_scalar_var(scan); break;
+                    value = get_declaration(scan->string, AST_PARAM, 0, 0, ast_root);
+                    if (value && value->type == AST_SYMBOL) {
+                        generate_not_initialized_scalar_var(scan);
+                    }
+                    break;
                     
                 case SYMBOL_IDENTIFIER_VECTOR:
-                    generate_vector_var(scan); break;
+                    value = get_declaration(scan->string, AST_ARY_DECL, 0, 3, ast_root);
+                    if (value && value->type == AST_EMPTY_LIT_LIST) {
+                        generate_not_initialized_vector_var(scan);
+                    }
+                    break;
+                    
+                case SYMBOL_TEMP:
+                    generate_not_initialized_scalar_var(scan);
+                    break;
             }
-            
             scan = scan->next;
         }
     }
     
-    // Create section for constants
+    // Create section for constants and initilized variables
     init_data_section();
     
     for (i=0; i<HASH_SIZE; i++) {
@@ -366,7 +398,22 @@ void generate_asm(TAC *tac_list) {
                 case SYMBOL_LIT_INTEGER:
                 case SYMBOL_LIT_REAL:
                 case SYMBOL_LIT_CHAR:
-                    generate_literal_const(scan); break;
+                    generate_initialized_scalar_var(scan, NULL);
+                    break;
+                    
+                case SYMBOL_IDENTIFIER_SCALAR:
+                    value = get_declaration(scan->string, AST_VAR_DECL, 0, 2, ast_root);
+                    if (value && value->type == AST_SYMBOL) {
+                        generate_initialized_scalar_var(scan, value);
+                    }
+                    break;
+                    
+                case SYMBOL_IDENTIFIER_VECTOR:
+                    value = get_declaration(scan->string, AST_ARY_DECL, 0, 3, ast_root);
+                    if (value && value->type == AST_LIT_LIST) {
+                        generate_initialized_vector_var(scan, value);
+                    }
+                    break;
             }
             scan = scan->next;
         }
@@ -378,9 +425,8 @@ void generate_asm(TAC *tac_list) {
     for (i=0; i<HASH_SIZE; i++) {
         scan = hashTable[i];
         while(scan != NULL) {
-            switch(scan->type) {
-                case SYMBOL_STRING:
-                    generate_string_const(scan); break;
+            if (scan->type == SYMBOL_STRING) {
+                generate_string_const(scan);
             }
             scan = scan->next;
         }

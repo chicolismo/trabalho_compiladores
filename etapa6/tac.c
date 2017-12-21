@@ -255,38 +255,6 @@ TAC *TAC_make_ary_index(TAC *identifier, TAC *index) {
     return TAC_join(TAC_join(TAC_join(temp_tac, identifier), index), ary_index_tac);
 }
 
-TAC *TAC_make_ary_decl_assign(TAC *identifier, TAC *index, TAC *expression) {
-    int i, n = atoi(index->res->string);
-    TAC *ary_decl_tac = NULL;
-    TAC *ary_assign_tac = NULL;
-    TAC *aux_expression = expression;
-
-    for (i=0; i<n; i++) {
-        if (!aux_expression) {
-            if (i == 0) {
-                return NULL; // Declaracao sem inicializacao
-            } else {
-                fprintf(stderr, "ERRO SEMANTICO: Vetor %s na linha %d inicializado com número incompatível de índices.\n",
-                        identifier->res->string, identifier->res->lineNumber);
-                exit(4);
-            }
-        }
-
-        char index_string[10];
-        sprintf(index_string, "%d", i);
-        
-        ary_assign_tac = TAC_create(TAC_ARRAY_ASSIGN, identifier->res,
-                                    setHashNode(index_string, SYMBOL_LIT_INTEGER),
-                                    aux_expression->res);
-        
-        ary_decl_tac = TAC_join(ary_decl_tac, ary_assign_tac);
-        
-        aux_expression = aux_expression->next;
-    }
-    
-    return ary_decl_tac;
-}
-
 TAC *TAC_make_func_declaration(TAC *func_name, TAC *func_params, TAC *func_body) {
     TAC *begin_func_tac = TAC_create(TAC_BEGIN_FUNC, func_name->res, NULL, NULL);
     TAC *end_func_tac = TAC_create(TAC_END_FUNC, func_name->res, NULL, NULL);
@@ -375,12 +343,6 @@ TAC *TAC_generate_code(AST *node) {
 
     case AST_ARY_INDEX:
         return TAC_make_ary_index(codes[0], codes[1]);
-
-    case AST_VAR_DECL:
-        return TAC_make_assign(codes[0], codes[2]);
-
-    case AST_ARY_DECL:
-        return TAC_make_ary_decl_assign(codes[0], codes[2], codes[3]);
 
     case AST_LIT_LIST:
         return TAC_join(codes[0], codes[1]);

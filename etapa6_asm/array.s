@@ -14,20 +14,28 @@ Lcfi1:
 Lcfi2:
 	.cfi_def_cfa_register %rbp
 	xorl	%eax, %eax
-	movq	_x@GOTPCREL(%rip), %rcx
+	leaq	_x(%rip), %rcx
 	movl	$0, -4(%rbp)
-	movl	$111111, 4(%rcx)        ## imm = 0x1B207
-	movl	$222222, 8(%rcx)        ## imm = 0x3640E
-	movl	$333333, 12(%rcx)       ## imm = 0x51615
+	movl	$111111, _x+4(%rip)     ## imm = 0x1B207
+	movl	$222222, _x+8(%rip)     ## imm = 0x3640E
+	movl	$333333, _x+12(%rip)    ## imm = 0x51615
 	movslq	_z(%rip), %rdx
 	movl	$444444, (%rcx,%rdx,4)  ## imm = 0x6C81C
 	popq	%rbp
 	retq
 	.cfi_endproc
 
+	.section	__DATA,__data
+	.globl	_x                      ## @x
+	.p2align	4
+_x:
+	.long	10                      ## 0xa
+	.long	20                      ## 0x14
+	.long	30                      ## 0x1e
+	.long	40                      ## 0x28
+
 	.globl	_z                      ## @z
 .zerofill __DATA,__common,_z,4,2
-	.comm	_x,16,4                 ## @x
 	.comm	_y,2004,4               ## @y
 
 .subsections_via_symbols
