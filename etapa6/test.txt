@@ -5,7 +5,7 @@ i: long = 0;
 v: long[10] 1 1 2 3 5 8 13 21 34 55; 
 mat: long[10];
 c: byte = 'x';
-d: byte = 65;
+d: byte = 5;
 
 (long) sum(x: long, y: long) {
     return (x + y)
@@ -13,6 +13,14 @@ d: byte = 65;
 
 (long) sub(w: long, z: long) {
     return (w - z)
+}
+
+(long) factorial(n: long) { 
+    if (n == 1) then { 
+        return (1) 
+    }; 
+ 
+    return (n)// * factorial(n - 1)) 
 }
 
 (long) main() {
@@ -45,6 +53,8 @@ d: byte = 65;
         i = sum(i, 1);
         a = sub(a, 1)
     };
+
+    print "Fatorial de ", d, " é ", factorial(d), "\n";
 
     return (0)
 }

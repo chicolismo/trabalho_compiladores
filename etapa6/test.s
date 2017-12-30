@@ -40,7 +40,7 @@ Lcfi5:
 	retq
 	.cfi_endproc
 
-_main:
+_factorial:
 	.cfi_startproc
 	pushq	%rbp
 Lcfi6:
@@ -49,6 +49,34 @@ Lcfi7:
 	.cfi_offset %rbp,	-16
 	movq	%rsp, %rbp
 Lcfi8:
+	.cfi_def_cfa_register	%rbp
+	movl	n(%rip), %ecx
+	cmpl	__1(%rip), %ecx
+	sete	%dl
+	andb	$1, %dl
+	movzbl	%dl, %ecx
+	movl	%ecx, __temp_2__(%rip)
+	movl	__temp_2__(%rip), %eax
+	cmpl	$0, %eax
+	je	__label_0__
+	movl	$1, %eax
+	popq	%rbp
+	retq
+__label_0__:
+	movl	n(%rip), %eax
+	popq	%rbp
+	retq
+	.cfi_endproc
+
+_main:
+	.cfi_startproc
+	pushq	%rbp
+Lcfi9:
+	.cfi_def_cfa_offset	16
+Lcfi10:
+	.cfi_offset %rbp,	-16
+	movq	%rsp, %rbp
+Lcfi11:
 	.cfi_def_cfa_register	%rbp
 	leaq	L_.str0(%rip), %rdi
 	movl	L_.str0(%rip), %esi
@@ -72,21 +100,21 @@ Lcfi8:
 	movl	L_.str2(%rip), %esi
 	movb	$0, %al
 	callq	_printf
-__label_0__:
+__label_1__:
 	movl	i(%rip), %ecx
 	cmpl	__10(%rip), %ecx
 	setl	%dl
 	andb	$1, %dl
 	movzbl	%dl, %ecx
-	movl	%ecx, __temp_2__(%rip)
-	movl	__temp_2__(%rip), %eax
+	movl	%ecx, __temp_3__(%rip)
+	movl	__temp_3__(%rip), %eax
 	cmpl	$0, %eax
-	je	__label_1__
+	je	__label_2__
 	movl	i(%rip), %eax
 	movl	__1(%rip), %ebx
 	addl	%ebx, %eax
-	movl	%eax, __temp_3__(%rip)
-	movl	__temp_3__(%rip), %eax
+	movl	%eax, __temp_4__(%rip)
+	movl	__temp_4__(%rip), %eax
 	movl	%eax, i(%rip)
 	leaq	L_.str3(%rip), %rdi
 	movl	L_.str3(%rip), %esi
@@ -100,20 +128,20 @@ __label_0__:
 	movl	L_.str2(%rip), %esi
 	movb	$0, %al
 	callq	_printf
-	jmp	__label_0__
-__label_1__:
+	jmp	__label_1__
+__label_2__:
 	movl	__0(%rip), %eax
 	movl	%eax, i(%rip)
-__label_2__:
+__label_3__:
 	movl	i(%rip), %ecx
 	cmpl	__9(%rip), %ecx
 	setle	%dl
 	andb	$1, %dl
 	movzbl	%dl, %ecx
-	movl	%ecx, __temp_4__(%rip)
-	movl	__temp_4__(%rip), %eax
+	movl	%ecx, __temp_5__(%rip)
+	movl	__temp_5__(%rip), %eax
 	cmpl	$0, %eax
-	je	__label_3__
+	je	__label_4__
 	leaq	L_.str4(%rip), %rdi
 	movl	L_.str4(%rip), %esi
 	movb	$0, %al
@@ -129,9 +157,9 @@ __label_2__:
 	movq	v@GOTPCREL(%rip), %rcx
 	movslq	i(%rip), %rdx
 	movl	(%rcx,%rdx,4), %eax
-	movl	%eax, __temp_5__(%rip)
+	movl	%eax, __temp_6__(%rip)
 	leaq	L_.str(%rip), %rdi
-	movl	__temp_5__(%rip), %esi
+	movl	__temp_6__(%rip), %esi
 	movb	$0, %al
 	callq	_printf
 	leaq	L_.str2(%rip), %rdi
@@ -143,76 +171,76 @@ __label_2__:
 	movl	i(%rip), %eax
 	movl	%eax, x(%rip)
 	callq	_sum
-	movl	%eax, __temp_6__(%rip)
-	movl	__temp_6__(%rip), %eax
+	movl	%eax, __temp_7__(%rip)
+	movl	__temp_7__(%rip), %eax
 	movl	%eax, i(%rip)
-	jmp	__label_2__
-__label_3__:
+	jmp	__label_3__
+__label_4__:
 	movl	__0(%rip), %eax
 	movl	%eax, i(%rip)
 	movl	__5(%rip), %eax
 	movl	%eax, a(%rip)
-__label_6__:
+__label_7__:
 	movl	i(%rip), %ecx
 	cmpl	__10(%rip), %ecx
 	sete	%dl
 	andb	$1, %dl
 	movzbl	%dl, %ecx
-	movl	%ecx, __temp_7__(%rip)
-	movl	__temp_7__(%rip), %ecx
+	movl	%ecx, __temp_8__(%rip)
+	movl	__temp_8__(%rip), %ecx
 	cmpl	$0, %ecx
 	setne	%dl
 	xorb	$-1, %dl
 	andb	$1, %dl
 	movzbl	%dl, %edx
-	movl	%edx, __temp_8__(%rip)
+	movl	%edx, __temp_9__(%rip)
 	movl	a(%rip), %ecx
 	cmpl	__0(%rip), %ecx
 	setge	%dl
 	andb	$1, %dl
 	movzbl	%dl, %ecx
-	movl	%ecx, __temp_9__(%rip)
-	movl	__temp_8__(%rip), %eax
-	movl	__temp_9__(%rip), %ebx
+	movl	%ecx, __temp_10__(%rip)
+	movl	__temp_9__(%rip), %eax
+	movl	__temp_10__(%rip), %ebx
 	andl	%ebx, %eax
-	movl	%eax, __temp_10__(%rip)
-	movl	__temp_10__(%rip), %eax
+	movl	%eax, __temp_11__(%rip)
+	movl	__temp_11__(%rip), %eax
 	cmpl	$0, %eax
-	je	__label_7__
+	je	__label_8__
 	movl	i(%rip), %ecx
 	cmpl	__0(%rip), %ecx
 	setg	%dl
 	andb	$1, %dl
 	movzbl	%dl, %ecx
-	movl	%ecx, __temp_11__(%rip)
-	movl	__temp_11__(%rip), %eax
+	movl	%ecx, __temp_12__(%rip)
+	movl	__temp_12__(%rip), %eax
 	cmpl	$0, %eax
-	je	__label_4__
+	je	__label_5__
 	movl	__3(%rip), %eax
 	movl	%eax, y(%rip)
 	movl	i(%rip), %eax
 	movl	__1(%rip), %ebx
 	subl	%ebx, %eax
-	movl	%eax, __temp_12__(%rip)
-	movq	mat@GOTPCREL(%rip), %rcx
-	movslq	__temp_12__(%rip), %rdx
-	movl	(%rcx,%rdx,4), %eax
 	movl	%eax, __temp_13__(%rip)
-	movl	__temp_13__(%rip), %eax
+	movq	mat@GOTPCREL(%rip), %rcx
+	movslq	__temp_13__(%rip), %rdx
+	movl	(%rcx,%rdx,4), %eax
+	movl	%eax, __temp_14__(%rip)
+	movl	__temp_14__(%rip), %eax
 	movl	%eax, x(%rip)
 	callq	_sum
-	movl	%eax, __temp_14__(%rip)
+	movl	%eax, __temp_15__(%rip)
 	movq	mat@GOTPCREL(%rip), %rcx
-	movl	__temp_14__(%rip), %eax
+	movl	__temp_15__(%rip), %eax
 	movslq	i(%rip), %rdx
 	movl	%eax, (%rcx,%rdx,4)
-	jmp	__label_5__
-__label_4__:
+	jmp	__label_6__
+__label_5__:
 	movq	mat@GOTPCREL(%rip), %rcx
 	movl	__0(%rip), %eax
 	movslq	i(%rip), %rdx
 	movl	%eax, (%rcx,%rdx,4)
-__label_5__:
+__label_6__:
 	leaq	L_.str6(%rip), %rdi
 	movl	L_.str6(%rip), %esi
 	movb	$0, %al
@@ -228,9 +256,9 @@ __label_5__:
 	movq	mat@GOTPCREL(%rip), %rcx
 	movslq	i(%rip), %rdx
 	movl	(%rcx,%rdx,4), %eax
-	movl	%eax, __temp_15__(%rip)
+	movl	%eax, __temp_16__(%rip)
 	leaq	L_.str(%rip), %rdi
-	movl	__temp_15__(%rip), %esi
+	movl	__temp_16__(%rip), %esi
 	movb	$0, %al
 	callq	_printf
 	leaq	L_.str2(%rip), %rdi
@@ -242,29 +270,55 @@ __label_5__:
 	movl	i(%rip), %eax
 	movl	%eax, x(%rip)
 	callq	_sum
-	movl	%eax, __temp_16__(%rip)
-	movl	__temp_16__(%rip), %eax
+	movl	%eax, __temp_17__(%rip)
+	movl	__temp_17__(%rip), %eax
 	movl	%eax, i(%rip)
 	movl	__1(%rip), %eax
 	movl	%eax, z(%rip)
 	movl	a(%rip), %eax
 	movl	%eax, w(%rip)
 	callq	_sub
-	movl	%eax, __temp_17__(%rip)
-	movl	__temp_17__(%rip), %eax
+	movl	%eax, __temp_18__(%rip)
+	movl	__temp_18__(%rip), %eax
 	movl	%eax, a(%rip)
-	jmp	__label_6__
-__label_7__:
+	jmp	__label_7__
+__label_8__:
+	leaq	L_.str7(%rip), %rdi
+	movl	L_.str7(%rip), %esi
+	movb	$0, %al
+	callq	_printf
+	leaq	L_.str(%rip), %rdi
+	movl	d(%rip), %esi
+	movb	$0, %al
+	callq	_printf
+	leaq	L_.str8(%rip), %rdi
+	movl	L_.str8(%rip), %esi
+	movb	$0, %al
+	callq	_printf
+	movl	d(%rip), %eax
+	movl	%eax, n(%rip)
+	callq	_factorial
+	movl	%eax, __temp_19__(%rip)
+	leaq	L_.str(%rip), %rdi
+	movl	__temp_19__(%rip), %esi
+	movb	$0, %al
+	callq	_printf
+	leaq	L_.str2(%rip), %rdi
+	movl	L_.str2(%rip), %esi
+	movb	$0, %al
+	callq	_printf
 	movl	$0, %eax
 	popq	%rbp
 	retq
 	.cfi_endproc
 
+	.comm	n,2,2
 	.comm	w,2,2
 	.comm	x,2,2
 	.comm	__temp_2__,2,2
 	.comm	__temp_7__,2,2
 	.comm	__temp_10__,2,2
+	.comm	__temp_18__,2,2
 	.comm	y,2,2
 	.comm	z,2,2
 	.comm	__temp_15__,2,2
@@ -278,6 +332,7 @@ __label_7__:
 	.comm	__temp_1__,2,2
 	.comm	__temp_6__,2,2
 	.comm	__temp_11__,2,2
+	.comm	__temp_19__,2,2
 	.comm	mat,40,4
 	.comm	__temp_16__,2,2
 	.comm	__temp_4__,2,2
@@ -324,7 +379,7 @@ c:
 	.globl	d
 	.p2align	2
 d:
-	.long	65
+	.long	5
 	.globl	i
 	.p2align	2
 i:
@@ -366,10 +421,6 @@ __34:
 	.p2align	2
 __55:
 	.long	55
-	.globl	__65
-	.p2align	2
-__65:
-	.long	65
 
 	.section	__TEXT,__cstring,cstring_literals
 L_.str:
@@ -380,6 +431,8 @@ L_.str5:
 	.asciz	"] = "
 L_.str4:
 	.asciz	"v["
+L_.str8:
+	.asciz	" é "
 L_.str6:
 	.asciz	"mat["
 L_.str2:
@@ -388,3 +441,5 @@ L_.str3:
 	.asciz	"Incrementado para "
 L_.str0:
 	.asciz	"Oi, o trabalho de compiladores funciona! Digite um numero:\n"
+L_.str7:
+	.asciz	"Fatorial de "

@@ -151,7 +151,7 @@ args: args_list { $$ = $1; }
     ;
 
 args_list: expression ',' args_list { $$ = createAST(AST_ARG_LIST, 0, $1, $3, 0, 0); }
-         | expression               { $$ = $1; }
+         | expression               { $$ = createAST(AST_ARG, 0, $1, 0, 0, 0); }
          ;
 
 block: '{' cmds '}' { $$ = createAST(AST_BLOCK, 0, $2, 0, 0, 0); }

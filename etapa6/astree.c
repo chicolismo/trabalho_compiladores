@@ -149,6 +149,10 @@ void printNode(AST *node) {
         fprintf(stdout, "AST_ARG_LIST: ");
         break;
 
+    case AST_ARG:
+        fprintf(stdout, "AST_ARG: ");
+        break;
+
     case AST_ARY_INDEX:
         fprintf(stdout, "AST_ARY_INDEX: ");
         break;
@@ -203,7 +207,6 @@ void printNode(AST *node) {
     }
 }
 
-// printAST {{{
 void printAST(AST *node, int level) {
     int i;
 
@@ -221,9 +224,7 @@ void printAST(AST *node, int level) {
         }
     }
 }
-// }}}
 
-/*#define d(text) printf("%s\n", (text))*/
 #define d(text)
 
 void generateCode(FILE *out, AST *node) {
@@ -357,6 +358,12 @@ void generateCode(FILE *out, AST *node) {
         generateCode(out, node->son[0]);
         fprintf(out, ", ");
         generateCode(out, node->son[1]);
+        break;
+
+    case AST_ARG:
+        d("ast_arg");
+
+        generateCode(out, node->son[0]);
         break;
 
     case AST_VAR_DECL:

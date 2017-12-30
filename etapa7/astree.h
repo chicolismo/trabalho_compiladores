@@ -41,19 +41,20 @@
 #define AST_PARAM          29
 #define AST_FUNC_CALL      30
 #define AST_ARG_LIST       31
+#define AST_ARG            32
 
-#define AST_READ           32
-#define AST_PRINT          33
-#define AST_RETURN         34
-#define AST_IF             35
-#define AST_IF_ELSE        36
-#define AST_WHILE          37
-#define AST_BLOCK          38
+#define AST_READ           33
+#define AST_PRINT          34
+#define AST_RETURN         35
+#define AST_IF             36
+#define AST_IF_ELSE        37
+#define AST_WHILE          38
+#define AST_BLOCK          39
 
-#define AST_PRINT_ARGS     39
-#define AST_PARENS_EXPR    40
-#define AST_LIT_LIST       41
-#define AST_EMPTY_LIT_LIST 42
+#define AST_PRINT_ARGS     40
+#define AST_PARENS_EXPR    41
+#define AST_LIT_LIST       42
+#define AST_EMPTY_LIT_LIST 43
 
 typedef struct ASTreeNode {
     int type;

@@ -237,7 +237,7 @@ void compareArgsAndParams(AST *functionCall, AST *args, AST *params) {
 
     if (args->type != AST_ARG_LIST && params->type != AST_PARAM_LIST) {
         // Compara ultimos elementos das listas
-        compareArgAndParam(functionCall, args, params);
+        compareArgAndParam(functionCall, args->son[0], params);
         return;
     }
 

@@ -263,14 +263,9 @@ TAC *TAC_make_func_declaration(TAC *func_name, TAC *func_params, TAC *func_body)
 }
 
 TAC *TAC_make_func_call(TAC *func_name, TAC *args) {
-    HashNode *label_node = makeLabel();
-    
     TAC *temp_tac = TAC_create(TAC_TEMP, makeTemp(), NULL, NULL);
-    TAC *func_call = TAC_create(TAC_CALL, temp_tac->res, func_name->res, label_node);
-    TAC *label = TAC_create(TAC_LABEL, label_node, NULL, NULL);
-    
-    TAC *func_call_join = TAC_join(TAC_join(args, func_call), label);
-    return TAC_join(temp_tac, func_call_join);
+    TAC *func_call = TAC_create(TAC_CALL, temp_tac->res, func_name->res, NULL);
+    return TAC_join(TAC_join(temp_tac, args), func_call);
 }
 
 TAC *TAC_make_push_arg(TAC *arg) {
@@ -363,11 +358,10 @@ TAC *TAC_generate_code(AST *node) {
         return TAC_make_func_call(codes[0], codes[1]);
 
     case AST_ARG_LIST:
-        if (codes[1]->type != AST_ARG_LIST)
-            return TAC_join(TAC_make_push_arg(codes[1]),
-                            TAC_make_push_arg(codes[0]));
-        else
-            return TAC_join(codes[1], TAC_make_push_arg(codes[0]));
+        return TAC_join(codes[1], TAC_make_push_arg(codes[0]));
+
+    case AST_ARG:
+        return TAC_make_push_arg(codes[0]);
 
     default:
         return TAC_join(TAC_join(TAC_join(codes[0], codes[1]), codes[2]), codes[3]);

@@ -358,11 +358,10 @@ TAC *TAC_generate_code(AST *node) {
         return TAC_make_func_call(codes[0], codes[1]);
 
     case AST_ARG_LIST:
-        if (codes[1]->type != AST_ARG_LIST)
-            return TAC_join(TAC_make_push_arg(codes[1]),
-                            TAC_make_push_arg(codes[0]));
-        else
-            return TAC_join(codes[1], TAC_make_push_arg(codes[0]));
+        return TAC_join(codes[1], TAC_make_push_arg(codes[0]));
+
+    case AST_ARG:
+        return TAC_make_push_arg(codes[0]);
 
     default:
         return TAC_join(TAC_join(TAC_join(codes[0], codes[1]), codes[2]), codes[3]);
