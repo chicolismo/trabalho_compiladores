@@ -36,7 +36,7 @@ d: byte = 65;
     i = 0; a = 5;
     while (!(i == 10) && a >= 0) {
         if (i > 0) then {
-            mat[i] = sum(sum(sum(mat[i-1], 1), 10), 100)
+            mat[i] = sum(100, sum(10, sum(1, mat[i-1])))
         } else {
             mat[i] = 0
         };

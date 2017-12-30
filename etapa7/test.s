@@ -188,12 +188,6 @@ __label_6__:
 	movl	__temp_11__(%rip), %eax
 	cmpl	$0, %eax
 	je	__label_4__
-	movl	__100(%rip), %eax
-	movl	%eax, y(%rip)
-	movl	__10(%rip), %eax
-	movl	%eax, y(%rip)
-	movl	__1(%rip), %eax
-	movl	%eax, y(%rip)
 	movl	i(%rip), %eax
 	movl	__1(%rip), %ebx
 	subl	%ebx, %eax
@@ -203,14 +197,20 @@ __label_6__:
 	movl	(%rcx,%rdx,4), %eax
 	movl	%eax, __temp_13__(%rip)
 	movl	__temp_13__(%rip), %eax
+	movl	%eax, y(%rip)
+	movl	__1(%rip), %eax
 	movl	%eax, x(%rip)
 	callq	_sum
 	movl	%eax, __temp_14__(%rip)
 	movl	__temp_14__(%rip), %eax
+	movl	%eax, y(%rip)
+	movl	__10(%rip), %eax
 	movl	%eax, x(%rip)
 	callq	_sum
 	movl	%eax, __temp_15__(%rip)
 	movl	__temp_15__(%rip), %eax
+	movl	%eax, y(%rip)
+	movl	__100(%rip), %eax
 	movl	%eax, x(%rip)
 	callq	_sum
 	movl	%eax, __temp_16__(%rip)
