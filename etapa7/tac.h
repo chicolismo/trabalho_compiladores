@@ -46,6 +46,7 @@
 // Define um Nodo TAC (Three address code)
 typedef struct TAC {
     int type;
+    int callId; // Just used for function calls in asm generation
 
     HashNode *res; // Resultado
     HashNode *op1; // Operando 1
@@ -84,8 +85,8 @@ TAC *TAC_make_assign(TAC *identifier, TAC *expression);
 TAC *TAC_make_ary_assign(TAC *identifier, TAC *index, TAC *expression);
 TAC *TAC_make_ary_index(TAC *identifier, TAC *index);
 TAC *TAC_make_func_declaration(TAC *func_name, TAC *func_params, TAC *func_body);
-TAC *TAC_make_func_call(TAC *func_name, TAC *args);
-TAC *TAC_make_push_arg(TAC *arg);
+TAC *TAC_make_func_call(TAC *func_name, TAC *args, int callId);
+TAC *TAC_make_push_arg(TAC *arg, TAC *func_name, int callId);
 TAC *TAC_generate_code(AST *node);
 
 #endif // __TAC_H__

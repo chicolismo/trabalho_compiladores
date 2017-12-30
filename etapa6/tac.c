@@ -7,6 +7,7 @@
 TAC *TAC_create(int type, HashNode *res, HashNode *op1, HashNode *op2) {
     TAC *tac = malloc(sizeof(TAC));
     tac->type = type;
+    tac->callId = 0;
     tac->res = res;
     tac->op1 = op1;
     tac->op2 = op2;
@@ -262,14 +263,16 @@ TAC *TAC_make_func_declaration(TAC *func_name, TAC *func_params, TAC *func_body)
     return TAC_join(TAC_join(TAC_join(begin_func_tac, func_params), func_body), end_func_tac);
 }
 
-TAC *TAC_make_func_call(TAC *func_name, TAC *args) {
+TAC *TAC_make_func_call(TAC *func_name, TAC *args, int callId) {
     TAC *temp_tac = TAC_create(TAC_TEMP, makeTemp(), NULL, NULL);
     TAC *func_call = TAC_create(TAC_CALL, temp_tac->res, func_name->res, NULL);
+    func_call->callId = callId;
     return TAC_join(TAC_join(temp_tac, args), func_call);
 }
 
-TAC *TAC_make_push_arg(TAC *arg) {
-    TAC *push_arg = TAC_create(TAC_PUSH_ARG, arg->res, NULL, NULL);
+TAC *TAC_make_push_arg(TAC *arg, TAC *func_name, int callId) {
+    TAC *push_arg = TAC_create(TAC_PUSH_ARG, arg->res, func_name->res, NULL);
+    push_arg->callId = callId;
     return TAC_join(arg, push_arg);
 }
 
@@ -355,13 +358,13 @@ TAC *TAC_generate_code(AST *node) {
         return codes[0];
 
     case AST_FUNC_CALL:
-        return TAC_make_func_call(codes[0], codes[1]);
+        return TAC_make_func_call(codes[0], codes[1], node->callId);
 
     case AST_ARG_LIST:
-        return TAC_join(codes[1], TAC_make_push_arg(codes[0]));
+        return TAC_join(codes[1], TAC_make_push_arg(codes[0], codes[2], node->callId));
 
     case AST_ARG:
-        return TAC_make_push_arg(codes[0]);
+        return TAC_make_push_arg(codes[0], codes[2], node->callId);
 
     default:
         return TAC_join(TAC_join(TAC_join(codes[0], codes[1]), codes[2]), codes[3]);

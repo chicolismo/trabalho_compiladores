@@ -14,6 +14,7 @@ int yyerror(char *text);
 extern int getLineNumber();
 
 FILE *output_file = NULL;
+static int call_count = 0;
 
 %}
 
@@ -209,7 +210,14 @@ any_expression: literal_string { $$ = $1; }
 expression: literal                            { $$ = $1; }
           | identifier                         { $$ = $1; }
           | identifier '[' expression ']'      { $$ = createAST(AST_ARY_INDEX, 0, $1, $3, 0, 0); }
-          | identifier '(' args ')'            { $$ = createAST(AST_FUNC_CALL, 0, $1, $3, 0, 0); }
+          | identifier '(' args ')'            { $$ = createAST(AST_FUNC_CALL, 0, $1, $3, 0, 0);
+                                                 $$->callId = ++call_count;
+                                                 AST *arg = $3;
+                                                 while (arg && (arg->type == AST_ARG || arg->type == AST_ARG_LIST)) {
+                                                     arg->son[2] = $1;
+                                                     arg->callId = $$->callId;
+                                                     arg = arg->son[1];
+                                                 }}
           | '(' expression ')'                 { $$ = createAST(AST_PARENS_EXPR, 0, $2, 0, 0, 0); }
           | expression '+' expression          { $$ = createAST(AST_ADD, 0, $1, $3, 0, 0); }
           | expression '-' expression          { $$ = createAST(AST_SUB, 0, $1, $3, 0, 0); }

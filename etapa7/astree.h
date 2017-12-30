@@ -60,6 +60,7 @@ typedef struct ASTreeNode {
     int type;
     HashNode *symbol;
     int lineNumber;
+    int callId; // Just used for function calls in asm generation
     struct ASTreeNode *son[MAX_SONS];
 } AST;
 

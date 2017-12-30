@@ -246,8 +246,14 @@ void generate_push_arg(TAC *tac) {
     int param_index = 0;
     
     // Find function call and param index
-    while (next_tac && next_tac->type != TAC_CALL) {
-        if (next_tac->type == TAC_PUSH_ARG) {
+    while (next_tac) {
+        if (next_tac->type == TAC_CALL &&
+            !strcmp(tac->op1->string, next_tac->op1->string) &&
+            tac->callId == next_tac->callId) {
+            break;
+        } else if (next_tac->type == TAC_PUSH_ARG &&
+                   !strcmp(tac->op1->string, next_tac->op1->string) &&
+                   tac->callId == next_tac->callId) {
             param_index++;
         }
         next_tac = next_tac->next;
