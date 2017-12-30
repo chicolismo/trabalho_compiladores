@@ -259,14 +259,9 @@ TAC *TAC_make_func_declaration(TAC *func_name, TAC *func_params, TAC *func_body)
 }
 
 TAC *TAC_make_func_call(TAC *func_name, TAC *args) {
-    HashNode *label_node = makeLabel();
-    
     TAC *temp_tac = TAC_create(TAC_TEMP, makeTemp(), NULL, NULL);
-    TAC *func_call = TAC_create(TAC_CALL, temp_tac->res, func_name->res, label_node);
-    TAC *label = TAC_create(TAC_LABEL, label_node, NULL, NULL);
-    
-    TAC *func_call_join = TAC_join(TAC_join(args, func_call), label);
-    return TAC_join(temp_tac, func_call_join);
+    TAC *func_call = TAC_create(TAC_CALL, temp_tac->res, func_name->res, NULL);
+    return TAC_join(TAC_join(temp_tac, args), func_call);
 }
 
 TAC *TAC_make_push_arg(TAC *arg) {

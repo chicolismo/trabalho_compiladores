@@ -104,7 +104,7 @@ __label_0__:
 __label_1__:
 	movl	__0(%rip), %eax
 	movl	%eax, i(%rip)
-__label_3__:
+__label_2__:
 	movl	i(%rip), %ecx
 	cmpl	__9(%rip), %ecx
 	setle	%dl
@@ -113,7 +113,7 @@ __label_3__:
 	movl	%ecx, __temp_4__(%rip)
 	movl	__temp_4__(%rip), %eax
 	cmpl	$0, %eax
-	je	__label_4__
+	je	__label_3__
 	leaq	L_.str4(%rip), %rdi
 	movl	L_.str4(%rip), %esi
 	movb	$0, %al
@@ -144,16 +144,15 @@ __label_3__:
 	movl	%eax, x(%rip)
 	callq	_sum
 	movl	%eax, __temp_6__(%rip)
-__label_2__:
 	movl	__temp_6__(%rip), %eax
 	movl	%eax, i(%rip)
-	jmp	__label_3__
-__label_4__:
+	jmp	__label_2__
+__label_3__:
 	movl	__0(%rip), %eax
 	movl	%eax, i(%rip)
 	movl	__5(%rip), %eax
 	movl	%eax, a(%rip)
-__label_10__:
+__label_6__:
 	movl	i(%rip), %ecx
 	cmpl	__10(%rip), %ecx
 	sete	%dl
@@ -179,7 +178,7 @@ __label_10__:
 	movl	%eax, __temp_10__(%rip)
 	movl	__temp_10__(%rip), %eax
 	cmpl	$0, %eax
-	je	__label_11__
+	je	__label_7__
 	movl	i(%rip), %ecx
 	cmpl	__0(%rip), %ecx
 	setg	%dl
@@ -188,7 +187,7 @@ __label_10__:
 	movl	%ecx, __temp_11__(%rip)
 	movl	__temp_11__(%rip), %eax
 	cmpl	$0, %eax
-	je	__label_6__
+	je	__label_4__
 	movl	__3(%rip), %eax
 	movl	%eax, y(%rip)
 	movl	i(%rip), %eax
@@ -203,18 +202,17 @@ __label_10__:
 	movl	%eax, x(%rip)
 	callq	_sum
 	movl	%eax, __temp_14__(%rip)
-__label_5__:
 	movq	mat@GOTPCREL(%rip), %rcx
 	movl	__temp_14__(%rip), %eax
 	movslq	i(%rip), %rdx
 	movl	%eax, (%rcx,%rdx,4)
-	jmp	__label_7__
-__label_6__:
+	jmp	__label_5__
+__label_4__:
 	movq	mat@GOTPCREL(%rip), %rcx
 	movl	__0(%rip), %eax
 	movslq	i(%rip), %rdx
 	movl	%eax, (%rcx,%rdx,4)
-__label_7__:
+__label_5__:
 	leaq	L_.str6(%rip), %rdi
 	movl	L_.str6(%rip), %esi
 	movb	$0, %al
@@ -245,7 +243,6 @@ __label_7__:
 	movl	%eax, x(%rip)
 	callq	_sum
 	movl	%eax, __temp_16__(%rip)
-__label_8__:
 	movl	__temp_16__(%rip), %eax
 	movl	%eax, i(%rip)
 	movl	__1(%rip), %eax
@@ -254,11 +251,10 @@ __label_8__:
 	movl	%eax, w(%rip)
 	callq	_sub
 	movl	%eax, __temp_17__(%rip)
-__label_9__:
 	movl	__temp_17__(%rip), %eax
 	movl	%eax, a(%rip)
-	jmp	__label_10__
-__label_11__:
+	jmp	__label_6__
+__label_7__:
 	movl	$0, %eax
 	popq	%rbp
 	retq
