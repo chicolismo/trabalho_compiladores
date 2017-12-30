@@ -128,5 +128,5 @@ HashNode *makeLabel() {
 HashNode *makeTemp() {
     char temp_name[TEMP_SIZE];
     sprintf(temp_name, "__temp_%d__", temp_counter++);
-    return setHashNode(temp_name, SYMBOL_IDENTIFIER_SCALAR);
+    return setHashNode(temp_name, SYMBOL_TEMP);
 }
