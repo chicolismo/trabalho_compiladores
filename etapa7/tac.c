@@ -258,7 +258,13 @@ TAC *TAC_make_ary_assign(TAC *identifier, TAC *index, TAC *expression) {
 }
 
 TAC *TAC_make_ary_index(TAC *identifier, TAC *index) {
-    TAC *temp_tac = TAC_create(TAC_TEMP, makeTemp(), NULL, NULL);
+    TAC *temp_tac;
+    if (index->type == TAC_TEMP) {
+        temp_tac = TAC_create(TAC_TEMP, index->res, NULL, NULL);
+    } else {
+        temp_tac = TAC_create(TAC_TEMP, makeTemp(), NULL, NULL);
+    }
+    
     TAC *ary_index_tac = TAC_create(TAC_ARRAY_INDEX, temp_tac->res,
                                     identifier->res, index->res);
     return TAC_join(TAC_join(TAC_join(temp_tac, identifier), index), ary_index_tac);
