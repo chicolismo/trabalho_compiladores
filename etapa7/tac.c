@@ -164,7 +164,15 @@ TAC *TAC_make_binary_operator(AST *node, TAC *op1, TAC *op2) {
         exit(1);
     }
     
-    TAC *temp_tac = TAC_create(TAC_TEMP, makeTemp(), NULL, NULL);
+    TAC *temp_tac;
+    if (op1->type == TAC_TEMP) {
+        temp_tac = TAC_create(TAC_TEMP, op1->res, NULL, NULL);
+    } else if (op2->type == TAC_TEMP) {
+        temp_tac = TAC_create(TAC_TEMP, op2->res, NULL, NULL);
+    } else {
+        temp_tac = TAC_create(TAC_TEMP, makeTemp(), NULL, NULL);
+    }
+    
     TAC *tac = TAC_create(type, temp_tac->res,
                           op1? op1->res : NULL,
                           op2? op2->res : NULL);
